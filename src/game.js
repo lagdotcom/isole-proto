@@ -5,7 +5,7 @@ const kJump = 'ArrowUp';
 const gGroundWalk = 9;
 const gGroundFriction = 0.8;
 const gAirWalk = 0.004;
-const gJumpStrength = 3;
+const gJumpStrength = 6;
 const gGravityStrength = 0.2;
 const gWalkScale = 10;
 const gMaxVA = 0.3;
@@ -28,16 +28,33 @@ function angledist(a, b) {
 	return Math.abs(d);
 }
 
-function Floor(game, height, angle, width) {
+function alla() {
+	var a = [];
+	for (var i = 0; i < arguments.length; i++) a = a.concat(arguments[i]);
+
+	return a;
+}
+
+function jbr() {
+	var s = '';
+	for (var i = 0; i < arguments.length; i++) {
+		if (i) s += '<br>';
+		s += arguments[i];
+	}
+
+	return s;
+}
+
+function Flat(game, height, angle, width) {
 	this.game = game;
 	this.r = height;
 	this.a = (pi2 * angle) / 360;
 	this.width = (pi2 * width) / 360 / 2;
 }
 
-Floor.prototype.update = function() {};
+Flat.prototype.update = function() {};
 
-Floor.prototype.draw = function(c) {
+Flat.prototype.draw = function(c) {
 	const { r, a, width } = this;
 	const { cx, cy } = this.game;
 
@@ -50,8 +67,8 @@ Floor.prototype.draw = function(c) {
 function Player(game, spriteId) {
 	this.game = game;
 
-	this.w = 10;
-	this.h = 20;
+	this.w = 56;
+	this.h = 30;
 	this.a = 0;
 	this.r = 100;
 	this.va = 0;
@@ -78,26 +95,45 @@ function Player(game, spriteId) {
 }
 
 Player.prototype.update = function(t) {
-	var { a, r, va, vr, game } = this;
-	const { floors, keys } = game;
-	var floordata = '';
+	var { a, h, r, va, vr, game } = this;
+	const { ceilings, floors, keys } = game;
+	var debug = '',
+		flags = [];
 
-	var hit = null;
-	floors.forEach((f, i) => {
-		var da = angledist(a, f.a),
-			dd = Math.abs(r - f.r);
+	var floor = null;
+	if (vr <= 0) {
+		floors.forEach((f, i) => {
+			var da = angledist(a, f.a),
+				dd = Math.abs(r - f.r);
 
-		floordata += `floor${i}: da=${da.toFixed(2)} dd=${dd.toFixed(2)}<br>`;
+			debug += `fl${i}: da=${da.toFixed(2)} dd=${dd.toFixed(2)}<br>`;
 
-		if (dd < 5 && da < f.width) hit = f;
-	});
+			if (dd < 5 && da < f.width) floor = f;
+		});
+	}
+
+	var ceiling = null;
+	if (vr > 0) {
+		ceilings.forEach((f, i) => {
+			var da = angledist(a, f.a),
+				dd = Math.abs(r + h - f.r);
+
+			debug += `ce${i}: da=${da.toFixed(2)} dd=${dd.toFixed(2)}<br>`;
+
+			if (dd < 5 && da < f.width) ceiling = f;
+		});
+		if (ceiling) {
+			flags.push('ceiling');
+			vr = 0;
+		}
+	}
 
 	this.jumpt -= t;
 
-	if (hit && this.jumpt <= 0) {
+	if (floor && this.jumpt <= 0) {
 		this.grounded = true;
 
-		r = hit.r;
+		r = floor.r;
 		vr = 0;
 		va *= gGroundFriction;
 	} else {
@@ -119,7 +155,7 @@ Player.prototype.update = function(t) {
 		this.sprite.xs = 1;
 	}
 
-	if (keys[kJump] && hit) {
+	if (keys[kJump] && floor) {
 		vr += gJumpStrength;
 		this.jumpt = 150;
 		controls.push('jump');
@@ -154,11 +190,16 @@ Player.prototype.update = function(t) {
 		}
 	}
 
-	this.del.innerHTML = `controls: ${controls.join(' ')}<br>flag: ${
-		this.jumpt > 0 ? 'jump' : ''
-	} ${this.grounded ? 'ground' : ''}<br>vel: ${vr.toFixed(2)},${va.toFixed(
-		2
-	)}<br>pos: ${r.toFixed(2)},${a.toFixed(2)}<hr>${floordata}`;
+	if (this.jumpt > 0) flags.push('jump');
+	if (this.grounded) flags.push('grounded');
+
+	this.del.innerHTML = jbr(
+		`controls: ${controls.join(' ')}`,
+		`flag: ${flags.join(' ')}`,
+		`vel: ${vr.toFixed(2)},${va.toFixed(2)}`,
+		`pos: ${r.toFixed(2)},${a.toFixed(2)}`,
+		debug
+	);
 };
 
 Player.prototype.draw = function(c) {
@@ -207,13 +248,17 @@ function Game(options) {
 	this.context.scale(scale, scale);
 
 	this.floors = [];
-	this.floors.push(new Floor(this, 80, 270, 90));
-	this.floors.push(new Floor(this, 100, 90, 135));
-	this.floors.push(new Floor(this, 15, 0, 360));
+	this.floors.push(new Flat(this, 80, 270, 90));
+	this.floors.push(new Flat(this, 100, 90, 135));
+	this.floors.push(new Flat(this, 15, 0, 360));
+
+	this.ceilings = [];
+	this.ceilings.push(new Flat(this, 75, 270, 90));
+	this.ceilings.push(new Flat(this, 95, 90, 135));
 
 	this.player = new Player(this, 'pspr');
 
-	this.components = this.floors.concat([this.player]);
+	this.components = alla(this.floors, this.ceilings, [this.player]);
 
 	this.time = 0;
 	this.next = this.next.bind(this);
