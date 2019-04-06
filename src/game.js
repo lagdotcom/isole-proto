@@ -35,7 +35,9 @@ function Floor(game, height, angle, width) {
 	this.width = (pi2 * width) / 360 / 2;
 }
 
-Floor.prototype.update = function() {
+Floor.prototype.update = function() {};
+
+Floor.prototype.draw = function(c) {
 	const { r, a, width } = this;
 	const { cx, cy } = this.game;
 
@@ -44,8 +46,6 @@ Floor.prototype.update = function() {
 	c.arc(cx, cy, r, a - width, a + width);
 	c.stroke();
 };
-
-Floor.prototype.draw = function(c) {};
 
 function Player(game, spriteId) {
 	this.game = game;
@@ -78,7 +78,7 @@ function Player(game, spriteId) {
 }
 
 Player.prototype.update = function(t) {
-	var { a, r, va, vr, jumpt, game, floor } = this;
+	var { a, r, va, vr, game } = this;
 	const { floors, keys } = game;
 	var floordata = '';
 
@@ -162,7 +162,7 @@ Player.prototype.update = function(t) {
 };
 
 Player.prototype.draw = function(c) {
-	const { a, r, va, vr, w, h, game, sprite } = this;
+	const { a, r, game, sprite } = this;
 	const { cx, cy } = game;
 	const normal = a + piHalf;
 
@@ -203,6 +203,7 @@ function Game(options) {
 
 	this.canvas = this.makeCanvas();
 	this.context = this.canvas.getContext('2d');
+	this.context.imageSmoothingEnabled = false;
 	this.context.scale(scale, scale);
 
 	this.floors = [];
@@ -237,7 +238,7 @@ Game.prototype.start = function() {
 Game.prototype.next = function(t) {
 	const { width, height, showFps } = this.options;
 	const step = t - this.time;
-	c = this.context;
+	var c = this.context;
 
 	c.fillStyle = '#000000';
 	c.fillRect(0, 0, width, height);
