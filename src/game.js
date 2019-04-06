@@ -60,11 +60,11 @@ function Player(game, spriteId) {
 
 	this.sprite = {
 		img: document.getElementById(spriteId),
-		w: 60,
+		w: 56,
 		h: 48,
-		c: 0,
+		c: Math.floor(Math.random() * 2),
 		r: 0,
-		xo: -30,
+		xo: -28,
 		yo: -39,
 		xs: -1,
 		ys: 1,
