@@ -1,0 +1,15 @@
+{
+	"name": "isole-proto",
+	"version": "0.1.0",
+	"description": "",
+	"main": "index.html",
+	"scripts": {
+		"start": "dev-server",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Lag.Com <lagdotcom@gmail.com>",
+	"license": "ISC",
+	"dependencies": {
+		"dev-server": "^0.1.0"
+	}
+}
