@@ -14,6 +14,7 @@ const gTimeScale = 10,
 	gMaxVA = 0.3,
 	gStandThreshold = 0.005,
 	gWallGap = 5,
+	gWallBounce = -0.01,
 	pi = Math.PI,
 	pi2 = pi * 2,
 	piHalf = pi / 2;
@@ -124,6 +125,7 @@ function Player(game, spriteId) {
 	this.va = 0;
 	this.vr = 0;
 	this.jumpt = 0;
+	this.tscale = 0;
 
 	this.sprite = {
 		img: document.getElementById(spriteId),
@@ -147,8 +149,9 @@ function Player(game, spriteId) {
 Player.prototype.update = function(time) {
 	var { a, r, va, vr, game } = this;
 	const { walls, ceilings, floors, keys } = game,
-		tscale = time / gTimeScale,
-		{ b, t } = this.getHitbox(tscale);
+		tscale = time / gTimeScale;
+	this.tscale = tscale;
+	const { b, t } = this.getHitbox();
 	var debug = '',
 		flags = [];
 
@@ -168,12 +171,11 @@ Player.prototype.update = function(time) {
 	if (vr <= 0) {
 		flags.push('down');
 		floors.forEach((f, i) => {
-			var da = angledist(a, f.a),
-				dd = Math.abs(b.r - f.r);
+			var da = angledist(a, f.a);
 
-			debug += `f${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
+			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}°<br>`;
 
-			if (dd < 5 && da < f.width + b.aw) floor = f;
+			if (b.r <= f.r && t.r >= f.r && da < f.width + b.aw) floor = f;
 		});
 	}
 
@@ -181,12 +183,11 @@ Player.prototype.update = function(time) {
 	if (vr > 0) {
 		flags.push('up');
 		ceilings.forEach((f, i) => {
-			var da = angledist(a, f.a),
-				dd = Math.abs(t.r - f.r);
+			var da = angledist(a, f.a);
 
-			debug += `c${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
+			debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}°<br>`;
 
-			if (dd < 5 && da < f.width + t.aw) ceiling = f;
+			if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) ceiling = f;
 		});
 		if (ceiling) {
 			flags.push('ceiling');
@@ -229,7 +230,7 @@ Player.prototype.update = function(time) {
 
 	if (wall && !ceiling) {
 		flags.push('wall');
-		va = 0;
+		va = wall.direction * gWallBounce;
 		if (wall.direction == 1) a = wall.a - b.aw;
 		else a = wall.a + b.aw;
 	} else if (va > gMaxVA) va = gMaxVA;
@@ -269,7 +270,7 @@ Player.prototype.update = function(time) {
 		`flags: ${flags.join(' ')}`,
 		`vel: ${vr.toFixed(2)},${va.toFixed(2)}°`,
 		`pos: ${r.toFixed(2)},${a.toFixed(2)}°`,
-		`hb: baw=${b.aw.toFixed(2)},taw=${t.aw.toFixed(2)}`,
+		`hb: baw=${b.aw.toFixed(2)}`,
 		debug
 	);
 };
@@ -319,24 +320,29 @@ Player.prototype.drawHitbox = function(c) {
 	c.stroke();
 };
 
-Player.prototype.getHitbox = function(tscale) {
-	const { r, a, va, w, h } = this;
+Player.prototype.getHitbox = function() {
+	const { r, a, va, vr, w, h, tscale } = this;
 	const baw = scalew(w, r),
 		taw = scalew(w, r + h);
-	var amod;
+	var amod,
+		vbr = 0,
+		vtr = 0;
 
 	if (tscale) amod = a + (va / r) * tscale * gWalkScale;
 	else amod = a;
 
+	if (vr > 0) vtr = vr;
+	else if (vr < 0) vbr = vr;
+
 	return {
 		b: {
-			r,
+			r: r + vbr,
 			aw: baw,
 			al: amod - baw,
 			ar: amod + baw,
 		},
 		t: {
-			r: r + h,
+			r: r + h + vtr,
 			aw: taw,
 			al: amod - taw,
 			ar: amod + taw,
