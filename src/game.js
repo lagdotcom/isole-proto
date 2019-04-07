@@ -61,16 +61,25 @@ function scalew(w, r) {
 	return (w / r) * gHitboxScale;
 }
 
-function Flat(game, height, angle, width) {
+function deg2rad(a) {
+	return (pi2 * a) / 360;
+}
+
+function Flat(game, height, angle, width, motion) {
 	Object.assign(this, {
 		game,
 		r: height,
-		a: (pi2 * angle) / 360,
-		width: (pi2 * width) / 360 / 2,
+		a: deg2rad(angle),
+		width: deg2rad(width) / 2,
+		motion: deg2rad(motion || 0),
 	});
 }
 
-Flat.prototype.update = function() {};
+Flat.prototype.update = function(time) {
+	if (this.motion) {
+		this.a = anglewrap(this.a + time * this.motion);
+	}
+};
 
 Flat.prototype.draw = function(c) {
 	const { r, a, width } = this;
@@ -82,12 +91,10 @@ Flat.prototype.draw = function(c) {
 	c.stroke();
 };
 
-function Wall(game, t, b, angle, direction) {
-	const a = anglewrap((pi2 * angle) / 360),
+function Wall(game, t, b, angle, direction, motion) {
+	const a = anglewrap(deg2rad(angle)),
 		top = t - gWallGap,
-		bottom = b + gWallGap,
-		start = cart(a, top),
-		end = cart(a, bottom);
+		bottom = b + gWallGap;
 
 	Object.assign(this, {
 		game,
@@ -95,14 +102,27 @@ function Wall(game, t, b, angle, direction) {
 		bottom,
 		a,
 		direction,
-		sx: start.x,
-		sy: start.y,
-		ex: end.x,
-		ey: end.y,
+		motion: deg2rad(motion),
 	});
+
+	this.updateXY();
 }
 
-Wall.prototype.update = function() {};
+Wall.prototype.updateXY = function() {
+	const start = cart(this.a, this.top),
+		end = cart(this.a, this.bottom);
+	this.sx = start.x;
+	this.sy = start.y;
+	this.ex = end.x;
+	this.ey = end.y;
+};
+
+Wall.prototype.update = function(time) {
+	if (this.motion) {
+		this.a = anglewrap(this.a + time * this.motion);
+		this.updateXY();
+	}
+};
 
 Wall.prototype.draw = function(c) {
 	const { game, sx, sy, ex, ey } = this;
@@ -125,6 +145,8 @@ function Player(game, spriteId) {
 	this.r = 200;
 	this.va = 0;
 	this.vr = 0;
+	this.vfa = 0;
+	this.vfr = 0;
 	this.jumpt = 0;
 	this.tscale = 0;
 
@@ -148,7 +170,7 @@ function Player(game, spriteId) {
 }
 
 Player.prototype.update = function(time) {
-	var { a, r, va, vr, game } = this;
+	var { a, r, va, vr, vfa, game } = this;
 	const { walls, ceilings, floors, keys } = game,
 		tscale = time / gTimeScale;
 	this.tscale = tscale;
@@ -156,25 +178,13 @@ Player.prototype.update = function(time) {
 	var debug = '',
 		flags = [];
 
-	var wall = null;
-	if (Math.abs(va) > gStandThreshold) {
-		flags.push('sideways');
-		const vas = Math.sign(va);
-		walls.forEach(w => {
-			if (vas != w.direction) return;
-
-			if (b.al <= w.a && b.ar >= w.a && t.r >= w.bottom && b.r <= w.top)
-				wall = w;
-		});
-	}
-
 	var floor = null;
 	if (vr <= 0) {
 		flags.push('down');
 		floors.forEach((f, i) => {
 			var da = angledist(a, f.a);
 
-			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}°<br>`;
+			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}πr<br>`;
 
 			if (b.r <= f.r && s.r >= f.r && da < f.width + s.aw) floor = f;
 		});
@@ -186,7 +196,7 @@ Player.prototype.update = function(time) {
 		ceilings.forEach((f, i) => {
 			var da = angledist(a, f.a);
 
-			debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}°<br>`;
+			debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}πr<br>`;
 
 			if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) ceiling = f;
 		});
@@ -194,6 +204,18 @@ Player.prototype.update = function(time) {
 			flags.push('ceiling');
 			vr = 0;
 		}
+	}
+
+	var wall = null;
+	if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
+		flags.push('sideways');
+		const vas = Math.sign(va + vfa);
+		walls.forEach(w => {
+			if (vas != w.direction && !w.motion) return;
+
+			if (b.al <= w.a && b.ar >= w.a && t.r >= w.bottom && b.r <= w.top)
+				wall = w;
+		});
 	}
 
 	this.jumpt -= tscale;
@@ -204,11 +226,13 @@ Player.prototype.update = function(time) {
 		r = floor.r;
 		vr = 0;
 		va *= gGroundFriction;
+		vfa = floor.motion * time;
 	} else {
 		this.grounded = false;
 		this.floor = null;
 
 		vr -= gGravityStrength;
+		vfa = 0;
 	}
 
 	var controls = [];
@@ -231,15 +255,21 @@ Player.prototype.update = function(time) {
 
 	if (wall && !ceiling) {
 		flags.push('wall');
-		va = wall.direction * gWallBounce;
-		if (wall.direction == 1) a = wall.a - b.aw;
-		else a = wall.a + b.aw;
+		const bounce = wall.direction * gWallBounce;
+		if (wall.direction == 1) {
+			a = wall.a - b.aw;
+			if (va > bounce) va = bounce;
+		} else {
+			a = wall.a + b.aw;
+			if (va < -bounce) va = -bounce;
+		}
 	} else if (va > gMaxVA) va = gMaxVA;
 	else if (va < -gMaxVA) va = -gMaxVA;
 
 	this.va = va;
+	this.vfa = vfa;
 	this.vr = vr;
-	a += (va / r) * tscale * gWalkScale;
+	a += (va / r) * tscale * gWalkScale + vfa;
 	r += vr * tscale;
 
 	if (r < 0) {
@@ -269,9 +299,8 @@ Player.prototype.update = function(time) {
 	this.del.innerHTML = jbr(
 		`controls: ${controls.join(' ')}`,
 		`flags: ${flags.join(' ')}`,
-		`vel: ${vr.toFixed(2)},${va.toFixed(2)}°`,
-		`pos: ${r.toFixed(2)},${a.toFixed(2)}°`,
-		`hb: baw=${b.aw.toFixed(2)}`,
+		`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
+		`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
 		debug
 	);
 };
@@ -384,9 +413,10 @@ function Game(options) {
 	this.walls = [];
 
 	var th = 45;
-	this.addPlatform(th * 5, 225, 60, th);
-	this.addPlatform(th * 5, 45, 240, th);
-	this.addPlatform(th * 3, 135, 320, th);
+	var rs = 0.04;
+	this.addPlatform(th * 5, 225, 60, th, rs);
+	this.addPlatform(th * 5, 45, 240, th, rs);
+	this.addPlatform(th * 3, 135, 320, th, -rs);
 	this.walls.push(new Wall(this, th * 4, th * 3, 350, 1));
 	this.walls.push(new Wall(this, th * 4, th * 3, 10, -1));
 	this.floors.push(new Flat(this, th, 0, 360));
@@ -411,15 +441,16 @@ Game.prototype.makeCanvas = function() {
 	return canvas;
 };
 
-Game.prototype.addPlatform = function(h, angle, width, th) {
-	this.floors.push(new Flat(this, h, angle, width));
-	this.ceilings.push(new Flat(this, h - th, angle, width));
-	this.walls.push(new Wall(this, h, h - th, angle - width / 2, 1));
-	this.walls.push(new Wall(this, h, h - th, angle + width / 2, -1));
+Game.prototype.addPlatform = function(h, angle, width, th, motion = 0) {
+	this.floors.push(new Flat(this, h, angle, width, motion));
+	this.ceilings.push(new Flat(this, h - th, angle, width, motion));
+	this.walls.push(new Wall(this, h, h - th, angle - width / 2, 1, motion));
+	this.walls.push(new Wall(this, h, h - th, angle + width / 2, -1, motion));
 };
 
 Game.prototype.start = function() {
 	this.running = true;
+	this.wallsInMotion = true; // TODO
 
 	requestAnimationFrame(this.next);
 };
