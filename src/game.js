@@ -4,7 +4,7 @@ const kJump = 'ArrowUp';
 
 const gTimeScale = 10,
 	gHitboxScale = 0.2,
-	gGroundWalk = 9,
+	gGroundWalk = 0.09,
 	gGroundFriction = 0.8,
 	gAirWalk = 0.01,
 	gJumpStrength = 5,
@@ -120,6 +120,7 @@ function Player(game, spriteId) {
 
 	this.w = 56;
 	this.h = 30;
+	this.steph = 10;
 	this.a = piHalf * 3;
 	this.r = 200;
 	this.va = 0;
@@ -151,7 +152,7 @@ Player.prototype.update = function(time) {
 	const { walls, ceilings, floors, keys } = game,
 		tscale = time / gTimeScale;
 	this.tscale = tscale;
-	const { b, t } = this.getHitbox();
+	const { b, t, s } = this.getHitbox();
 	var debug = '',
 		flags = [];
 
@@ -175,7 +176,7 @@ Player.prototype.update = function(time) {
 
 			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}°<br>`;
 
-			if (b.r <= f.r && t.r >= f.r && da < f.width + b.aw) floor = f;
+			if (b.r <= f.r && s.r >= f.r && da < f.width + s.aw) floor = f;
 		});
 	}
 
@@ -310,7 +311,7 @@ Player.prototype.draw = function(c) {
 Player.prototype.drawHitbox = function(c) {
 	const { game } = this;
 	const { cx, cy } = game;
-	const { b, t } = this.getHitbox();
+	const { b, t, s } = this.getHitbox();
 
 	c.strokeStyle = '#ffff00';
 	c.beginPath();
@@ -318,12 +319,20 @@ Player.prototype.drawHitbox = function(c) {
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
+
+	c.strokeStyle = '#ff0000';
+	c.beginPath();
+	c.arc(cx, cy, b.r, b.al, b.ar);
+	c.arc(cx, cy, s.r, s.ar, s.al, true);
+	c.arc(cx, cy, b.r, b.al, b.ar);
+	c.stroke();
 };
 
 Player.prototype.getHitbox = function() {
-	const { r, a, va, vr, w, h, tscale } = this;
+	const { r, a, va, vr, w, h, steph, tscale } = this;
 	const baw = scalew(w, r),
-		taw = scalew(w, r + h);
+		taw = scalew(w, r + h),
+		saw = scalew(w, r + steph);
 	var amod,
 		vbr = 0,
 		vtr = 0;
@@ -346,6 +355,12 @@ Player.prototype.getHitbox = function() {
 			aw: taw,
 			al: amod - taw,
 			ar: amod + taw,
+		},
+		s: {
+			r: r + steph + vtr,
+			aw: saw,
+			al: amod - saw,
+			ar: amod + saw,
 		},
 	};
 };
@@ -451,9 +466,9 @@ window.addEventListener('load', () => {
 });
 
 window.addEventListener('keydown', e => {
-	G.press(e.code);
+	if (G) G.press(e.code);
 });
 
 window.addEventListener('keyup', e => {
-	G.release(e.code);
+	if (G) G.release(e.code);
 });
