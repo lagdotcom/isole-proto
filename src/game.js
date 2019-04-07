@@ -173,7 +173,7 @@ Player.prototype.update = function(time) {
 
 			debug += `f${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
 
-			if (dd < 5 && da < f.width) floor = f;
+			if (dd < 5 && da < f.width + b.aw) floor = f;
 		});
 	}
 
@@ -186,7 +186,7 @@ Player.prototype.update = function(time) {
 
 			debug += `c${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
 
-			if (dd < 5 && da < f.width) ceiling = f;
+			if (dd < 5 && da < f.width + t.aw) ceiling = f;
 		});
 		if (ceiling) {
 			flags.push('ceiling');
