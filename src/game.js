@@ -2,19 +2,21 @@ const kLeft = 'ArrowLeft';
 const kRight = 'ArrowRight';
 const kJump = 'ArrowUp';
 
-const gTimeScale = 10;
-const gGroundWalk = 9;
-const gGroundFriction = 0.8;
-const gAirWalk = 0.01;
-const gJumpStrength = 5;
-const gJumpTimer = 8;
-const gGravityStrength = 0.2;
-const gWalkScale = 10;
-const gMaxVA = 0.3;
-const gStandThreshold = 0.005;
-const pi = Math.PI;
-const pi2 = pi * 2;
-const piHalf = pi / 2;
+const gTimeScale = 10,
+	gHitboxScale = 0.2,
+	gGroundWalk = 9,
+	gGroundFriction = 0.8,
+	gAirWalk = 0.01,
+	gJumpStrength = 5,
+	gJumpTimer = 8,
+	gGravityStrength = 0.2,
+	gWalkScale = 10,
+	gMaxVA = 0.3,
+	gStandThreshold = 0.005,
+	gWallGap = 5,
+	pi = Math.PI,
+	pi2 = pi * 2,
+	piHalf = pi / 2;
 var G;
 
 function anglewrap(a) {
@@ -55,7 +57,7 @@ function cart(a, r) {
 }
 
 function scalew(w, r) {
-	return (w / r) * 0.2;
+	return (w / r) * gHitboxScale;
 }
 
 function Flat(game, height, angle, width) {
@@ -79,10 +81,12 @@ Flat.prototype.draw = function(c) {
 	c.stroke();
 };
 
-function Wall(game, top, bottom, angle, direction) {
-	const a = (pi2 * angle) / 360;
-	const start = cart(a, top);
-	const end = cart(a, bottom);
+function Wall(game, t, b, angle, direction) {
+	const a = anglewrap((pi2 * angle) / 360),
+		top = t - gWallGap,
+		bottom = b + gWallGap,
+		start = cart(a, top),
+		end = cart(a, bottom);
 
 	Object.assign(this, {
 		game,
@@ -141,19 +145,33 @@ function Player(game, spriteId) {
 }
 
 Player.prototype.update = function(time) {
-	var { a, h, r, va, vr, game } = this;
-	const { ceilings, floors, keys } = game,
-		tscale = time / gTimeScale;
+	var { a, r, va, vr, game } = this;
+	const { walls, ceilings, floors, keys } = game,
+		tscale = time / gTimeScale,
+		{ b, t } = this.getHitbox(tscale);
 	var debug = '',
 		flags = [];
 
+	var wall = null;
+	if (Math.abs(va) > gStandThreshold) {
+		flags.push('sideways');
+		const vas = Math.sign(va);
+		walls.forEach(w => {
+			if (vas != w.direction) return;
+
+			if (b.al <= w.a && b.ar >= w.a && t.r >= w.bottom && b.r <= w.top)
+				wall = w;
+		});
+	}
+
 	var floor = null;
 	if (vr <= 0) {
+		flags.push('down');
 		floors.forEach((f, i) => {
 			var da = angledist(a, f.a),
-				dd = Math.abs(r - f.r);
+				dd = Math.abs(b.r - f.r);
 
-			debug += `fl${i}: da=${da.toFixed(2)} dd=${dd.toFixed(2)}<br>`;
+			debug += `f${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
 
 			if (dd < 5 && da < f.width) floor = f;
 		});
@@ -161,11 +179,12 @@ Player.prototype.update = function(time) {
 
 	var ceiling = null;
 	if (vr > 0) {
+		flags.push('up');
 		ceilings.forEach((f, i) => {
 			var da = angledist(a, f.a),
-				dd = Math.abs(r + h - f.r);
+				dd = Math.abs(t.r - f.r);
 
-			debug += `ce${i}: da=${da.toFixed(2)} dd=${dd.toFixed(2)}<br>`;
+			debug += `c${i}: da=${da.toFixed(2)}° dd=${dd.toFixed(2)}<br>`;
 
 			if (dd < 5 && da < f.width) ceiling = f;
 		});
@@ -208,7 +227,12 @@ Player.prototype.update = function(time) {
 		controls.push('jump');
 	}
 
-	if (va > gMaxVA) va = gMaxVA;
+	if (wall && !ceiling) {
+		flags.push('wall');
+		va = 0;
+		if (wall.direction == 1) a = wall.a - b.aw;
+		else a = wall.a + b.aw;
+	} else if (va > gMaxVA) va = gMaxVA;
 	else if (va < -gMaxVA) va = -gMaxVA;
 
 	this.va = va;
@@ -242,9 +266,10 @@ Player.prototype.update = function(time) {
 
 	this.del.innerHTML = jbr(
 		`controls: ${controls.join(' ')}`,
-		`flag: ${flags.join(' ')}`,
-		`vel: ${vr.toFixed(2)},${va.toFixed(2)}`,
-		`pos: ${r.toFixed(2)},${a.toFixed(2)}`,
+		`flags: ${flags.join(' ')}`,
+		`vel: ${vr.toFixed(2)},${va.toFixed(2)}°`,
+		`pos: ${r.toFixed(2)},${a.toFixed(2)}°`,
+		`hb: baw=${b.aw.toFixed(2)},taw=${t.aw.toFixed(2)}`,
 		debug
 	);
 };
@@ -294,21 +319,27 @@ Player.prototype.drawHitbox = function(c) {
 	c.stroke();
 };
 
-Player.prototype.getHitbox = function() {
-	const { r, a, w, h } = this;
+Player.prototype.getHitbox = function(tscale) {
+	const { r, a, va, w, h } = this;
 	const baw = scalew(w, r),
 		taw = scalew(w, r + h);
+	var amod;
+
+	if (tscale) amod = a + (va / r) * tscale * gWalkScale;
+	else amod = a;
 
 	return {
 		b: {
 			r,
-			al: a - baw,
-			ar: a + baw,
+			aw: baw,
+			al: amod - baw,
+			ar: amod + baw,
 		},
 		t: {
 			r: r + h,
-			al: a - taw,
-			ar: a + taw,
+			aw: taw,
+			al: amod - taw,
+			ar: amod + taw,
 		},
 	};
 };
