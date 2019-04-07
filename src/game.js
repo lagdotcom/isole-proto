@@ -2,10 +2,12 @@ const kLeft = 'ArrowLeft';
 const kRight = 'ArrowRight';
 const kJump = 'ArrowUp';
 
+const gTimeScale = 10;
 const gGroundWalk = 9;
 const gGroundFriction = 0.8;
-const gAirWalk = 0.004;
-const gJumpStrength = 6;
+const gAirWalk = 0.01;
+const gJumpStrength = 5;
+const gJumpTimer = 8;
 const gGravityStrength = 0.2;
 const gWalkScale = 10;
 const gMaxVA = 0.3;
@@ -45,11 +47,24 @@ function jbr() {
 	return s;
 }
 
+function cart(a, r) {
+	return {
+		x: Math.cos(a) * r,
+		y: Math.sin(a) * r,
+	};
+}
+
+function scalew(w, r) {
+	return (w / r) * 0.2;
+}
+
 function Flat(game, height, angle, width) {
-	this.game = game;
-	this.r = height;
-	this.a = (pi2 * angle) / 360;
-	this.width = (pi2 * width) / 360 / 2;
+	Object.assign(this, {
+		game,
+		r: height,
+		a: (pi2 * angle) / 360,
+		width: (pi2 * width) / 360 / 2,
+	});
 }
 
 Flat.prototype.update = function() {};
@@ -64,13 +79,44 @@ Flat.prototype.draw = function(c) {
 	c.stroke();
 };
 
+function Wall(game, top, bottom, angle, direction) {
+	const a = (pi2 * angle) / 360;
+	const start = cart(a, top);
+	const end = cart(a, bottom);
+
+	Object.assign(this, {
+		game,
+		top,
+		bottom,
+		a,
+		direction,
+		sx: start.x,
+		sy: start.y,
+		ex: end.x,
+		ey: end.y,
+	});
+}
+
+Wall.prototype.update = function() {};
+
+Wall.prototype.draw = function(c) {
+	const { game, sx, sy, ex, ey } = this;
+	const { cx, cy } = game;
+
+	c.strokeStyle = '#888888';
+	c.beginPath();
+	c.moveTo(sx + cx, sy + cy);
+	c.lineTo(ex + cx, ey + cy);
+	c.stroke();
+};
+
 function Player(game, spriteId) {
 	this.game = game;
 
 	this.w = 56;
 	this.h = 30;
-	this.a = 0;
-	this.r = 100;
+	this.a = piHalf * 3;
+	this.r = 200;
 	this.va = 0;
 	this.vr = 0;
 	this.jumpt = 0;
@@ -86,7 +132,7 @@ function Player(game, spriteId) {
 		xs: -1,
 		ys: 1,
 		m: 0,
-		n: 80,
+		n: 8,
 		rx: 8,
 	};
 
@@ -94,9 +140,10 @@ function Player(game, spriteId) {
 	document.body.appendChild(this.del);
 }
 
-Player.prototype.update = function(t) {
+Player.prototype.update = function(time) {
 	var { a, h, r, va, vr, game } = this;
-	const { ceilings, floors, keys } = game;
+	const { ceilings, floors, keys } = game,
+		tscale = time / gTimeScale;
 	var debug = '',
 		flags = [];
 
@@ -128,7 +175,7 @@ Player.prototype.update = function(t) {
 		}
 	}
 
-	this.jumpt -= t;
+	this.jumpt -= tscale;
 
 	if (floor && this.jumpt <= 0) {
 		this.grounded = true;
@@ -157,7 +204,7 @@ Player.prototype.update = function(t) {
 
 	if (keys[kJump] && floor) {
 		vr += gJumpStrength;
-		this.jumpt = 150;
+		this.jumpt = gJumpTimer;
 		controls.push('jump');
 	}
 
@@ -166,8 +213,8 @@ Player.prototype.update = function(t) {
 
 	this.va = va;
 	this.vr = vr;
-	a += (va / r) * gWalkScale;
-	r += vr;
+	a += (va / r) * tscale * gWalkScale;
+	r += vr * tscale;
 
 	if (r < 0) {
 		r -= r;
@@ -182,7 +229,7 @@ Player.prototype.update = function(t) {
 	} else if (Math.abs(va) < gStandThreshold) {
 		this.sprite.r = 0;
 	} else {
-		this.sprite.m += t;
+		this.sprite.m += tscale;
 		if (this.sprite.m > this.sprite.n) {
 			this.sprite.m -= this.sprite.n;
 			this.sprite.r++;
@@ -207,8 +254,7 @@ Player.prototype.draw = function(c) {
 	const { cx, cy } = game;
 	const normal = a + piHalf;
 
-	var x = Math.cos(a) * r,
-		y = Math.sin(a) * r;
+	const { x, y } = cart(a, r);
 
 	c.translate(x + cx, y + cy);
 	c.rotate(normal);
@@ -231,6 +277,40 @@ Player.prototype.draw = function(c) {
 
 	c.rotate(-normal);
 	c.translate(-x - cx, -y - cy);
+
+	if (game.options.showHitboxes) this.drawHitbox(c);
+};
+
+Player.prototype.drawHitbox = function(c) {
+	const { game } = this;
+	const { cx, cy } = game;
+	const { b, t } = this.getHitbox();
+
+	c.strokeStyle = '#ffff00';
+	c.beginPath();
+	c.arc(cx, cy, b.r, b.al, b.ar);
+	c.arc(cx, cy, t.r, t.ar, t.al, true);
+	c.arc(cx, cy, b.r, b.al, b.ar);
+	c.stroke();
+};
+
+Player.prototype.getHitbox = function() {
+	const { r, a, w, h } = this;
+	const baw = scalew(w, r),
+		taw = scalew(w, r + h);
+
+	return {
+		b: {
+			r,
+			al: a - baw,
+			ar: a + baw,
+		},
+		t: {
+			r: r + h,
+			al: a - taw,
+			ar: a + taw,
+		},
+	};
 };
 
 function Game(options) {
@@ -248,17 +328,22 @@ function Game(options) {
 	this.context.scale(scale, scale);
 
 	this.floors = [];
-	this.floors.push(new Flat(this, 80, 270, 90));
-	this.floors.push(new Flat(this, 100, 90, 135));
-	this.floors.push(new Flat(this, 15, 0, 360));
-
 	this.ceilings = [];
-	this.ceilings.push(new Flat(this, 75, 270, 90));
-	this.ceilings.push(new Flat(this, 95, 90, 135));
+	this.walls = [];
+
+	var th = 45;
+	this.addPlatform(th * 5, 225, 60, th);
+	this.addPlatform(th * 5, 45, 240, th);
+	this.addPlatform(th * 3, 135, 320, th);
+	this.walls.push(new Wall(this, th * 4, th * 3, 350, 1));
+	this.walls.push(new Wall(this, th * 4, th * 3, 10, -1));
+	this.floors.push(new Flat(this, th, 0, 360));
 
 	this.player = new Player(this, 'pspr');
 
-	this.components = alla(this.floors, this.ceilings, [this.player]);
+	this.components = alla(this.floors, this.ceilings, this.walls, [
+		this.player,
+	]);
 
 	this.time = 0;
 	this.next = this.next.bind(this);
@@ -272,6 +357,13 @@ Game.prototype.makeCanvas = function() {
 
 	document.body.appendChild(canvas);
 	return canvas;
+};
+
+Game.prototype.addPlatform = function(h, angle, width, th) {
+	this.floors.push(new Flat(this, h, angle, width));
+	this.ceilings.push(new Flat(this, h - th, angle, width));
+	this.walls.push(new Wall(this, h, h - th, angle - width / 2, 1));
+	this.walls.push(new Wall(this, h, h - th, angle + width / 2, -1));
 };
 
 Game.prototype.start = function() {
@@ -309,7 +401,13 @@ Game.prototype.release = function(key) {
 };
 
 window.addEventListener('load', () => {
-	G = new Game({ width: 1024, height: 768, scale: 2, showFps: true });
+	G = new Game({
+		width: 1024,
+		height: 768,
+		scale: 1,
+		showFps: true,
+		showHitboxes: true,
+	});
 	window.G = G;
 
 	G.start();
