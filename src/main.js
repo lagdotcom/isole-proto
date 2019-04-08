@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
 		width: 1024,
 		height: 768,
 		scale: 1,
+		showDebug: true,
 		showFps: true,
 		showHitboxes: true,
 	});

@@ -73,8 +73,10 @@ export default function Player(game, img) {
 		sprite: woodyController(img),
 	});
 
-	this.del = document.createElement('div');
-	document.body.appendChild(this.del);
+	if (game.options.showDebug) {
+		this.del = document.createElement('div');
+		document.body.appendChild(this.del);
+	}
 }
 
 Player.prototype.update = function(time) {
@@ -199,13 +201,14 @@ Player.prototype.update = function(time) {
 	if (this.jumpt > 0) flags.push('jump');
 	if (this.grounded) flags.push('grounded');
 
-	this.del.innerHTML = jbr(
-		`controls: ${controls.join(' ')}`,
-		`flags: ${flags.join(' ')}`,
-		`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
-		`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
-		debug
-	);
+	if (game.options.showDebug)
+		this.del.innerHTML = jbr(
+			`controls: ${controls.join(' ')}`,
+			`flags: ${flags.join(' ')}`,
+			`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
+			`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
+			debug
+		);
 };
 
 Player.prototype.draw = function(c) {
