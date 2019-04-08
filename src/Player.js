@@ -2,59 +2,18 @@ import { kLeft, kRight, kJump } from './keys';
 import {
 	gAirWalk,
 	gGravityStrength,
-	gStandThreshold,
 	gGroundFriction,
 	gGroundWalk,
 	gJumpStrength,
 	gJumpTimer,
-	gTimeScale,
-	gWallBounce,
-	gWalkScale,
 	gMaxVA,
+	gStandThreshold,
+	gTimeScale,
+	gWalkScale,
+	gWallBounce,
 } from './nums';
 import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from './tools';
-import Controller from './Controller';
-
-const gcbdController = img =>
-	new Controller({
-		img,
-		w: 56,
-		h: 48,
-		column: Math.floor(Math.random() * 2),
-		row: 0,
-		xo: -28,
-		yo: -39,
-		walktimer: 0,
-		walkmax: 8,
-		ground: me => {
-			if (me.row == 0 || me.row == 4) me.row++;
-		},
-		air: me => {
-			me.row = 0;
-		},
-		walk: (me, t) => {
-			me.walktimer += t;
-			if (me.walktimer > me.walkmax) {
-				me.walktimer -= me.walkmax;
-				me.row++;
-				if (me.row >= 8) me.row = 0;
-			}
-		},
-	});
-
-const woodyController = img =>
-	new Controller({
-		img,
-		w: 28,
-		h: 28,
-		column: 0,
-		row: 0,
-		xo: -14,
-		yo: -28,
-		ground: () => {},
-		air: () => {},
-		walk: () => {},
-	});
+import controller from './spr/woody';
 
 export default function Player(game, img) {
 	Object.assign(this, {
@@ -70,7 +29,7 @@ export default function Player(game, img) {
 		vfr: 0,
 		jumpt: 0,
 		tscale: 0,
-		sprite: woodyController(img),
+		sprite: controller(img),
 	});
 
 	if (game.options.showDebug) {
