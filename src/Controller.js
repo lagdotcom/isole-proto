@@ -18,9 +18,9 @@ Controller.prototype.left = function() {
 };
 
 Controller.prototype.draw = function(ctx) {
-	const { w, c, h, r, flip, img, xo, yo } = this,
-		sx = w * c,
-		sy = h * r;
+	const { w, column, h, row, flip, img, xo, yo } = this,
+		sx = w * column,
+		sy = h * row;
 
 	if (flip) ctx.scale(-1, 1);
 	ctx.drawImage(img, sx, sy, w, h, xo, yo, w, h);

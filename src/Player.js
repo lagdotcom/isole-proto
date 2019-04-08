@@ -20,24 +20,24 @@ const gcbdController = img =>
 		img,
 		w: 56,
 		h: 48,
-		c: Math.floor(Math.random() * 2),
-		r: 0,
+		column: Math.floor(Math.random() * 2),
+		row: 0,
 		xo: -28,
 		yo: -39,
-		m: 0,
-		n: 8,
+		walktimer: 0,
+		walkmax: 8,
 		ground: me => {
-			if (me.r == 0 || me.r == 4) me.r++;
+			if (me.row == 0 || me.row == 4) me.row++;
 		},
 		air: me => {
-			me.r = 0;
+			me.row = 0;
 		},
 		walk: (me, t) => {
-			me.m += t;
-			if (me.m > me.n) {
-				me.m -= me.n;
-				me.r++;
-				if (me.r >= 8) me.r = 0;
+			me.walktimer += t;
+			if (me.walktimer > me.walkmax) {
+				me.walktimer -= me.walkmax;
+				me.row++;
+				if (me.row >= 8) me.row = 0;
 			}
 		},
 	});
@@ -47,8 +47,8 @@ const woodyController = img =>
 		img,
 		w: 28,
 		h: 28,
-		r: 0,
-		c: 0,
+		column: 0,
+		row: 0,
 		xo: -14,
 		yo: -28,
 		ground: () => {},
