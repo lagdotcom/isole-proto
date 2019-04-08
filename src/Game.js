@@ -59,6 +59,8 @@ Game.prototype.begin = function() {
 	this.components = alla(this.floors, this.ceilings, this.walls, [
 		this.player,
 	]);
+
+	this.wallsInMotion = true; // TODO
 };
 
 Game.prototype.makeCanvas = function() {
@@ -88,8 +90,6 @@ Game.prototype.start = function() {
 	if (!this.player) this.begin();
 
 	this.running = true;
-	this.wallsInMotion = true; // TODO
-
 	requestAnimationFrame(this.next);
 };
 

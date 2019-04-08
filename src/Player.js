@@ -13,6 +13,34 @@ import {
 	gMaxVA,
 } from './nums';
 import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from './tools';
+import Controller from './Controller';
+
+const gcbdController = img =>
+	new Controller({
+		img,
+		w: 56,
+		h: 48,
+		c: Math.floor(Math.random() * 2),
+		r: 0,
+		xo: -28,
+		yo: -39,
+		m: 0,
+		n: 8,
+		ground: me => {
+			if (me.r == 0 || me.r == 4) me.r++;
+		},
+		air: me => {
+			me.r = 0;
+		},
+		walk: (me, t) => {
+			me.m += t;
+			if (me.m > me.n) {
+				me.m -= me.n;
+				me.r++;
+				if (me.r >= 8) me.r = 0;
+			}
+		},
+	});
 
 export default function Player(game, img) {
 	Object.assign(this, {
@@ -28,23 +56,8 @@ export default function Player(game, img) {
 		vfr: 0,
 		jumpt: 0,
 		tscale: 0,
-		del: document.createElement('div'),
+		sprite: gcbdController(img),
 	});
-
-	this.sprite = {
-		img,
-		w: 56,
-		h: 48,
-		c: Math.floor(Math.random() * 2),
-		r: 0,
-		xo: -28,
-		yo: -39,
-		xs: -1,
-		ys: 1,
-		m: 0,
-		n: 8,
-		rx: 8,
-	};
 
 	this.del = document.createElement('div');
 	document.body.appendChild(this.del);
@@ -121,11 +134,11 @@ Player.prototype.update = function(time) {
 	if (keys[kLeft]) {
 		va -= strength;
 		controls.push('left');
-		this.sprite.xs = -1;
+		this.sprite.left();
 	} else if (keys[kRight]) {
 		va += strength;
 		controls.push('right');
-		this.sprite.xs = 1;
+		this.sprite.right();
 	}
 
 	if (keys[kJump] && floor) {
@@ -162,16 +175,11 @@ Player.prototype.update = function(time) {
 	this.r = r;
 
 	if (!this.grounded) {
-		if (this.sprite.r == 0 || this.sprite.r == 4) this.sprite.r++;
+		this.sprite.ground();
 	} else if (Math.abs(va) < gStandThreshold) {
-		this.sprite.r = 0;
+		this.sprite.air();
 	} else {
-		this.sprite.m += tscale;
-		if (this.sprite.m > this.sprite.n) {
-			this.sprite.m -= this.sprite.n;
-			this.sprite.r++;
-			if (this.sprite.r >= this.sprite.rx) this.sprite.r = 0;
-		}
+		this.sprite.walk(tscale);
 	}
 
 	if (this.jumpt > 0) flags.push('jump');
@@ -196,21 +204,7 @@ Player.prototype.draw = function(c) {
 	c.translate(x + cx, y + cy);
 	c.rotate(normal);
 
-	const sx = sprite.w * sprite.c,
-		sy = sprite.h * sprite.r;
-	c.scale(sprite.xs, sprite.ys);
-	c.drawImage(
-		sprite.img,
-		sx,
-		sy,
-		sprite.w,
-		sprite.h,
-		sprite.xo,
-		sprite.yo,
-		sprite.w,
-		sprite.h
-	);
-	c.scale(sprite.xs, sprite.ys);
+	sprite.draw(c);
 
 	c.rotate(-normal);
 	c.translate(-x - cx, -y - cy);
