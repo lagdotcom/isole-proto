@@ -42,6 +42,20 @@ const gcbdController = img =>
 		},
 	});
 
+const woodyController = img =>
+	new Controller({
+		img,
+		w: 28,
+		h: 28,
+		r: 0,
+		c: 0,
+		xo: -14,
+		yo: -28,
+		ground: () => {},
+		air: () => {},
+		walk: () => {},
+	});
+
 export default function Player(game, img) {
 	Object.assign(this, {
 		game,
@@ -56,7 +70,7 @@ export default function Player(game, img) {
 		vfr: 0,
 		jumpt: 0,
 		tscale: 0,
-		sprite: gcbdController(img),
+		sprite: woodyController(img),
 	});
 
 	this.del = document.createElement('div');

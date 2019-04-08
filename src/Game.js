@@ -3,7 +3,7 @@ import Player from './Player';
 import Wall from './Wall';
 import { alla } from './tools';
 
-import playerImg from '../media/gcbd.png';
+import playerImg from '../media/woody.png';
 
 export default function Game(options) {
 	const { width, height, scale } = options;
