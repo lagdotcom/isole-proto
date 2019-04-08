@@ -1,0 +1,50 @@
+import { gHitboxScale } from './nums';
+
+export const pi = Math.PI,
+	pi2 = pi * 2,
+	piHalf = pi / 2;
+
+export function anglewrap(a) {
+	a = a % pi2;
+	if (a < 0) a += pi2;
+	return a;
+}
+
+export function angledist(a, b) {
+	var d = a - b;
+	if (d > pi) d -= pi2;
+	else if (d < -pi) d += pi2;
+	return Math.abs(d);
+}
+
+export function alla() {
+	var a = [];
+	for (var i = 0; i < arguments.length; i++) a = a.concat(arguments[i]);
+
+	return a;
+}
+
+export function jbr() {
+	var s = '';
+	for (var i = 0; i < arguments.length; i++) {
+		if (i) s += '<br>';
+		s += arguments[i];
+	}
+
+	return s;
+}
+
+export function cart(a, r) {
+	return {
+		x: Math.cos(a) * r,
+		y: Math.sin(a) * r,
+	};
+}
+
+export function scalew(w, r) {
+	return (w / r) * gHitboxScale;
+}
+
+export function deg2rad(a) {
+	return (pi2 * a) / 360;
+}

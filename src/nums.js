@@ -1,0 +1,13 @@
+export const gTimeScale = 10,
+	gHitboxScale = 0.2,
+	gGroundWalk = 0.09,
+	gGroundFriction = 0.8,
+	gAirWalk = 0.01,
+	gJumpStrength = 5,
+	gJumpTimer = 8,
+	gGravityStrength = 0.2,
+	gWalkScale = 10,
+	gMaxVA = 0.3,
+	gStandThreshold = 0.005,
+	gWallGap = 5,
+	gWallBounce = -0.01;
