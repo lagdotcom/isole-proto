@@ -12,7 +12,7 @@ export default function Wall(game, t, b, angle, direction, motion) {
 		bottom,
 		a,
 		direction,
-		motion: deg2rad(motion),
+		motion: deg2rad(motion || 0),
 	});
 
 	this.updateXY();

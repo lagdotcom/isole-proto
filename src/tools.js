@@ -48,3 +48,11 @@ export function scalew(w, r) {
 export function deg2rad(a) {
 	return (pi2 * a) / 360;
 }
+
+export function max(a, b) {
+	return a > b ? a : b;
+}
+
+export function min(a, b) {
+	return a < b ? a : b;
+}

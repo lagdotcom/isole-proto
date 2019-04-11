@@ -22,7 +22,7 @@ export default function Player(game, img) {
 		h: 30,
 		steph: 10,
 		a: piHalf * 3,
-		r: 200,
+		r: 300,
 		va: 0,
 		vr: 0,
 		vfa: 0,
@@ -98,7 +98,6 @@ Player.prototype.update = function(time) {
 		vfa = floor.motion * time;
 	} else {
 		this.grounded = false;
-		this.floor = null;
 
 		vr -= gGravityStrength;
 		vfa = 0;
@@ -142,7 +141,7 @@ Player.prototype.update = function(time) {
 	r += vr * tscale;
 
 	if (r < 0) {
-		r -= r;
+		r *= -1;
 		a += pi;
 	}
 

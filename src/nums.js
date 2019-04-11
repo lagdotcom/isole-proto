@@ -8,6 +8,7 @@ export const gTimeScale = 10,
 	gGravityStrength = 0.2,
 	gWalkScale = 10,
 	gMaxVA = 0.3,
+	gMaxTimeStep = 1000 / 20.0,
 	gStandThreshold = 0.005,
 	gWallGap = 5,
 	gWallBounce = -0.01;

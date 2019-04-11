@@ -1,9 +1,12 @@
 import Flat from './Flat';
 import Player from './Player';
+import Zoomer from './enemy/Zoomer';
 import Wall from './Wall';
-import { alla } from './tools';
+import { alla, min } from './tools';
+import { gMaxTimeStep } from './nums';
 
 import playerImg from '../media/woody.png';
+import zoomerImg from '../media/zoomer.png';
 
 export default function Game(options) {
 	const { width, height, scale } = options;
@@ -26,6 +29,7 @@ export default function Game(options) {
 	this.loading = 0;
 	this.resources = [];
 	this.require('player', playerImg);
+	this.require('zoomer', zoomerImg);
 }
 
 Game.prototype.require = function(key, src) {
@@ -44,6 +48,7 @@ Game.prototype.begin = function() {
 	this.floors = [];
 	this.ceilings = [];
 	this.walls = [];
+	this.enemies = [];
 
 	var th = 45;
 	var rs = 0.04;
@@ -55,10 +60,15 @@ Game.prototype.begin = function() {
 	this.floors.push(new Flat(this, th, 0, 360));
 
 	this.player = new Player(this, this.resources.player);
+	this.enemies.push(new Zoomer(this, this.resources.zoomer));
 
-	this.components = alla(this.floors, this.ceilings, this.walls, [
-		this.player,
-	]);
+	this.components = alla(
+		this.floors,
+		this.ceilings,
+		this.walls,
+		this.enemies,
+		[this.player]
+	);
 
 	this.wallsInMotion = true; // TODO
 };
@@ -74,10 +84,27 @@ Game.prototype.makeCanvas = function() {
 };
 
 Game.prototype.addPlatform = function(h, angle, width, th, motion = 0) {
-	this.floors.push(new Flat(this, h, angle, width, motion));
-	this.ceilings.push(new Flat(this, h - th, angle, width, motion));
-	this.walls.push(new Wall(this, h, h - th, angle - width / 2, 1, motion));
-	this.walls.push(new Wall(this, h, h - th, angle + width / 2, -1, motion));
+	var floor = new Flat(this, h, angle, width, motion),
+		ceiling = new Flat(this, h - th, angle, width, motion),
+		left = new Wall(this, h, h - th, angle - width / 2, 1, motion),
+		right = new Wall(this, h, h - th, angle + width / 2, -1, motion);
+
+	floor.wleft = left;
+	floor.wright = right;
+
+	ceiling.wleft = left;
+	ceiling.wright = right;
+
+	left.ceiling = ceiling;
+	left.floor = floor;
+
+	right.ceiling = ceiling;
+	right.floor = floor;
+
+	this.floors.push(floor);
+	this.ceilings.push(ceiling);
+	this.walls.push(left);
+	this.walls.push(right);
 };
 
 Game.prototype.start = function() {
@@ -95,7 +122,7 @@ Game.prototype.start = function() {
 
 Game.prototype.next = function(t) {
 	const { width, height, showFps } = this.options;
-	const step = t - this.time;
+	const step = min(t - this.time, gMaxTimeStep);
 	var c = this.context;
 
 	c.fillStyle = '#000000';
