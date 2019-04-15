@@ -39,7 +39,7 @@ export default function Player(game, img) {
 }
 
 Player.prototype.update = function(time) {
-	var { a, r, va, vr, vfa, game } = this;
+	var { a, r, va, vr, vfa, game, sprite } = this;
 	const { walls, ceilings, floors, keys } = game,
 		tscale = time / gTimeScale;
 	this.tscale = tscale;
@@ -103,16 +103,16 @@ Player.prototype.update = function(time) {
 		vfa = 0;
 	}
 
-	var controls = [];
-	var strength = this.grounded ? gGroundWalk : gAirWalk;
+	var controls = [],
+		strength = this.grounded ? gGroundWalk : gAirWalk;
 	if (keys[kLeft]) {
 		va -= strength;
 		controls.push('left');
-		this.sprite.left();
+		sprite.face(-1);
 	} else if (keys[kRight]) {
 		va += strength;
 		controls.push('right');
-		this.sprite.right();
+		sprite.face(1);
 	}
 
 	if (keys[kJump] && floor) {
@@ -149,11 +149,12 @@ Player.prototype.update = function(time) {
 	this.r = r;
 
 	if (!this.grounded) {
-		this.sprite.ground();
+		if (vr > 0) sprite.jump(time);
+		else sprite.fall(time);
 	} else if (Math.abs(va) < gStandThreshold) {
-		this.sprite.air();
+		sprite.stand(time);
 	} else {
-		this.sprite.walk(tscale);
+		sprite.walk(time);
 	}
 
 	if (this.jumpt > 0) flags.push('jump');
@@ -165,6 +166,9 @@ Player.prototype.update = function(time) {
 			`flags: ${flags.join(' ')}`,
 			`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
 			`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
+			`anim: ${sprite.state}+${sprite.timer.toFixed(0)}ms, ${
+				sprite.flip
+			}`,
 			debug
 		);
 };

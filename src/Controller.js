@@ -2,7 +2,9 @@ export default function Controller(options) {
 	Object.entries(options).forEach(e => {
 		const [key, val] = e;
 		if (typeof val === 'function') {
-			this[key] = (x, y, z) => val(this, x, y, z);
+			this[key] = function() {
+				val(this, ...arguments);
+			};
 		} else {
 			this[key] = val;
 		}
@@ -15,6 +17,18 @@ Controller.prototype.right = function() {
 
 Controller.prototype.left = function() {
 	this.flip = true;
+};
+
+Controller.prototype.play = function(state, column, row) {
+	if (this.state !== state) {
+		this.state = state;
+		this.column = column;
+		this.row = row;
+		this.timer = 0;
+		return false;
+	} else {
+		return true;
+	}
 };
 
 Controller.prototype.draw = function(ctx) {
