@@ -31,6 +31,7 @@ export default img =>
 		xo: -36,
 		yo: -72,
 		timer: 0,
+		flip: false,
 		facing: 1,
 		state: '',
 		jump: (me, t) => {
@@ -72,7 +73,7 @@ export default img =>
 				me.timer += t;
 				if (me.timer >= 75) {
 					me.row++;
-					if (me.row == 8) return true;
+					if (me.row >= 8) return true;
 					else me.timer = 0;
 				}
 			}

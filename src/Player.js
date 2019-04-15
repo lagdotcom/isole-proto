@@ -167,7 +167,7 @@ Player.prototype.update = function(time) {
 			`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
 			`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
 			`anim: ${sprite.state}+${sprite.timer.toFixed(0)}ms, ${
-				sprite.flip
+				sprite.flip ? 'flip' : 'normal'
 			}`,
 			debug
 		);

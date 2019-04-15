@@ -3,7 +3,7 @@ export default function Controller(options) {
 		const [key, val] = e;
 		if (typeof val === 'function') {
 			this[key] = function() {
-				val(this, ...arguments);
+				return val(this, ...arguments);
 			};
 		} else {
 			this[key] = val;
