@@ -45,6 +45,10 @@ export function scalew(w, r) {
 	return (w / r) * gHitboxScale;
 }
 
+export function unscalew(ws, r) {
+	return (ws / gHitboxScale) * r;
+}
+
 export function deg2rad(a) {
 	return (pi2 * a) / 360;
 }

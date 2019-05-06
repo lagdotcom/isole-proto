@@ -208,7 +208,7 @@ Player.prototype.drawHitbox = function(c) {
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
 
-	c.strokeStyle = '#ff0000';
+	c.strokeStyle = '#888800';
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, s.r, s.ar, s.al, true);

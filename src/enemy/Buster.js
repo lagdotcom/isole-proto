@@ -7,14 +7,24 @@ import {
 	gWalkScale,
 	gWallBounce,
 } from '../nums';
-import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from '../tools';
+import {
+	angledist,
+	anglewrap,
+	cart,
+	jbr,
+	pi,
+	piHalf,
+	scalew,
+	unscalew,
+} from '../tools';
 import controller from '../spr/buster';
 
 const gJumpDelay = 150,
 	gJumpSide = 0.4,
 	gJumpStartup = 15,
 	gJumpStrength = 4,
-	gNearDistance = 0.7,
+	gAttackWidth = 700,
+	gNearWidth = 1200,
 	gRadiusMult = 6;
 
 const sIdle = 'idle',
@@ -25,7 +35,7 @@ const sIdle = 'idle',
 export default function Buster(game, img) {
 	Object.assign(this, {
 		game,
-		width: 180,
+		width: 90,
 		height: 35,
 		a: 0,
 		r: 250,
@@ -44,8 +54,9 @@ Buster.prototype.update = function(time) {
 	const { player, walls, ceilings, floors } = game,
 		tscale = time / gTimeScale;
 	const { b, t } = this.getHitbox();
-	const playerDist = angledist(a, player.a),
-		near = playerDist <= gNearDistance;
+	const playerDist = unscalew(angledist(a, player.a), r),
+		attackable = playerDist - player.w <= gAttackWidth,
+		near = playerDist - player.w <= gNearWidth;
 
 	var floor = null;
 	if (vr <= 0) {
@@ -89,7 +100,7 @@ Buster.prototype.update = function(time) {
 		va *= gGroundFriction;
 		vfa = floor.motion * time;
 
-		if (near) {
+		if (attackable) {
 			switch (state) {
 				case sPreJump:
 					this.jumpdelay -= tscale;
@@ -190,7 +201,7 @@ Buster.prototype.draw = function(c) {
 Buster.prototype.drawHitbox = function(c) {
 	const { game } = this;
 	const { cx, cy } = game;
-	const { b, t, s } = this.getHitbox();
+	const { b, t, a, n } = this.getHitbox();
 
 	c.strokeStyle = '#ffff00';
 	c.beginPath();
@@ -198,12 +209,28 @@ Buster.prototype.drawHitbox = function(c) {
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
+
+	c.strokeStyle = '#ff0000';
+	c.beginPath();
+	c.arc(cx, cy, a.r, a.al, a.ar);
+	c.arc(cx, cy, t.r, a.ar, a.al, true);
+	c.arc(cx, cy, a.r, a.al, a.ar);
+	c.stroke();
+
+	c.strokeStyle = '#880000';
+	c.beginPath();
+	c.arc(cx, cy, n.r, n.al, n.ar);
+	c.arc(cx, cy, t.r, n.ar, n.al, true);
+	c.arc(cx, cy, n.r, n.al, n.ar);
+	c.stroke();
 };
 
 Buster.prototype.getHitbox = function() {
 	const { r, a, va, vr, width, height, tscale } = this;
 	const baw = scalew(width, r),
-		taw = scalew(width, r + height);
+		taw = scalew(width, r + height),
+		aaw = scalew(gAttackWidth, r),
+		naw = scalew(gNearWidth, r);
 	var amod,
 		vbr = 0,
 		vtr = 0;
@@ -226,6 +253,18 @@ Buster.prototype.getHitbox = function() {
 			aw: taw,
 			al: amod - taw,
 			ar: amod + taw,
+		},
+		a: {
+			r: r + vbr,
+			aw: aaw,
+			al: amod - aaw,
+			ar: amod + aaw,
+		},
+		n: {
+			r: r + vbr,
+			aw: naw,
+			al: amod - naw,
+			ar: amod + naw,
 		},
 	};
 };
