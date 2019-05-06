@@ -53,7 +53,7 @@ Player.prototype.update = function(time) {
 		floors.forEach((f, i) => {
 			var da = angledist(a, f.a);
 
-			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}πr<br>`;
+			debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}r<br>`;
 
 			if (b.r <= f.r && s.r >= f.r && da < f.width + s.aw) floor = f;
 		});
@@ -65,7 +65,7 @@ Player.prototype.update = function(time) {
 		ceilings.forEach((f, i) => {
 			var da = angledist(a, f.a);
 
-			debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}πr<br>`;
+			debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}r<br>`;
 
 			if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) ceiling = f;
 		});
@@ -169,8 +169,8 @@ Player.prototype.update = function(time) {
 		this.del.innerHTML = jbr(
 			`controls: ${controls.join(' ')}`,
 			`flags: ${flags.join(' ')}`,
-			`vel: ${vr.toFixed(2)},${va.toFixed(2)}πr`,
-			`pos: ${r.toFixed(2)},${a.toFixed(2)}πr`,
+			`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
+			`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
 			`anim: ${sprite.state}+${sprite.timer.toFixed(0)}ms, ${
 				sprite.flip ? 'flip' : 'normal'
 			}`,
