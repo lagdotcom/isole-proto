@@ -1,3 +1,4 @@
+import Buster from './enemy/Buster';
 import Flat from './Flat';
 import Player from './Player';
 import Zoomer from './enemy/Zoomer';
@@ -5,6 +6,7 @@ import Wall from './Wall';
 import { alla, min } from './tools';
 import { gMaxTimeStep } from './nums';
 
+import busterImg from '../media/buster.png';
 import playerImg from '../media/woody.png';
 import zoomerImg from '../media/zoomer.png';
 
@@ -30,6 +32,7 @@ export default function Game(options) {
 	this.resources = [];
 	this.require('player', playerImg);
 	this.require('zoomer', zoomerImg);
+	this.require('buster', busterImg);
 }
 
 Game.prototype.require = function(key, src) {
@@ -61,6 +64,7 @@ Game.prototype.begin = function() {
 
 	this.player = new Player(this, this.resources.player);
 	this.enemies.push(new Zoomer(this, this.resources.zoomer));
+	this.enemies.push(new Buster(this, this.resources.buster));
 
 	this.components = alla(
 		this.floors,
