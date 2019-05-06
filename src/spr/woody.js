@@ -4,13 +4,13 @@ import gTimeScale from '../nums';
 /*
 Spritesheet Layout (72x72)
 
-Stand	FlipL	Run1	Jump1
-		FlipR	Run2	Jump2
-				Run3	Jump3
-				Run4	Fall1
-				Run5	Fall2
-				Run6	Fall3
-				Run7	Land1
+Stand	FlipL	Run1	Jump1	JFlipL	Throw1
+		FlipR	Run2	Jump2	JFlipR	Throw2
+				Run3	Jump3			Throw3
+				Run4	Fall1			Throw4
+				Run5	Fall2			Throw5
+				Run6	Fall3			Throw6
+				Run7	Land1			Throw7
 				Run8	Land2
 */
 
@@ -34,7 +34,16 @@ export default img =>
 		flip: false,
 		facing: 1,
 		state: '',
+		flipOverride: (me, t) => {
+			if (me.state === aFlip) {
+				me.timer += t;
+				if (me.timer < 75) return true;
+			}
+		},
+
 		jump: (me, t) => {
+			if (me.flipOverride(t)) return;
+
 			if (me.play(aJump, 3, 0)) {
 				me.timer += t;
 				if (me.timer >= 75 && me.row < 2) {
@@ -44,6 +53,8 @@ export default img =>
 			}
 		},
 		fall: (me, t) => {
+			if (me.flipOverride(t)) return;
+
 			if (me.play(aFall, 3, 3)) {
 				me.timer += t;
 				if (me.timer >= 75 && me.row < 5) {
@@ -59,11 +70,17 @@ export default img =>
 
 			me.play(aStand, 0, 0);
 		},
-		face: (me, vr) => {
+		face: (me, vr, grounded) => {
 			if (vr != me.facing) {
 				me.facing = vr;
-				if (vr > 0) me.play(aFlip, 1, 1);
-				else me.play(aFlip, 1, 0);
+
+				if (grounded) {
+					if (vr > 0) me.play(aFlip, 1, 1);
+					else me.play(aFlip, 1, 0);
+				} else {
+					if (vr > 0) me.play(aFlip, 4, 1);
+					else me.play(aFlip, 4, 0);
+				}
 
 				me.flip = vr < 0;
 			}
@@ -85,10 +102,7 @@ export default img =>
 				if (!me.land(t)) return;
 			}
 
-			if (me.state === aFlip) {
-				me.timer += t;
-				if (me.timer < 75) return;
-			}
+			if (me.flipOverride(t)) return;
 
 			if (me.play(aWalk, 2, 0)) {
 				me.timer += t;

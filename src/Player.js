@@ -108,11 +108,11 @@ Player.prototype.update = function(time) {
 	if (keys[kLeft]) {
 		va -= strength;
 		controls.push('left');
-		sprite.face(-1);
+		sprite.face(-1, this.grounded);
 	} else if (keys[kRight]) {
 		va += strength;
 		controls.push('right');
-		sprite.face(1);
+		sprite.face(1, this.grounded);
 	}
 
 	if (keys[kJump] && floor) {
