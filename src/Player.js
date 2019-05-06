@@ -1,4 +1,4 @@
-import { kLeft, kRight, kJump } from './keys';
+import { kLeft, kRight, kJump, kThrow } from './keys';
 import {
 	gAirWalk,
 	gGravityStrength,
@@ -13,7 +13,7 @@ import {
 	gWallBounce,
 } from './nums';
 import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from './tools';
-import controller from './spr/woody';
+import WoodyController from './spr/woody';
 
 export default function Player(game, img) {
 	Object.assign(this, {
@@ -29,7 +29,7 @@ export default function Player(game, img) {
 		vfr: 0,
 		jumpt: 0,
 		tscale: 0,
-		sprite: controller(img),
+		sprite: new WoodyController(img),
 	});
 
 	if (game.options.showDebug) {
@@ -119,6 +119,11 @@ Player.prototype.update = function(time) {
 		vr += gJumpStrength;
 		this.jumpt = gJumpTimer;
 		controls.push('jump');
+	}
+
+	if (keys[kThrow]) {
+		controls.push('throw');
+		sprite.throw();
 	}
 
 	if (wall && !ceiling) {
