@@ -44,7 +44,7 @@ export default function Flat(
 	this.right = this.a + this.width;
 
 	if (texture) {
-		this.sprite = FlatController(texture, texX, texY);
+		this.sprite = FlatController(game.resources[texture], texX, texY);
 		this.scale = this.sprite.w / gHitboxScale;
 	}
 }

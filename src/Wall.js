@@ -1,7 +1,38 @@
-import { anglewrap, cart, deg2rad } from './tools';
-import { gWallGap } from './nums';
+import Controller from './Controller';
+import { anglewrap, cart, deg2rad, piHalf, scalew } from './tools';
+import { gHitboxScale, gWallGap } from './nums';
 
-export default function Wall(game, t, b, angle, direction, motion) {
+const WallController = (img, c, r) =>
+	new Controller({
+		img,
+		w: 32,
+		h: 32,
+		column: c,
+		row: r,
+		xo: 0,
+		yo: 0,
+		top: me => {
+			me.row = r;
+		},
+		middle: me => {
+			me.row = r + 1;
+		},
+		bottom: me => {
+			me.row = r + 2;
+		},
+	});
+
+export default function Wall(
+	game,
+	t,
+	b,
+	angle,
+	direction,
+	motion,
+	texture,
+	texX = 0,
+	texY = 0
+) {
 	const a = anglewrap(deg2rad(angle)),
 		top = t - gWallGap,
 		bottom = b + gWallGap;
@@ -10,10 +41,23 @@ export default function Wall(game, t, b, angle, direction, motion) {
 		game,
 		top,
 		bottom,
+		t,
+		b,
 		a,
 		direction,
 		motion: deg2rad(motion || 0),
 	});
+
+	if (texture) {
+		this.sprite = WallController(game.resources[texture], texX, texY);
+		this.scale = this.sprite.w / gHitboxScale;
+
+		if (direction < 0) {
+			this.draw = this.drawLeft;
+		} else {
+			this.draw = this.drawRight;
+		}
+	}
 
 	this.updateXY();
 }
@@ -31,6 +75,73 @@ Wall.prototype.update = function(time) {
 	if (this.motion) {
 		this.a = anglewrap(this.a + time * this.motion);
 		this.updateXY();
+	}
+};
+
+Wall.prototype.drawLeft = function(c) {
+	const { a, t, b, game, scale, sprite } = this;
+	const { cx, cy } = game;
+	const step = sprite.h;
+
+	var remaining = t - b,
+		r = t;
+
+	sprite.top();
+	while (remaining > 0) {
+		if (remaining < step) {
+			sprite.bottom();
+			r = b + step;
+		}
+
+		const offset = scalew(scale / 2, r),
+			amod = a - scalew(scale, r),
+			normal = amod + offset + piHalf,
+			{ x, y } = cart(amod, r);
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+
+		remaining -= step;
+		r -= step;
+		sprite.middle();
+	}
+};
+
+Wall.prototype.drawRight = function(c) {
+	const { a, t, b, game, scale, sprite } = this;
+	const { cx, cy } = game;
+	const step = sprite.h;
+
+	var remaining = t - b,
+		r = t;
+
+	sprite.top();
+	while (remaining > 0) {
+		if (remaining < step) {
+			sprite.bottom();
+			r = b + step;
+		}
+
+		const offset = scalew(scale / 2, r),
+			normal = a + offset + piHalf,
+			{ x, y } = cart(a, r);
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+
+		remaining -= step;
+		r -= step;
+		sprite.middle();
 	}
 };
 

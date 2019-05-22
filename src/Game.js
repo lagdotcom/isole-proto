@@ -60,9 +60,9 @@ Game.prototype.begin = function() {
 	this.addPlatform(th * 5, 225, 60, 32, rs, 'grass');
 	this.addPlatform(th * 5, 45, 240, 32, rs, 'grass');
 	this.addPlatform(th * 3, 135, 320, 32, -rs, 'grass');
-	this.walls.push(new Wall(this, th * 4, th * 3, 350, 1));
-	this.walls.push(new Wall(this, th * 4, th * 3, 10, -1));
-	this.floors.push(new Flat(this, th, 0, 360, 0, this.resources['grass'], 7));
+	this.walls.push(new Wall(this, 218, th * 3, 350, 1, 0, 'grass'));
+	this.walls.push(new Wall(this, 218, th * 3, 10, -1, 0, 'grass', 2));
+	this.floors.push(new Flat(this, th, 0, 360, 0, 'grass', 7));
 
 	this.player = new Player(this, this.resources.player);
 	this.enemies.push(new Zoomer(this, this.resources.zoomer));
@@ -95,16 +95,11 @@ Game.prototype.addPlatform = function(
 	width,
 	th,
 	motion = 0,
-	texture = null
+	texture = null,
+	texX = 0,
+	texY = 0
 ) {
-	var floor = new Flat(
-			this,
-			h,
-			angle,
-			width,
-			motion,
-			this.resources[texture]
-		),
+	var floor = new Flat(this, h, angle, width, motion, texture, texX, texY),
 		ceiling = new Flat(this, h - th, angle, width, motion),
 		left = new Wall(this, h, h - th, angle - width / 2, 1, motion),
 		right = new Wall(this, h, h - th, angle + width / 2, -1, motion);
