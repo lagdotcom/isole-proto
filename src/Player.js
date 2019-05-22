@@ -18,8 +18,8 @@ import WoodyController from './spr/woody';
 export default function Player(game, img) {
 	Object.assign(this, {
 		game,
-		w: 56,
-		h: 30,
+		w: 76,
+		h: 34,
 		steph: 10,
 		a: piHalf * 3,
 		r: 300,

@@ -38,7 +38,7 @@ export default class WoodyController extends Controller {
 			h: 76,
 			column: 0,
 			row: 0,
-			xo: -36,
+			xo: -38,
 			yo: -72,
 			timer: 0,
 			flip: false,
