@@ -7,6 +7,7 @@ import { alla, min } from './tools';
 import { gMaxTimeStep } from './nums';
 
 import busterImg from '../media/buster.png';
+import grassImg from '../media/tilesheet_grass.png';
 import playerImg from '../media/woody.png';
 import zoomerImg from '../media/zoomer.png';
 
@@ -33,6 +34,7 @@ export default function Game(options) {
 	this.require('player', playerImg);
 	this.require('zoomer', zoomerImg);
 	this.require('buster', busterImg);
+	this.require('grass', grassImg);
 }
 
 Game.prototype.require = function(key, src) {
@@ -53,14 +55,14 @@ Game.prototype.begin = function() {
 	this.walls = [];
 	this.enemies = [];
 
-	var th = 45;
+	var th = 50;
 	var rs = 0.04;
-	this.addPlatform(th * 5, 225, 60, th, rs);
-	this.addPlatform(th * 5, 45, 240, th, rs);
-	this.addPlatform(th * 3, 135, 320, th, -rs);
+	this.addPlatform(th * 5, 225, 60, 32, rs, 'grass');
+	this.addPlatform(th * 5, 45, 240, 32, rs, 'grass');
+	this.addPlatform(th * 3, 135, 320, 32, -rs, 'grass');
 	this.walls.push(new Wall(this, th * 4, th * 3, 350, 1));
 	this.walls.push(new Wall(this, th * 4, th * 3, 10, -1));
-	this.floors.push(new Flat(this, th, 0, 360));
+	this.floors.push(new Flat(this, th, 0, 360, 0, this.resources['grass'], 7));
 
 	this.player = new Player(this, this.resources.player);
 	this.enemies.push(new Zoomer(this, this.resources.zoomer));
@@ -87,8 +89,22 @@ Game.prototype.makeCanvas = function() {
 	return canvas;
 };
 
-Game.prototype.addPlatform = function(h, angle, width, th, motion = 0) {
-	var floor = new Flat(this, h, angle, width, motion),
+Game.prototype.addPlatform = function(
+	h,
+	angle,
+	width,
+	th,
+	motion = 0,
+	texture = null
+) {
+	var floor = new Flat(
+			this,
+			h,
+			angle,
+			width,
+			motion,
+			this.resources[texture]
+		),
 		ceiling = new Flat(this, h - th, angle, width, motion),
 		left = new Wall(this, h, h - th, angle - width / 2, 1, motion),
 		right = new Wall(this, h, h - th, angle + width / 2, -1, motion);
@@ -132,13 +148,22 @@ Game.prototype.next = function(t) {
 	c.fillStyle = '#000000';
 	c.fillRect(0, 0, width, height);
 
+	this.components.forEach(co => co.update(step));
+	this.components.forEach(co => co.draw && co.draw(c));
+
+	if (this.options.showHitboxes) {
+		c.beginPath();
+		c.rect(0, 0, width, height);
+		c.fillStyle = 'rgba(0,0,0,0.5)';
+		c.fill();
+
+		this.components.forEach(co => co.drawHitbox && co.drawHitbox(c));
+	}
+
 	if (showFps) {
 		c.fillStyle = '#ffffff';
 		c.fillText(Math.floor(1000 / step) + 'fps', 10, 10);
 	}
-
-	this.components.forEach(co => co.update(step));
-	this.components.forEach(co => co.draw(c));
 
 	this.time = t;
 	if (this.running) requestAnimationFrame(this.next);

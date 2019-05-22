@@ -34,7 +34,7 @@ Wall.prototype.update = function(time) {
 	}
 };
 
-Wall.prototype.draw = function(c) {
+Wall.prototype.drawHitbox = function(c) {
 	const { game, sx, sy, ex, ey } = this;
 	const { cx, cy } = game;
 

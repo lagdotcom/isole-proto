@@ -192,8 +192,6 @@ Player.prototype.draw = function(c) {
 
 	c.rotate(-normal);
 	c.translate(-x - cx, -y - cy);
-
-	if (game.options.showHitboxes) this.drawHitbox(c);
 };
 
 Player.prototype.drawHitbox = function(c) {
