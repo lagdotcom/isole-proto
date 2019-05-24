@@ -87,7 +87,7 @@ Game.prototype.begin = function() {
 	this.walls = [];
 	this.enemies = [];
 
-	testRoomB(this);
+	testRoomA(this);
 
 	this.components = alla(
 		this.floors,

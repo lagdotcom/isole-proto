@@ -110,6 +110,11 @@ Krillna.prototype.update = function(time) {
 		va = dir == dRight ? speed : -speed;
 		vfa = f.motion * time;
 
+		if (last.wall) {
+			if (last.wall.direction === 1) a = f.left;
+			else a = f.right;
+		}
+
 		sprite.ground();
 	}
 
@@ -142,6 +147,11 @@ Krillna.prototype.update = function(time) {
 		dir = dir == dRight ? dir : dLeft;
 		va = dir == dRight ? speed : -speed;
 		vfa = c.motion * time;
+
+		if (last.wall) {
+			if (last.wall.direction === 1) a = c.left;
+			else a = c.right;
+		}
 
 		sprite.ceiling();
 	}
@@ -178,9 +188,9 @@ Krillna.prototype.update = function(time) {
 	if (wall) {
 		applywall(wall);
 	} else if (last.wall) {
-		if (b.r <= last.wall.top && t.r >= last.wall.bottom)
+		if (b.r <= last.wall.top && t.r >= last.wall.bottom) {
 			applywall(last.wall);
-		else if (dir == dDown && last.wall.ceiling) {
+		} else if (dir == dDown && last.wall.ceiling) {
 			if (last.wall.direction == 1) dir = dRight;
 			else dir = dLeft;
 			applyceiling(last.wall.ceiling);
