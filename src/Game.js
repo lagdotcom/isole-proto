@@ -1,15 +1,15 @@
 import Buster from './enemy/Buster';
 import Flat from './Flat';
+import Krillna from './enemy/Krillna';
 import Player from './Player';
-import Zoomer from './enemy/Zoomer';
 import Wall from './Wall';
 import { alla, min } from './tools';
 import { gMaxTimeStep } from './nums';
 
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
+import krillnaImg from '../media/krillna.png';
 import playerImg from '../media/woody.png';
-import zoomerImg from '../media/zoomer.png';
 
 export default function Game(options) {
 	const { width, height, scale } = options;
@@ -32,7 +32,7 @@ export default function Game(options) {
 	this.loading = 0;
 	this.resources = [];
 	this.require('player', playerImg);
-	this.require('zoomer', zoomerImg);
+	this.require('krillna', krillnaImg);
 	this.require('buster', busterImg);
 	this.require('grass', grassImg);
 }
@@ -65,7 +65,14 @@ Game.prototype.begin = function() {
 	this.floors.push(new Flat(this, th, 0, 360, 0, 'grass', 7));
 
 	this.player = new Player(this, this.resources.player);
-	this.enemies.push(new Zoomer(this, this.resources.zoomer));
+	this.enemies.push(new Krillna(this, this.resources.krillna));
+	this.enemies.push(
+		new Krillna(this, this.resources.krillna, {
+			a: Math.PI,
+			r: 300,
+			dir: 'L',
+		})
+	);
 	this.enemies.push(new Buster(this, this.resources.buster));
 
 	this.components = alla(

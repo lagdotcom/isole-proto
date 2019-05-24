@@ -1,0 +1,79 @@
+import Controller from '../Controller';
+import { dRight, dDown, dLeft, dUp } from '../nums';
+
+// MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
+
+const moveTimes = {
+	0: 12,
+	1: 7.5,
+	2: 7.5,
+	3: 12,
+	4: 7.5,
+	5: 7.5,
+};
+
+export default img =>
+	new Controller({
+		img,
+		w: 72,
+		h: 72,
+		column: 0,
+		row: 0,
+		xo: -36,
+		yo: -58,
+		walktimer: 0,
+		walkmax: 8,
+		normal: 0,
+		fliptwice: false,
+		air: me => {
+			me.stuck = null;
+		},
+		ground: me => {
+			me.stuck = 'ground';
+			me.normal = 0;
+			me.fliptwice = false;
+			me.yo = -58;
+		},
+		wleft: me => {
+			me.stuck = 'wleft';
+			me.normal = Math.PI / -2;
+			me.yo = -45;
+		},
+		wright: me => {
+			me.stuck = 'wright';
+			me.normal = Math.PI / 2;
+			me.yo = -45;
+		},
+		ceiling: me => {
+			me.stuck = 'ceiling';
+			me.normal = Math.PI;
+			me.fliptwice = true;
+			me.yo = -32;
+		},
+		walk: (me, t, dir) => {
+			const { fliptwice, stuck } = me;
+
+			me.xo = -36;
+
+			if (dir === dRight) {
+				me.flip = true;
+				if (fliptwice) me.flip = !me.flip;
+			} else if (dir === dLeft) {
+				me.flip = false;
+				if (fliptwice) me.flip = !me.flip;
+			} else if (dir === dUp && stuck === 'wright') {
+				me.xo = -48;
+			} else if (dir === dDown && stuck === 'wleft') {
+				me.xo = -24;
+			}
+
+			if (me.play('walk', 0, 0)) {
+				me.timer += t;
+				if (me.timer >= moveTimes[me.row]) {
+					me.timer = 0;
+					me.row++;
+					if (me.row >= 6) me.row = 0;
+				}
+			}
+		},
+	});

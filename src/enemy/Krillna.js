@@ -1,4 +1,8 @@
 import {
+	dRight,
+	dDown,
+	dLeft,
+	dUp,
 	gAirWalk,
 	gGravityStrength,
 	gGroundFriction,
@@ -12,35 +16,37 @@ import {
 	gWallBounce,
 } from '../nums';
 import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from '../tools';
-import controller from '../spr/zoomer';
+import controller from '../spr/Krillna';
 
-const dRight = 'R',
-	dDown = 'D',
-	dLeft = 'L',
-	dUp = 'U',
-	gZoomerSpeed = 0.16,
+const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
+	gKrillnaSpeed = 0.16,
 	gRadiusMult = 6;
 
-export default function Zoomer(game, img) {
-	Object.assign(this, {
-		game,
-		dir: dRight,
-		speed: gZoomerSpeed,
-		last: {},
-		width: 32,
-		height: 14,
-		a: piHalf,
-		r: 200,
-		va: 0,
-		vr: 0,
-		vfa: 0,
-		vfr: 0,
-		tscale: 0,
-		sprite: controller(img),
-	});
+export default function Krillna(game, img, options = {}) {
+	Object.assign(
+		this,
+		{
+			game,
+			dir: dRight,
+			speed: gKrillnaSpeed,
+			last: {},
+			width: 80,
+			height: 30,
+			a: piHalf,
+			r: 200,
+			va: 0,
+			vr: 0,
+			vfa: 0,
+			vfr: 0,
+			tscale: 0,
+			movefn: (fr, n) => gFrameMotion[fr] * n,
+			sprite: controller(img),
+		},
+		options
+	);
 }
 
-Zoomer.prototype.update = function(time) {
+Krillna.prototype.update = function(time) {
 	var {
 		a,
 		r,
@@ -54,6 +60,7 @@ Zoomer.prototype.update = function(time) {
 		sprite,
 		height,
 		width,
+		movefn,
 	} = this;
 	const { walls, ceilings, floors } = game,
 		tscale = time / gTimeScale;
@@ -118,10 +125,10 @@ Zoomer.prototype.update = function(time) {
 
 		var wsw = scalew(width, r);
 		if (w.direction == 1) {
-			sprite.left();
+			sprite.wleft();
 			a = w.a - wsw;
 		} else {
-			sprite.right();
+			sprite.wright();
 			a = w.a + wsw;
 		}
 	}
@@ -188,11 +195,14 @@ Zoomer.prototype.update = function(time) {
 		vr -= gGravityStrength;
 	}
 
+	const mva = stuck ? movefn(sprite.row, va) : va,
+		mvr = stuck ? movefn(sprite.row, vr) : vr;
+
 	this.va = va;
 	this.vfa = vfa;
 	this.vr = vr;
-	a += (va / r) * tscale * gWalkScale + vfa;
-	r += vr * tscale;
+	a += (mva / r) * tscale * gWalkScale + vfa;
+	r += mvr * tscale;
 
 	if (r < 0) {
 		r *= -1;
@@ -207,14 +217,14 @@ Zoomer.prototype.update = function(time) {
 	if (!floor && !ceiling && !wall) {
 		sprite.air();
 	} else {
-		sprite.walk(tscale);
+		sprite.walk(tscale, dir);
 	}
 };
 
-Zoomer.prototype.draw = function(c) {
+Krillna.prototype.draw = function(c) {
 	const { a, r, game, sprite } = this;
 	const { cx, cy } = game;
-	const normal = a + piHalf;
+	const normal = a + piHalf + sprite.normal;
 
 	const { x, y } = cart(a, r);
 
@@ -227,7 +237,7 @@ Zoomer.prototype.draw = function(c) {
 	c.translate(-x - cx, -y - cy);
 };
 
-Zoomer.prototype.drawHitbox = function(c) {
+Krillna.prototype.drawHitbox = function(c) {
 	const { game } = this;
 	const { cx, cy } = game;
 	const { b, t, s } = this.getHitbox();
@@ -240,7 +250,7 @@ Zoomer.prototype.drawHitbox = function(c) {
 	c.stroke();
 };
 
-Zoomer.prototype.getHitbox = function() {
+Krillna.prototype.getHitbox = function() {
 	const { r, a, va, vr, width, height, tscale } = this;
 	const baw = scalew(width, r),
 		taw = scalew(width, r + height);
