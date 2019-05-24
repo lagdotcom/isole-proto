@@ -23,8 +23,8 @@ const gJumpDelay = 150,
 	gJumpSide = 0.4,
 	gJumpStartup = 15,
 	gJumpStrength = 4,
-	gAttackWidth = 700,
-	gNearWidth = 1200,
+	gAttackWidth = 250,
+	gNearWidth = 500,
 	gRadiusMult = 6;
 
 const sIdle = 'idle',
@@ -35,7 +35,7 @@ const sIdle = 'idle',
 export default function Buster(game, img) {
 	Object.assign(this, {
 		game,
-		width: 90,
+		width: 35,
 		height: 35,
 		a: 0,
 		r: 250,

@@ -30,7 +30,7 @@ export default function Krillna(game, img, options = {}) {
 			dir: dRight,
 			speed: gKrillnaSpeed,
 			last: {},
-			width: 80,
+			width: 30,
 			height: 30,
 			a: piHalf,
 			r: 200,
