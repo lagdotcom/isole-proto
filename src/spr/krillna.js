@@ -13,6 +13,13 @@ const moveTimes = {
 	5: 7.5,
 };
 
+const xoffsets = {
+	[dLeft]: -36,
+	[dRight]: -36,
+	[dUp]: -48,
+	[dDown]: -24,
+};
+
 export default img =>
 	new Controller({
 		img,
@@ -54,7 +61,7 @@ export default img =>
 		walk: (me, t, dir) => {
 			const { fliptwice, stuck } = me;
 
-			me.xo = -36;
+			me.xo = xoffsets[dir];
 
 			if (dir === dRight) {
 				me.flip = true;
@@ -62,10 +69,6 @@ export default img =>
 			} else if (dir === dLeft) {
 				me.flip = false;
 				if (fliptwice) me.flip = !me.flip;
-			} else if (dir === dUp && stuck === 'wright') {
-				me.xo = -48;
-			} else if (dir === dDown && stuck === 'wleft') {
-				me.xo = -24;
 			}
 
 			if (me.play('walk', 0, 0)) {

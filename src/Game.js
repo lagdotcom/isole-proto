@@ -3,7 +3,7 @@ import Flat from './Flat';
 import Krillna from './enemy/Krillna';
 import Player from './Player';
 import Wall from './Wall';
-import { alla, min, pi } from './tools';
+import { alla, min, pi, piHalf } from './tools';
 import { gMaxTimeStep } from './nums';
 
 import busterImg from '../media/buster.png';
@@ -49,31 +49,45 @@ Game.prototype.require = function(key, src) {
 	this.loading++;
 };
 
+function testRoomA(g) {
+	var th = 50;
+	var rs = 0.04;
+	g.addPlatform(th * 5, 225, 60, 32, rs, 'grass');
+	g.addPlatform(th * 5, 45, 240, 32, rs, 'grass');
+	g.addPlatform(th * 3, 135, 320, 32, -rs, 'grass');
+	g.walls.push(new Wall(g, 218, th * 3, 350, 1, 0, 'grass'));
+	g.walls.push(new Wall(g, 218, th * 3, 10, -1, 0, 'grass', 2));
+	g.floors.push(new Flat(g, th, 0, 360, 0, 'grass', 7));
+
+	g.player = new Player(g, g.resources.player);
+	g.enemies.push(new Krillna(g, g.resources.krillna));
+	g.enemies.push(
+		new Krillna(g, g.resources.krillna, {
+			a: pi,
+			r: 300,
+			dir: 'L',
+		})
+	);
+	g.enemies.push(new Buster(g, g.resources.buster));
+}
+
+function testRoomB(g) {
+	g.addPlatform(250, 270, 60, 32, 0, 'grass');
+	g.floors.push(new Flat(g, 50, 0, 360, 0, 'grass', 7));
+
+	g.player = new Player(g, g.resources.player, { r: 100 });
+	g.enemies.push(
+		new Krillna(g, g.resources.krillna, { a: -piHalf, r: 300, dir: 'L' })
+	);
+}
+
 Game.prototype.begin = function() {
 	this.floors = [];
 	this.ceilings = [];
 	this.walls = [];
 	this.enemies = [];
 
-	var th = 50;
-	var rs = 0.04;
-	this.addPlatform(th * 5, 225, 60, 32, rs, 'grass');
-	this.addPlatform(th * 5, 45, 240, 32, rs, 'grass');
-	this.addPlatform(th * 3, 135, 320, 32, -rs, 'grass');
-	this.walls.push(new Wall(this, 218, th * 3, 350, 1, 0, 'grass'));
-	this.walls.push(new Wall(this, 218, th * 3, 10, -1, 0, 'grass', 2));
-	this.floors.push(new Flat(this, th, 0, 360, 0, 'grass', 7));
-
-	this.player = new Player(this, this.resources.player);
-	this.enemies.push(new Krillna(this, this.resources.krillna));
-	this.enemies.push(
-		new Krillna(this, this.resources.krillna, {
-			a: pi,
-			r: 300,
-			dir: 'L',
-		})
-	);
-	this.enemies.push(new Buster(this, this.resources.buster));
+	testRoomB(this);
 
 	this.components = alla(
 		this.floors,

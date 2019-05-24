@@ -32,21 +32,25 @@ const sIdle = 'idle',
 	sJumping = 'jumping',
 	sWaiting = 'waiting';
 
-export default function Buster(game, img) {
-	Object.assign(this, {
-		game,
-		width: 35,
-		height: 35,
-		a: 0,
-		r: 250,
-		va: 0,
-		vr: 0,
-		vfa: 0,
-		vfr: 0,
-		fatigue: 0,
-		state: sIdle,
-		sprite: controller(img),
-	});
+export default function Buster(game, img, options = {}) {
+	Object.assign(
+		this,
+		{
+			game,
+			width: 35,
+			height: 35,
+			a: 0,
+			r: 250,
+			va: 0,
+			vr: 0,
+			vfa: 0,
+			vfr: 0,
+			fatigue: 0,
+			state: sIdle,
+			sprite: controller(img),
+		},
+		options
+	);
 }
 
 Buster.prototype.update = function(time) {

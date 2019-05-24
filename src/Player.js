@@ -15,22 +15,26 @@ import {
 import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from './tools';
 import WoodyController from './spr/woody';
 
-export default function Player(game, img) {
-	Object.assign(this, {
-		game,
-		w: 30,
-		h: 34,
-		steph: 10,
-		a: piHalf * 3,
-		r: 300,
-		va: 0,
-		vr: 0,
-		vfa: 0,
-		vfr: 0,
-		jumpt: 0,
-		tscale: 0,
-		sprite: new WoodyController(img),
-	});
+export default function Player(game, img, options = {}) {
+	Object.assign(
+		this,
+		{
+			game,
+			w: 30,
+			h: 34,
+			steph: 10,
+			a: piHalf * 3,
+			r: 300,
+			va: 0,
+			vr: 0,
+			vfa: 0,
+			vfr: 0,
+			jumpt: 0,
+			tscale: 0,
+			sprite: new WoodyController(img),
+		},
+		options
+	);
 
 	if (game.options.showDebug) {
 		this.del = document.createElement('div');
