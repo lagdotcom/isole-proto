@@ -3,7 +3,7 @@ import Flat from './Flat';
 import Krillna from './enemy/Krillna';
 import Player from './Player';
 import Wall from './Wall';
-import { alla, min } from './tools';
+import { alla, min, pi } from './tools';
 import { gMaxTimeStep } from './nums';
 
 import busterImg from '../media/buster.png';
@@ -68,7 +68,7 @@ Game.prototype.begin = function() {
 	this.enemies.push(new Krillna(this, this.resources.krillna));
 	this.enemies.push(
 		new Krillna(this, this.resources.krillna, {
-			a: Math.PI,
+			a: pi,
 			r: 300,
 			dir: 'L',
 		})

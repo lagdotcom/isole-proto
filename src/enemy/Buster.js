@@ -105,7 +105,7 @@ Buster.prototype.update = function(time) {
 				case sPreJump:
 					this.jumpdelay -= tscale;
 					if (this.jumpdelay <= 0) {
-						if (anglewrap(a - player.a) > Math.PI) va = gJumpSide;
+						if (anglewrap(a - player.a) > pi) va = gJumpSide;
 						else va = -gJumpSide;
 
 						this.fatigue = gJumpDelay;

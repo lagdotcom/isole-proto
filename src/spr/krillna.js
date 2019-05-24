@@ -1,5 +1,6 @@
 import Controller from '../Controller';
 import { dRight, dDown, dLeft, dUp } from '../nums';
+import { pi, piHalf } from '../tools';
 
 // MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
 
@@ -36,17 +37,17 @@ export default img =>
 		},
 		wleft: me => {
 			me.stuck = 'wleft';
-			me.normal = Math.PI / -2;
+			me.normal = -piHalf;
 			me.yo = -45;
 		},
 		wright: me => {
 			me.stuck = 'wright';
-			me.normal = Math.PI / 2;
+			me.normal = piHalf;
 			me.yo = -45;
 		},
 		ceiling: me => {
 			me.stuck = 'ceiling';
-			me.normal = Math.PI;
+			me.normal = pi;
 			me.fliptwice = true;
 			me.yo = -32;
 		},
