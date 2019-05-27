@@ -15,7 +15,7 @@ import krillnaImg from '../media/krillna.png';
 import woodyImg from '../media/woody.png';
 
 export default function Game(options) {
-	const { parent, width, height, scale } = options;
+	const { parent, width, height, scale, smoothing } = options;
 
 	this.running = false;
 	this.options = options;
@@ -26,7 +26,7 @@ export default function Game(options) {
 
 	this.element = this.makeCanvas(parent || document.body);
 	this.context = this.element.getContext('2d');
-	this.context.imageSmoothingEnabled = false;
+	this.context.imageSmoothingEnabled = smoothing || false;
 	this.context.scale(scale, scale);
 
 	this.time = 0;

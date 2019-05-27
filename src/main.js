@@ -17,13 +17,16 @@ function addCheckbox(text, checked, change) {
 
 window.addEventListener('load', () => {
 	const layout = mel(document.body, 'div', { className: 'layout' });
+	extras = mel(layout, 'div', { className: 'extras' });
 
 	G = new Game({
 		parent: layout,
 		width: 1024,
 		height: 768,
 		scale: 1,
-		showDebug: false,
+		smoothing: false,
+		showDebug: true,
+		debugContainer: extras,
 		showFps: true,
 		showHitboxes: false,
 	});
@@ -32,13 +35,15 @@ window.addEventListener('load', () => {
 	const editor = new Editor({ parent: layout, game: G });
 	window.E = editor;
 
-	extras = mel(layout, 'div', { className: 'extras' });
-
 	addCheckbox('Show FPS', G.options.showFps, e => {
 		G.options.showFps = e.target.checked;
 	});
 	addCheckbox('Show hitboxes', G.options.showHitboxes, e => {
 		G.options.showHitboxes = e.target.checked;
+	});
+	addCheckbox('Smoothing', G.options.smoothing, e => {
+		G.options.smoothing = e.target.checked;
+		G.context.imageSmoothingEnabled = G.options.smoothing;
 	});
 
 	G.start();
