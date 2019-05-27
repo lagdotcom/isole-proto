@@ -4,11 +4,11 @@ import Editor from './Editor';
 import Game from './Game';
 import mel from './makeElement';
 
-var extras, G;
+var options, G;
 
 function addCheckbox(text, checked, change) {
 	mel(
-		mel(extras, 'label', { innerText: text }),
+		mel(options, 'label', { innerText: text }),
 		'input',
 		{ type: 'checkbox', checked },
 		{ change }
@@ -17,7 +17,9 @@ function addCheckbox(text, checked, change) {
 
 window.addEventListener('load', () => {
 	const layout = mel(document.body, 'div', { className: 'layout' });
-	extras = mel(layout, 'div', { className: 'extras' });
+	const extras = mel(layout, 'div', { className: 'extras' });
+	options = mel(extras, 'div', { className: 'options' });
+	const debug = mel(extras, 'div');
 
 	G = new Game({
 		parent: layout,
@@ -26,7 +28,7 @@ window.addEventListener('load', () => {
 		scale: 1,
 		smoothing: false,
 		showDebug: true,
-		debugContainer: extras,
+		debugContainer: debug,
 		showFps: true,
 		showHitboxes: false,
 	});

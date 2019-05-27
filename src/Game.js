@@ -59,10 +59,6 @@ Game.prototype.begin = function() {
 	this.walls = [];
 	this.enemies = [];
 
-	this.player = new Player(this);
-	this.components = [this.player];
-	this.wallsInMotion = true; // TODO
-
 	dispatch(this.element, 'isole.begin');
 };
 

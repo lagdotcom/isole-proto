@@ -1,8 +1,10 @@
 import Buster from './enemy/Buster';
-import Krillna from './enemy/Krillna';
 import Flat from './Flat';
+import Krillna from './enemy/Krillna';
+import Player from './Player';
 import Wall from './Wall';
 import mel from './makeElement';
+import clearChildren from './clearChildren';
 import { alla, deg2rad } from './tools';
 import { dLeft, dRight } from './nums';
 
@@ -98,6 +100,8 @@ Editor.prototype.onGameBegin = function() {
 	const { data, game } = this;
 	const { platforms, walls, floors, player, enemies } = data;
 
+	if (game.options.debugContainer) clearChildren(game.options.debugContainer);
+
 	game.floors = [];
 	game.ceilings = [];
 	game.walls = [];
@@ -121,7 +125,7 @@ Editor.prototype.onGameBegin = function() {
 		game.enemies.push(this.makeEnemy(e));
 	});
 
-	Object.assign(game.player, {
+	game.player = new Player(game, {
 		a: deg2rad(player.a),
 		r: player.r,
 	});
@@ -133,6 +137,7 @@ Editor.prototype.onGameBegin = function() {
 		...game.enemies,
 		game.player,
 	];
+	game.wallsInMotion = true; // TODO
 
 	this.dump.value = JSON.stringify(data);
 };
@@ -146,7 +151,7 @@ Editor.prototype.makeDom = function(parent) {
 	var c = this.container;
 
 	if (c) {
-		for (var i = c.children.length - 1; i >= 0; i--) c.children[i].remove();
+		clearChildren(c);
 	} else {
 		c = this.container = mel(parent, 'div', { className: 'editor' });
 	}
