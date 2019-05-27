@@ -45,3 +45,11 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
 	if (G) G.release(e.code);
 });
+
+window.addEventListener('gamepadconnected', e => {
+	G.addPad(e.gamepad);
+});
+
+window.addEventListener('gamepaddisconnected', e => {
+	G.removePad(e.gamepad);
+});

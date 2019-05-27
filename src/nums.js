@@ -15,4 +15,5 @@ export const dRight = 'R',
 	gMaxTimeStep = 1000 / 20.0,
 	gStandThreshold = 0.005,
 	gWallGap = 5,
-	gWallBounce = -0.01;
+	gWallBounce = -0.01,
+	gPadAxisThreshold = 0.4;

@@ -60,3 +60,11 @@ export function max(a, b) {
 export function min(a, b) {
 	return a < b ? a : b;
 }
+
+export function any(a, fn) {
+	for (var i = a.length - 1; i >= 0; i--) {
+		if (fn(a[i])) return true;
+	}
+
+	return false;
+}

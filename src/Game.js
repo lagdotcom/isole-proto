@@ -3,8 +3,9 @@ import Flat from './Flat';
 import Krillna from './enemy/Krillna';
 import Player from './Player';
 import Wall from './Wall';
-import { alla, min, pi, piHalf } from './tools';
-import { gMaxTimeStep } from './nums';
+import { kLeft, kRight, kJump, kThrow } from './keys';
+import { alla, any, min, pi, piHalf } from './tools';
+import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
@@ -19,6 +20,7 @@ export default function Game(options) {
 	this.cx = width / 2 / scale;
 	this.cy = height / 2 / scale;
 	this.keys = {};
+	this.pads = [];
 
 	this.canvas = this.makeCanvas();
 	this.context = this.canvas.getContext('2d');
@@ -164,6 +166,8 @@ Game.prototype.next = function(t) {
 	c.fillStyle = '#000000';
 	c.fillRect(0, 0, width, height);
 
+	if (this.pads.length) this.readGamepads();
+
 	this.components.forEach(co => co.update(step));
 	this.components.forEach(co => co.draw && co.draw(c));
 
@@ -183,6 +187,39 @@ Game.prototype.next = function(t) {
 
 	this.time = t;
 	if (this.running) requestAnimationFrame(this.next);
+};
+
+Game.prototype.addPad = function(pad) {
+	if (pad.buttons.length < 2) {
+		console.log(`Cannot use pad ${pad.id} - not enough buttons.`);
+		return;
+	}
+
+	console.log(`Added pad ${pad.id}.`);
+	this.pads.push(pad);
+};
+
+Game.prototype.removePad = function(pad) {
+	if (any(this.pads, p => p.id === pad.id)) {
+		console.log(`No longer listening to pad ${pad.id}.`);
+		this.pads = this.pads.filter(p => p.id !== pad.id);
+	}
+};
+
+Game.prototype.readGamepads = function() {
+	const pads = navigator.getGamepads();
+	this.pads.forEach(p => {
+		const pad = pads[p.index];
+
+		const buttons = pad.buttons;
+		const axes = pad.axes;
+
+		// TODO: configuration
+		this.keys[kLeft] = axes[0] < -gPadAxisThreshold;
+		this.keys[kRight] = axes[0] > gPadAxisThreshold;
+		this.keys[kJump] = buttons[0].pressed;
+		this.keys[kThrow] = buttons[1].pressed;
+	});
 };
 
 Game.prototype.press = function(key) {
