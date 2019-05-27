@@ -177,8 +177,10 @@ Krillna.prototype.update = function(time) {
 			wall = last.floor.wleft;
 		}
 
-		r = wall.top;
-		dir = dDown;
+		if (wall) {
+			r = wall.top;
+			dir = dDown;
+		}
 	}
 
 	if (ceiling && !last.wall) {
