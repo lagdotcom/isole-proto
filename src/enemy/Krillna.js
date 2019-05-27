@@ -15,7 +15,16 @@ import {
 	gWalkScale,
 	gWallBounce,
 } from '../nums';
-import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from '../tools';
+import {
+	angledist,
+	anglewrap,
+	cart,
+	deg2rad,
+	jbr,
+	pi,
+	piHalf,
+	scalew,
+} from '../tools';
 import controller from '../spr/Krillna';
 
 const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
@@ -44,6 +53,8 @@ export default function Krillna(game, img, options = {}) {
 		},
 		options
 	);
+
+	this.a = deg2rad(this.a);
 }
 
 Krillna.prototype.update = function(time) {

@@ -6,6 +6,8 @@ import Wall from './Wall';
 import { kLeft, kRight, kJump, kThrow } from './keys';
 import { alla, any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
+import mel from './makeElement';
+import dispatch from './dispatchEvent';
 
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
@@ -13,7 +15,7 @@ import krillnaImg from '../media/krillna.png';
 import playerImg from '../media/woody.png';
 
 export default function Game(options) {
-	const { width, height, scale } = options;
+	const { parent, width, height, scale } = options;
 
 	this.running = false;
 	this.options = options;
@@ -22,8 +24,8 @@ export default function Game(options) {
 	this.keys = {};
 	this.pads = [];
 
-	this.canvas = this.makeCanvas();
-	this.context = this.canvas.getContext('2d');
+	this.element = this.makeCanvas(parent || document.body);
+	this.context = this.element.getContext('2d');
 	this.context.imageSmoothingEnabled = false;
 	this.context.scale(scale, scale);
 
@@ -34,8 +36,8 @@ export default function Game(options) {
 	this.loading = 0;
 	this.resources = [];
 	this.require('player', playerImg);
-	this.require('krillna', krillnaImg);
-	this.require('buster', busterImg);
+	this.require('enemy.krillna', krillnaImg);
+	this.require('enemy.buster', busterImg);
 	this.require('grass', grassImg);
 }
 
@@ -51,81 +53,38 @@ Game.prototype.require = function(key, src) {
 	this.loading++;
 };
 
-function testRoomA(g) {
-	var th = 50;
-	var rs = 0.04;
-	g.addPlatform(th * 5, 225, 60, 32, rs, 'grass');
-	g.addPlatform(th * 5, 45, 240, 32, rs, 'grass');
-	g.addPlatform(th * 3, 135, 320, 32, -rs, 'grass');
-	g.walls.push(new Wall(g, 218, th * 3, 350, 1, 0, 'grass'));
-	g.walls.push(new Wall(g, 218, th * 3, 10, -1, 0, 'grass', 2));
-	g.floors.push(new Flat(g, th, 0, 360, 0, 'grass', 7));
-
-	g.player = new Player(g, g.resources.player);
-	g.enemies.push(new Krillna(g, g.resources.krillna));
-	g.enemies.push(
-		new Krillna(g, g.resources.krillna, {
-			a: pi,
-			r: 300,
-			dir: 'L',
-		})
-	);
-	g.enemies.push(new Buster(g, g.resources.buster));
-}
-
-function testRoomB(g) {
-	g.addPlatform(250, 270, 60, 32, 0, 'grass');
-	g.floors.push(new Flat(g, 50, 0, 360, 0, 'grass', 7));
-
-	g.player = new Player(g, g.resources.player, { r: 100 });
-	g.enemies.push(
-		new Krillna(g, g.resources.krillna, { a: -piHalf, r: 300, dir: 'L' })
-	);
-}
-
 Game.prototype.begin = function() {
 	this.floors = [];
 	this.ceilings = [];
 	this.walls = [];
 	this.enemies = [];
 
-	testRoomA(this);
-
-	this.components = alla(
-		this.floors,
-		this.ceilings,
-		this.walls,
-		this.enemies,
-		[this.player]
-	);
-
+	this.player = new Player(this, this.resources.player);
+	this.components = [this.player];
 	this.wallsInMotion = true; // TODO
+
+	dispatch(this.element, 'isole.begin');
 };
 
-Game.prototype.makeCanvas = function() {
+Game.prototype.makeCanvas = function(parent) {
 	const { width, height } = this.options;
-	var canvas = document.createElement('canvas');
-	canvas.width = width;
-	canvas.height = height;
-
-	document.body.appendChild(canvas);
-	return canvas;
+	return mel(parent, 'canvas', { width, height });
 };
 
-Game.prototype.addPlatform = function(
+Game.prototype.addPlatform = function({
 	h,
-	angle,
-	width,
+	a,
+	w,
 	th,
 	motion = 0,
 	texture = null,
 	texX = 0,
-	texY = 0
-) {
-	var floor = new Flat(this, h, angle, width, motion, texture, texX, texY),
-		ceiling = new Flat(this, h - th, angle, width, motion),
-		left = new Wall(this, h, h - th, angle - width / 2, 1, motion),
-		right = new Wall(this, h, h - th, angle + width / 2, -1, motion);
+	texY = 0,
+}) {
+	var floor = new Flat(this, h, a, w, motion, texture, texX, texY),
+		ceiling = new Flat(this, h - th, a, w, motion),
+		left = new Wall(this, h, h - th, a - w / 2, 1, motion),
+		right = new Wall(this, h, h - th, a + w / 2, -1, motion);
 
 	floor.wleft = left;
 	floor.wright = right;

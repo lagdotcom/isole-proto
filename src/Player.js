@@ -12,7 +12,16 @@ import {
 	gWalkScale,
 	gWallBounce,
 } from './nums';
-import { angledist, anglewrap, cart, jbr, pi, piHalf, scalew } from './tools';
+import {
+	angledist,
+	anglewrap,
+	cart,
+	deg2rad,
+	jbr,
+	pi,
+	piHalf,
+	scalew,
+} from './tools';
 import WoodyController from './spr/woody';
 
 export default function Player(game, img, options = {}) {
@@ -23,7 +32,7 @@ export default function Player(game, img, options = {}) {
 			w: 30,
 			h: 34,
 			steph: 10,
-			a: piHalf * 3,
+			a: 0,
 			r: 300,
 			va: 0,
 			vr: 0,
@@ -35,6 +44,8 @@ export default function Player(game, img, options = {}) {
 		},
 		options
 	);
+
+	this.a = deg2rad(this.a);
 
 	if (game.options.showDebug) {
 		this.del = document.createElement('div');

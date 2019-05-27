@@ -28,7 +28,7 @@ export default function Wall(
 	b,
 	angle,
 	direction,
-	motion,
+	motion = 0,
 	texture,
 	texX = 0,
 	texY = 0
@@ -45,7 +45,7 @@ export default function Wall(
 		b,
 		a,
 		direction,
-		motion: deg2rad(motion || 0),
+		motion: deg2rad(motion / 100 || 0),
 	});
 
 	if (texture) {

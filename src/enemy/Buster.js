@@ -11,6 +11,7 @@ import {
 	angledist,
 	anglewrap,
 	cart,
+	deg2rad,
 	jbr,
 	pi,
 	piHalf,
@@ -51,6 +52,8 @@ export default function Buster(game, img, options = {}) {
 		},
 		options
 	);
+
+	this.a = deg2rad(this.a);
 }
 
 Buster.prototype.update = function(time) {

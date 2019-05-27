@@ -1,39 +1,45 @@
+import './isole.css';
+
+import Editor from './Editor';
 import Game from './Game';
+import mel from './makeElement';
 
-var controls, G;
+var extras, G;
 
-function addCheckbox(text, checked, onchange) {
-	var label = document.createElement('label');
-	label.innerText = text;
-	var input = document.createElement('input');
-	input.type = 'checkbox';
-	input.checked = checked;
-	input.onchange = onchange;
-
-	label.appendChild(input);
-	controls.appendChild(label);
+function addCheckbox(text, checked, change) {
+	mel(
+		mel(extras, 'label', { innerText: text }),
+		'input',
+		{ type: 'checkbox', checked },
+		{ change }
+	);
 }
 
 window.addEventListener('load', () => {
+	const layout = mel(document.body, 'div', { className: 'layout' });
+
 	G = new Game({
+		parent: layout,
 		width: 1024,
 		height: 768,
 		scale: 1,
-		showDebug: true,
+		showDebug: false,
 		showFps: true,
-		showHitboxes: true,
+		showHitboxes: false,
 	});
 	window.G = G;
 
-	controls = document.createElement('div');
+	const editor = new Editor({ parent: layout, game: G });
+	window.E = editor;
+
+	extras = mel(layout, 'div', { className: 'extras' });
+
 	addCheckbox('Show FPS', G.options.showFps, e => {
 		G.options.showFps = e.target.checked;
 	});
 	addCheckbox('Show hitboxes', G.options.showHitboxes, e => {
 		G.options.showHitboxes = e.target.checked;
 	});
-
-	document.body.appendChild(controls);
 
 	G.start();
 });

@@ -37,7 +37,7 @@ export default function Flat(
 		r: height,
 		a: deg2rad(angle),
 		width: deg2rad(width) / 2,
-		motion: deg2rad(motion || 0),
+		motion: deg2rad(motion / 100 || 0),
 	});
 
 	this.left = this.a - this.width;

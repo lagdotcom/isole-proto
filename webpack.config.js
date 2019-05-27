@@ -7,6 +7,12 @@ module.exports = {
 		open: true,
 	},
 	module: {
-		rules: [{ test: /\.png$/, use: 'file-loader' }],
+		rules: [
+			{ test: /\.png$/, use: 'file-loader' },
+			{
+				test: /.css$/,
+				use: ['style-loader', 'css-loader'],
+			},
+		],
 	},
 };
