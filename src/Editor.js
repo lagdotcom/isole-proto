@@ -153,8 +153,14 @@ Editor.prototype.makeEnemy = function(e) {
 
 Editor.prototype.makeDom = function(parent) {
 	const { data } = this;
+	var c = this.container;
 
-	const c = mel(parent, 'div', { className: 'editor' });
+	if (c) {
+		for (var i = c.children.length - 1; i >= 0; i--) c.children[i].remove();
+	} else {
+		c = this.container = mel(parent, 'div', { className: 'editor' });
+	}
+
 	mel(c, 'h1', { innerText: 'Editor' });
 
 	const yc = mel(c, 'div', { className: 'player' });
@@ -192,7 +198,27 @@ Editor.prototype.makeDom = function(parent) {
 
 	const dc = mel(c, 'div', { className: 'dump' });
 	mel(dc, 'h2', { innerText: 'Dump' });
-	this.dump = mel(dc, 'textarea', { readOnly: true });
+	this.dump = mel(dc, 'textarea');
+	mel(
+		dc,
+		'button',
+		{ innerText: 'Load' },
+		{
+			click: () => {
+				try {
+					const newData = JSON.parse(this.dump.value);
+
+					this.data = newData;
+					this.makeDom();
+
+					this.game.begin();
+				} catch (e) {
+					alert(e);
+					return;
+				}
+			},
+		}
+	);
 };
 
 Editor.prototype.makeSection = function(parent, name, label, maker, example) {
