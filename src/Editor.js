@@ -6,8 +6,10 @@ import mel from './makeElement';
 import { alla, deg2rad } from './tools';
 import { dLeft, dRight } from './nums';
 
-const enemies = ['buster', 'krillna'];
+const enemyTypes = { buster: Buster, krillna: Krillna };
+const enemies = Object.keys(enemyTypes);
 const textures = ['grass'];
+const wallDirections = [1, -1];
 
 export default function Editor(options) {
 	const { data, game, parent } = options;
@@ -47,7 +49,7 @@ export default function Editor(options) {
 				top: 218,
 				bottom: 150,
 				a: 350,
-				direction: 1,
+				dir: 1,
 				motion: 0,
 				texture: 'grass',
 			},
@@ -55,7 +57,7 @@ export default function Editor(options) {
 				top: 218,
 				bottom: 150,
 				a: 10,
-				direction: -1,
+				dir: -1,
 				texture: 'grass',
 			},
 		],
@@ -107,15 +109,7 @@ Editor.prototype.onGameBegin = function() {
 
 	walls.forEach(w => {
 		game.walls.push(
-			new Wall(
-				game,
-				w.top,
-				w.bottom,
-				w.a,
-				w.direction,
-				w.motion,
-				w.texture
-			)
+			new Wall(game, w.top, w.bottom, w.a, w.dir, w.motion, w.texture)
 		);
 	});
 
@@ -132,23 +126,19 @@ Editor.prototype.onGameBegin = function() {
 		r: player.r,
 	});
 
-	game.components = alla(
-		game.floors,
-		game.ceilings,
-		game.walls,
-		game.enemies,
-		[game.player]
-	);
+	game.components = [
+		...game.floors,
+		...game.ceilings,
+		...game.walls,
+		...game.enemies,
+		game.player,
+	];
 
 	this.dump.value = JSON.stringify(data);
 };
 
 Editor.prototype.makeEnemy = function(e) {
-	return new { buster: Buster, krillna: Krillna }[e.type](
-		this.game,
-		this.game.resources[`enemy.${e.type}`],
-		e
-	);
+	return new enemyTypes[e.type](this.game, e);
 };
 
 Editor.prototype.makeDom = function(parent) {
@@ -351,7 +341,7 @@ Editor.prototype.makeWallDom = function(parent, o) {
 	this.makeNumInput(e, o, 'Bottom', 'bottom');
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeNumInput(e, o, 'Motion', 'motion');
-	this.makeChoiceInput(e, o, 'Direction', 'direction', [1, -1]);
+	this.makeChoiceInput(e, o, 'Direction', 'dir', wallDirections);
 	this.makeChoiceInput(e, o, 'Texture', 'texture', textures);
 };
 

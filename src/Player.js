@@ -24,7 +24,7 @@ import {
 } from './tools';
 import WoodyController from './spr/woody';
 
-export default function Player(game, img, options = {}) {
+export default function Player(game, options = {}) {
 	Object.assign(
 		this,
 		{
@@ -40,7 +40,9 @@ export default function Player(game, img, options = {}) {
 			vfr: 0,
 			jumpt: 0,
 			tscale: 0,
-			sprite: new WoodyController(img),
+			sprite: new WoodyController(
+				game.resources[options.img || 'player.woody']
+			),
 		},
 		options
 	);

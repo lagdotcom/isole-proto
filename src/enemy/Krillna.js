@@ -31,7 +31,7 @@ const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
 	gKrillnaSpeed = 0.16,
 	gRadiusMult = 6;
 
-export default function Krillna(game, img, options = {}) {
+export default function Krillna(game, options = {}) {
 	Object.assign(
 		this,
 		{
@@ -49,7 +49,7 @@ export default function Krillna(game, img, options = {}) {
 			vfr: 0,
 			tscale: 0,
 			movefn: (fr, n) => gFrameMotion[fr] * n,
-			sprite: controller(img),
+			sprite: controller(game.resources[options.img || 'enemy.krillna']),
 		},
 		options
 	);

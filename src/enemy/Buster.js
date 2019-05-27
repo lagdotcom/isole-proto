@@ -33,7 +33,7 @@ const sIdle = 'idle',
 	sJumping = 'jumping',
 	sWaiting = 'waiting';
 
-export default function Buster(game, img, options = {}) {
+export default function Buster(game, options = {}) {
 	Object.assign(
 		this,
 		{
@@ -48,7 +48,7 @@ export default function Buster(game, img, options = {}) {
 			vfr: 0,
 			fatigue: 0,
 			state: sIdle,
-			sprite: controller(img),
+			sprite: controller(game.resources[options.img || 'enemy.buster']),
 		},
 		options
 	);

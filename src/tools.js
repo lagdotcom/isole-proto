@@ -17,13 +17,6 @@ export function angledist(a, b) {
 	return Math.abs(d);
 }
 
-export function alla() {
-	var a = [];
-	for (var i = 0; i < arguments.length; i++) a = a.concat(arguments[i]);
-
-	return a;
-}
-
 export function jbr() {
 	var s = '';
 	for (var i = 0; i < arguments.length; i++) {

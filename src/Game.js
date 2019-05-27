@@ -4,7 +4,7 @@ import Krillna from './enemy/Krillna';
 import Player from './Player';
 import Wall from './Wall';
 import { kLeft, kRight, kJump, kThrow } from './keys';
-import { alla, any, min, pi, piHalf } from './tools';
+import { any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 import mel from './makeElement';
 import dispatch from './dispatchEvent';
@@ -12,7 +12,7 @@ import dispatch from './dispatchEvent';
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
 import krillnaImg from '../media/krillna.png';
-import playerImg from '../media/woody.png';
+import woodyImg from '../media/woody.png';
 
 export default function Game(options) {
 	const { parent, width, height, scale } = options;
@@ -35,7 +35,7 @@ export default function Game(options) {
 
 	this.loading = 0;
 	this.resources = [];
-	this.require('player', playerImg);
+	this.require('player.woody', woodyImg);
 	this.require('enemy.krillna', krillnaImg);
 	this.require('enemy.buster', busterImg);
 	this.require('grass', grassImg);
@@ -59,7 +59,7 @@ Game.prototype.begin = function() {
 	this.walls = [];
 	this.enemies = [];
 
-	this.player = new Player(this, this.resources.player);
+	this.player = new Player(this);
 	this.components = [this.player];
 	this.wallsInMotion = true; // TODO
 
