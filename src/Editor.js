@@ -153,7 +153,7 @@ Editor.prototype.makeDom = function(parent) {
 
 	mel(c, 'h1', { innerText: 'Editor' });
 
-	const yc = mel(c, 'div', { className: 'player' });
+	const yc = mel(c, 'div', { className: 'section section-player' });
 	mel(yc, 'h2', { innerText: 'Player' });
 	this.makePlayerDom(yc, data.player);
 
@@ -186,7 +186,7 @@ Editor.prototype.makeDom = function(parent) {
 		dir: dLeft,
 	});
 
-	const dc = mel(c, 'div', { className: 'dump' });
+	const dc = mel(c, 'div', { className: 'section section-dump' });
 	mel(dc, 'h2', { innerText: 'Dump' });
 	this.dump = mel(dc, 'textarea');
 	mel(
@@ -212,7 +212,9 @@ Editor.prototype.makeDom = function(parent) {
 };
 
 Editor.prototype.makeSection = function(parent, name, label, maker, example) {
-	const container = mel(parent, 'div', { className: name });
+	const container = mel(parent, 'div', {
+		className: 'section section-' + name,
+	});
 	this.makeAdd(
 		mel(container, 'h2', { innerText: label }),
 		name,

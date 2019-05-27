@@ -41,7 +41,7 @@ window.addEventListener('load', () => {
 	addCheckbox('Show hitboxes', G.options.showHitboxes, e => {
 		G.options.showHitboxes = e.target.checked;
 	});
-	addCheckbox('Smoothing', G.options.smoothing, e => {
+	addCheckbox('Smoothing', G.context.imageSmoothingEnabled, e => {
 		G.options.smoothing = e.target.checked;
 		G.context.imageSmoothingEnabled = G.options.smoothing;
 	});

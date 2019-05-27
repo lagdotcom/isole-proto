@@ -22,6 +22,7 @@ import {
 	piHalf,
 	scalew,
 } from './tools';
+import mel from './makeElement';
 import WoodyController from './spr/woody';
 
 export default function Player(game, options = {}) {
@@ -50,8 +51,9 @@ export default function Player(game, options = {}) {
 	this.a = deg2rad(this.a);
 
 	if (game.options.showDebug) {
-		this.del = document.createElement('div');
-		document.body.appendChild(this.del);
+		this.del = mel(game.options.debugContainer, 'div', {
+			className: 'debug debug-player',
+		});
 	}
 }
 
