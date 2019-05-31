@@ -103,12 +103,12 @@ export default class WoodyController extends AnimController {
 		super({
 			animations,
 			img,
-			w: 76,
-			h: 76,
+			w: 80,
+			h: 80,
 			c: 0,
 			row: 0,
-			xo: -38,
-			yo: -72,
+			xo: -40,
+			yo: -74,
 			flip: false,
 			facing: 1,
 		});
