@@ -25,7 +25,7 @@ function Rock(game, options = {}) {
 		options
 	);
 
-	this.sprite.xo = -8;
+	this.sprite.xo = -24;
 	this.sprite.yo = -36;
 }
 
@@ -39,19 +39,19 @@ Rock.prototype.update = function(time) {
 	this.tscale = tscale;
 	float -= tscale;
 
+	if (float <= 0) vr -= gGravityStrength;
+	va *= gWindLoss;
+
 	var floor = null;
-	if (vr <= 0) {
+	if (vr < 0) {
 		floors.forEach((f, i) => {
 			var da = angledist(a, f.a);
-			if (b.r <= f.r && t.r >= t.r && da < f.width + t.aw) floor = f;
+			if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) floor = f;
 		});
 	}
 
 	var wall = null;
-	const vas = Math.sign(va + vfa);
 	walls.forEach(w => {
-		if (vas != w.direction && !w.motion) return;
-
 		if (b.al <= w.a && b.ar >= w.a && t.r >= w.bottom && b.r <= w.top)
 			wall = w;
 	});
@@ -61,9 +61,6 @@ Rock.prototype.update = function(time) {
 		game.components = game.components.filter(c => c != this);
 		return;
 	}
-
-	if (float <= 0) vr -= gGravityStrength;
-	va *= gWindLoss;
 
 	this.va = va;
 	this.vfa = vfa;
