@@ -126,7 +126,7 @@ Editor.prototype.onGameBegin = function() {
 	});
 
 	game.player = new Player(game, {
-		a: deg2rad(player.a),
+		a: player.a,
 		r: player.r,
 	});
 
