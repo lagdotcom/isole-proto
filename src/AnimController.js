@@ -11,6 +11,7 @@ export default class AnimController extends Controller {
 			afi: 0,
 			at: 0,
 			ae: null,
+			al: {},
 			ar: null,
 		});
 
@@ -21,7 +22,7 @@ export default class AnimController extends Controller {
 		});
 	}
 
-	play(animation, force = false) {
+	play(animation, force = false, listeners = {}) {
 		if (this.a !== animation) {
 			if (
 				!force &&
@@ -33,6 +34,7 @@ export default class AnimController extends Controller {
 
 			this.a = animation;
 			this.ac = this.animations[animation];
+			this.al = listeners;
 			this.frame(0);
 		}
 	}
@@ -73,6 +75,6 @@ export default class AnimController extends Controller {
 	}
 
 	dispatch(e, details) {
-		// TODO
+		if (this.al[e]) this.al[e](details);
 	}
 }

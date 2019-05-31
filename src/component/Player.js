@@ -1,4 +1,4 @@
-import { kLeft, kRight, kJump, kThrow } from './keys';
+import { kLeft, kRight, kJump, kThrow } from '../keys';
 import {
 	gAirWalk,
 	gGravityStrength,
@@ -11,7 +11,7 @@ import {
 	gTimeScale,
 	gWalkScale,
 	gWallBounce,
-} from './nums';
+} from '../nums';
 import {
 	angledist,
 	anglewrap,
@@ -21,9 +21,9 @@ import {
 	pi,
 	piHalf,
 	scalew,
-} from './tools';
-import mel from './makeElement';
-import WoodyController from './spr/woody';
+} from '../tools';
+import mel from '../makeElement';
+import WoodyController from '../spr/woody';
 
 export default function Player(game, options = {}) {
 	Object.assign(
@@ -142,7 +142,6 @@ Player.prototype.update = function(time) {
 
 	if (keys[kThrow]) {
 		controls.push('throw');
-		sprite.throw();
 	}
 
 	if (wall && !ceiling) {

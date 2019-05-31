@@ -1,6 +1,6 @@
-import Controller from './Controller';
-import { anglewrap, cart, deg2rad, piHalf, scalew } from './tools';
-import { gHitboxScale, gWallGap } from './nums';
+import Controller from '../Controller';
+import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
+import { gHitboxScale, gWallGap } from '../nums';
 
 const WallController = (img, c, r) =>
 	new Controller({
@@ -9,8 +9,6 @@ const WallController = (img, c, r) =>
 		h: 32,
 		c,
 		r,
-		xo: 0,
-		yo: 0,
 		top: me => {
 			me.r = r;
 		},

@@ -1,8 +1,9 @@
 import Buster from './enemy/Buster';
-import Flat from './Flat';
+import Flat from './component/Flat';
+import Inventory from './component/Inventory';
 import Krillna from './enemy/Krillna';
-import Player from './Player';
-import Wall from './Wall';
+import Player from './component/Player';
+import Wall from './component/Wall';
 import { kLeft, kRight, kJump, kThrow } from './keys';
 import { any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
@@ -12,6 +13,7 @@ import dispatch from './dispatchEvent';
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
 import krillnaImg from '../media/krillna.png';
+import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
 
 export default function Game(options) {
@@ -39,6 +41,7 @@ export default function Game(options) {
 	this.require('enemy.krillna', krillnaImg);
 	this.require('enemy.buster', busterImg);
 	this.require('grass', grassImg);
+	this.require('item.rock', rockImg);
 }
 
 Game.prototype.require = function(key, src) {
@@ -107,6 +110,7 @@ Game.prototype.start = function() {
 		return;
 	}
 
+	this.inventory = new Inventory(this);
 	if (!this.player) this.begin();
 
 	this.running = true;
@@ -123,7 +127,7 @@ Game.prototype.next = function(t) {
 
 	if (this.pads.length) this.readGamepads();
 
-	this.components.forEach(co => co.update(step));
+	this.components.forEach(co => co.update && co.update(step));
 	this.components.forEach(co => co.draw && co.draw(c));
 
 	if (this.options.showHitboxes) {

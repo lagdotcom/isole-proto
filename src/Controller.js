@@ -1,6 +1,8 @@
 export default class Controller {
 	constructor(options) {
-		Object.entries(options).forEach(e => {
+		Object.entries(
+			Object.assign({}, { c: 0, r: 0, xo: 0, yo: 0 }, options)
+		).forEach(e => {
 			const [key, val] = e;
 			if (typeof val === 'function') {
 				this[key] = function() {

@@ -1,6 +1,6 @@
-import Controller from './Controller';
-import { gHitboxScale } from './nums';
-import { anglewrap, cart, deg2rad, piHalf, scalew } from './tools';
+import Controller from '../Controller';
+import { gHitboxScale } from '../nums';
+import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 
 const FlatController = (img, c, r) =>
 	new Controller({
@@ -9,8 +9,6 @@ const FlatController = (img, c, r) =>
 		h: 32,
 		c,
 		r,
-		xo: 0,
-		yo: 0,
 		left: me => {
 			me.c = c;
 		},
