@@ -190,7 +190,7 @@ Player.prototype.update = function(time) {
 			`flags: ${flags.join(' ')}`,
 			`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
 			`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
-			`anim: ${sprite.state}+${sprite.timer.toFixed(0)}ms, ${
+			`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
 				sprite.flip ? 'flip' : 'normal'
 			}`,
 			debug

@@ -1,1 +1,2 @@
-export const eThrow = 'throw';
+export const eAnimationEnded = 'animend',
+	eThrow = 'throw';

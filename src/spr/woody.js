@@ -1,5 +1,4 @@
-import Controller from '../Controller';
-import gTimeScale from '../nums';
+import AnimController from '../AnimController';
 import {
 	aStand,
 	aFlip,
@@ -33,82 +32,105 @@ const tFlip = 75,
 	tThrow = 75,
 	tThrowLast = 150;
 
-export default class WoodyController extends Controller {
+const animations = {
+	[aStand]: {
+		extend: true,
+		frames: [{ c: 0, r: 0, t: 1000 }],
+	},
+
+	[aFlip]: {
+		priority: 5,
+		frames: [{ c: 1, r: 0, t: 75 }],
+	},
+
+	[aWalk]: {
+		loop: true,
+		frames: [
+			{ c: 2, r: 0, t: 85 },
+			{ c: 2, r: 1, t: 85 },
+			{ c: 2, r: 2, t: 85 },
+			{ c: 2, r: 3, t: 85 },
+			{ c: 2, r: 4, t: 85 },
+			{ c: 2, r: 5, t: 85 },
+			{ c: 2, r: 6, t: 85 },
+			{ c: 2, r: 7, t: 85 },
+		],
+	},
+
+	[aJump]: {
+		extend: true,
+		frames: [
+			{ c: 3, r: 0, t: 75 },
+			{ c: 3, r: 1, t: 75 },
+			{ c: 3, r: 2, t: 1000 },
+		],
+	},
+
+	[aFall]: {
+		extend: true,
+		frames: [
+			{ c: 3, r: 3, t: 75 },
+			{ c: 3, r: 4, t: 75 },
+			{ c: 3, r: 5, t: 1000 },
+		],
+	},
+
+	[aLand]: {
+		priority: 1,
+		frames: [{ c: 3, r: 6, t: 75 }, { c: 3, r: 7, t: 75 }],
+	},
+
+	[aJFlip]: {
+		priority: 5,
+		frames: [{ c: 4, r: 0, t: 75 }],
+	},
+
+	[aThrow]: {
+		priority: 2,
+		frames: [
+			{ c: 5, r: 0, t: 75 },
+			{ c: 5, r: 1, t: 75 },
+			{ c: 5, r: 2, t: 75 },
+			{ c: 5, r: 3, t: 75, event: eThrow },
+			{ c: 5, r: 4, t: 75 },
+			{ c: 5, r: 5, t: 150 },
+		],
+	},
+};
+
+export default class WoodyController extends AnimController {
 	constructor(img) {
 		super({
+			animations,
 			img,
 			w: 76,
 			h: 76,
-			column: 0,
+			c: 0,
 			row: 0,
 			xo: -38,
 			yo: -72,
-			timer: 0,
 			flip: false,
 			facing: 1,
-			state: '',
 		});
 	}
 
-	flipOverride(t) {
-		if (this.state === aFlip || this.state === aJFlip) {
-			this.timer += t;
-			if (this.timer < tFlip) return true;
-		}
-	}
-
-	throwOverride(t) {
-		if (this.state === aThrow) {
-			this.timer += t;
-			if (
-				(this.row === 5 && this.timer >= tThrowLast) ||
-				(this.row < 5 && this.timer >= tThrow)
-			) {
-				this.row++;
-				this.timer = 0;
-				return this.row < 6;
-			}
-			return true;
-		}
-	}
-
-	checkOverrides(t) {
-		if (this.flipOverride(t)) return true;
-		if (this.throwOverride(t)) return true;
-	}
-
 	jump(t) {
-		if (this.checkOverrides(t)) return;
-
-		if (this.play(aJump, 3, 0)) {
-			this.timer += t;
-			if (this.timer >= tJump && this.row < 2) {
-				this.row++;
-				this.timer = 0;
-			}
-		}
+		this.play(aJump);
+		this.next(t);
 	}
 
 	fall(t) {
-		if (this.checkOverrides(t)) return;
-
-		if (this.play(aFall, 3, 3)) {
-			this.timer += t;
-			if (this.timer >= tFall && this.row < 5) {
-				this.row++;
-				this.timer = 0;
-			}
-		}
+		this.play(aFall);
+		this.next(t);
 	}
 
 	stand(t) {
-		if (this.checkOverrides(t)) return;
-
-		if (this.state === aFall || this.state == aLand) {
-			if (!this.land(t)) return;
+		if (this.a === aFall) {
+			this.play(aLand);
 		}
 
-		this.play(aStand, 0, 0);
+		this.play(aStand);
+		this.next(t);
 	}
 
 	face(vr, grounded) {
@@ -116,48 +138,25 @@ export default class WoodyController extends Controller {
 			this.facing = vr;
 
 			if (grounded) {
-				if (vr > 0) this.play(aFlip, 1, 1);
-				else this.play(aFlip, 1, 0);
+				this.play(aFlip);
 			} else {
-				if (vr > 0) this.play(aJFlip, 4, 1);
-				else this.play(aJFlip, 4, 0);
+				this.play(aJFlip);
 			}
 
 			this.flip = vr < 0;
 		}
 	}
 
-	land(t) {
-		if (this.play(aLand, 3, 6)) {
-			this.timer += t;
-			if (this.timer >= tLand) {
-				this.row++;
-				if (this.row >= 8) return true;
-				else this.timer = 0;
-			}
-		}
-
-		return false;
-	}
-
 	walk(t) {
-		if (this.state === aFall || this.state == aLand) {
-			if (!this.land(t)) return;
+		if (this.a === aFall) {
+			this.play(aLand);
 		}
 
-		if (this.checkOverrides(t)) return;
-
-		if (this.play(aWalk, 2, 0)) {
-			this.timer += t;
-			if (this.timer >= tWalk) {
-				this.row++;
-				this.timer = 0;
-				if (this.row >= 8) this.row = 0;
-			}
-		}
+		this.play(aWalk);
+		this.next(t);
 	}
 
-	throw(t) {
-		this.play(aThrow, 5, 0);
+	throw() {
+		this.play(aThrow);
 	}
 }
