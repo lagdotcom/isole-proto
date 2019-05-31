@@ -1,3 +1,4 @@
+import { dLeft, dRight } from '../dirs';
 import { kLeft, kRight, kJump, kThrow } from '../keys';
 import {
 	gAirWalk,
@@ -39,6 +40,7 @@ export default function Player(game, options = {}) {
 			vr: 0,
 			vfa: 0,
 			vfr: 0,
+			facing: dRight,
 			jumpt: 0,
 			tscale: 0,
 			sprite: new WoodyController(
@@ -128,10 +130,12 @@ Player.prototype.update = function(time) {
 		va -= strength;
 		controls.push('left');
 		sprite.face(-1, this.grounded);
+		this.facing = dLeft;
 	} else if (keys[kRight]) {
 		va += strength;
 		controls.push('right');
 		sprite.face(1, this.grounded);
+		this.facing = dRight;
 	}
 
 	if (keys[kJump] && floor) {
