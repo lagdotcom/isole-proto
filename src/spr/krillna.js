@@ -1,5 +1,5 @@
 import Controller from '../Controller';
-import { dRight, dDown, dLeft, dUp } from '../nums';
+import { dRight, dDown, dLeft, dUp } from '../dirs';
 import { pi, piHalf } from '../tools';
 
 // MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
@@ -25,8 +25,8 @@ export default img =>
 		img,
 		w: 72,
 		h: 72,
-		column: 0,
-		row: 0,
+		c: 0,
+		r: 0,
 		xo: -36,
 		yo: -58,
 		walktimer: 0,
@@ -73,10 +73,10 @@ export default img =>
 
 			if (me.play('walk', 0, 0)) {
 				me.timer += t;
-				if (me.timer >= moveTimes[me.row]) {
+				if (me.timer >= moveTimes[me.r]) {
 					me.timer = 0;
-					me.row++;
-					if (me.row >= 6) me.row = 0;
+					me.r++;
+					if (me.r >= 6) me.r = 0;
 				}
 			}
 		},

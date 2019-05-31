@@ -7,18 +7,18 @@ const FlatController = (img, c, r) =>
 		img,
 		w: 32,
 		h: 32,
-		column: c,
-		row: r,
+		c,
+		r,
 		xo: 0,
 		yo: 0,
 		left: me => {
-			me.column = c;
+			me.c = c;
 		},
 		middle: me => {
-			me.column = c + 1;
+			me.c = c + 1;
 		},
 		right: me => {
-			me.column = c + 2;
+			me.c = c + 2;
 		},
 	});
 

@@ -23,8 +23,8 @@ export default class Controller {
 	play(state, column, row) {
 		if (this.state !== state) {
 			this.state = state;
-			this.column = column;
-			this.row = row;
+			this.c = column;
+			this.r = row;
 			this.timer = 0;
 			return false;
 		} else {
@@ -33,9 +33,9 @@ export default class Controller {
 	}
 
 	draw(ctx) {
-		const { w, column, h, row, flip, img, xo, yo } = this,
-			sx = w * column,
-			sy = h * row;
+		const { w, c, h, r, flip, img, xo, yo } = this,
+			sx = w * c,
+			sy = h * r;
 
 		if (flip) ctx.scale(-1, 1);
 		ctx.drawImage(img, sx, sy, w, h, xo, yo, w, h);

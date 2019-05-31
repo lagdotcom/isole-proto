@@ -15,8 +15,8 @@ export default img =>
 		img,
 		w: 84,
 		h: 56,
-		column: Math.floor(Math.random() * 2),
-		row: 0,
+		c: Math.floor(Math.random() * 2),
+		r: 0,
 		xo: -42,
 		yo: -52,
 		timer: 0,
@@ -25,8 +25,8 @@ export default img =>
 			if (me.play(aLand, 1, 8)) {
 				me.timer += t;
 				if (me.timer >= 75) {
-					me.row++;
-					if (me.row >= 10) return true;
+					me.r++;
+					if (me.r >= 10) return true;
 					else me.timer = 0;
 				}
 			}
@@ -46,9 +46,9 @@ export default img =>
 			if (me.play('near', 0, 1)) {
 				me.timer += t;
 				if (me.timer >= 75) {
-					me.row++;
+					me.r++;
 					me.timer = 0;
-					if (me.row === 7) me.row = 1;
+					if (me.r === 7) me.r = 1;
 				}
 			}
 		},
@@ -56,8 +56,8 @@ export default img =>
 		jump: (me, t) => {
 			if (me.play('jump', 1, 0)) {
 				me.timer += t;
-				if (me.timer >= 75 && me.row < 1) {
-					me.row++;
+				if (me.timer >= 75 && me.r < 1) {
+					me.r++;
 					me.timer = 0;
 				}
 			}
@@ -66,8 +66,8 @@ export default img =>
 		rise: (me, t) => {
 			if (me.play('rise', 1, 2)) {
 				me.timer += t;
-				if (me.timer >= 75 && me.row < 3) {
-					me.row++;
+				if (me.timer >= 75 && me.r < 3) {
+					me.r++;
 					me.timer = 0;
 				}
 			}
@@ -76,8 +76,8 @@ export default img =>
 		fall: (me, t) => {
 			if (me.play(aFall, 1, 4)) {
 				me.timer += t;
-				if (me.timer >= 75 && me.row < 7) {
-					me.row++;
+				if (me.timer >= 75 && me.r < 7) {
+					me.r++;
 					me.timer = 0;
 				}
 			}

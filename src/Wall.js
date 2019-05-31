@@ -7,18 +7,18 @@ const WallController = (img, c, r) =>
 		img,
 		w: 32,
 		h: 32,
-		column: c,
-		row: r,
+		c,
+		r,
 		xo: 0,
 		yo: 0,
 		top: me => {
-			me.row = r;
+			me.r = r;
 		},
 		middle: me => {
-			me.row = r + 1;
+			me.r = r + 1;
 		},
 		bottom: me => {
-			me.row = r + 2;
+			me.r = r + 2;
 		},
 	});
 

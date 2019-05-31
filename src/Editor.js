@@ -2,14 +2,17 @@ import Buster from './enemy/Buster';
 import Flat from './Flat';
 import Krillna from './enemy/Krillna';
 import Player from './Player';
+import Rock from './item/Rock';
 import Wall from './Wall';
 import mel from './makeElement';
 import clearChildren from './clearChildren';
 import { alla, deg2rad } from './tools';
-import { dLeft, dRight } from './nums';
+import { dLeft, dRight } from './dirs';
 
 const enemyTypes = { buster: Buster, krillna: Krillna };
 const enemies = Object.keys(enemyTypes);
+const itemTypes = { rock: Rock };
+const items = [null, ...Object.keys(itemTypes)];
 const textures = ['grass'];
 const wallDirections = [1, -1];
 
@@ -71,7 +74,7 @@ export default function Editor(options) {
 				texture: 'grass',
 			},
 		],
-		player: { a: 270, r: 300 },
+		player: { a: 270, r: 300, item: null },
 		enemies: [
 			{
 				type: 'krillna',
@@ -328,6 +331,7 @@ Editor.prototype.makePlayerDom = function(parent, o) {
 	const e = mel(parent, 'div', { className: 'entry' });
 	this.makeNumInput(e, o, 'Height', 'r');
 	this.makeAngleInput(e, o, 'Angle', 'a');
+	this.makeChoiceInput(e, o, 'Item', 'item', items);
 };
 
 Editor.prototype.makePlatformDom = function(parent, o) {

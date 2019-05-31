@@ -1,8 +1,5 @@
+import { dRight, dDown, dLeft, dUp } from '../dirs';
 import {
-	dRight,
-	dDown,
-	dLeft,
-	dUp,
 	gAirWalk,
 	gGravityStrength,
 	gGroundFriction,
@@ -25,7 +22,7 @@ import {
 	piHalf,
 	scalew,
 } from '../tools';
-import controller from '../spr/Krillna';
+import controller from '../spr/krillna';
 
 const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
 	gKrillnaSpeed = 0.16,
@@ -218,8 +215,8 @@ Krillna.prototype.update = function(time) {
 		vr -= gGravityStrength;
 	}
 
-	const mva = stuck ? movefn(sprite.row, va) : va,
-		mvr = stuck ? movefn(sprite.row, vr) : vr;
+	const mva = stuck ? movefn(sprite.r, va) : va,
+		mvr = stuck ? movefn(sprite.r, vr) : vr;
 
 	this.va = va;
 	this.vfa = vfa;

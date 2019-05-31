@@ -1,5 +1,16 @@
 import Controller from '../Controller';
 import gTimeScale from '../nums';
+import {
+	aStand,
+	aFlip,
+	aJFlip,
+	aWalk,
+	aJump,
+	aFall,
+	aLand,
+	aThrow,
+} from '../anims';
+import { eThrow } from '../events';
 
 /*
 Spritesheet Layout (72x72)
@@ -13,14 +24,6 @@ Stand	FlipL	Run1	Jump1	JFlipL	Throw1
 				Run7	Land1
 				Run8	Land2
 */
-
-const aStand = 'stand',
-	aFlip = 'flip',
-	aWalk = 'walk',
-	aJump = 'jump',
-	aFall = 'fall',
-	aLand = 'land',
-	aThrow = 'throw';
 
 const tFlip = 75,
 	tJump = 75,
@@ -48,7 +51,7 @@ export default class WoodyController extends Controller {
 	}
 
 	flipOverride(t) {
-		if (this.state === aFlip) {
+		if (this.state === aFlip || this.state === aJFlip) {
 			this.timer += t;
 			if (this.timer < tFlip) return true;
 		}
@@ -116,8 +119,8 @@ export default class WoodyController extends Controller {
 				if (vr > 0) this.play(aFlip, 1, 1);
 				else this.play(aFlip, 1, 0);
 			} else {
-				if (vr > 0) this.play(aFlip, 4, 1);
-				else this.play(aFlip, 4, 0);
+				if (vr > 0) this.play(aJFlip, 4, 1);
+				else this.play(aJFlip, 4, 0);
 			}
 
 			this.flip = vr < 0;
