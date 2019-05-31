@@ -13,6 +13,7 @@ export default class AnimController extends Controller {
 			ae: null,
 			al: {},
 			ar: null,
+			flags: {},
 		});
 
 		// pre-calculations
@@ -35,6 +36,7 @@ export default class AnimController extends Controller {
 			this.a = animation;
 			this.ac = this.animations[animation];
 			this.al = listeners;
+			this.flags = this.ac.flags || {};
 			this.frame(0);
 		}
 	}

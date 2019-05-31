@@ -87,6 +87,7 @@ const animations = {
 
 	[aThrow]: {
 		priority: 2,
+		flags: { preventTurn: true },
 		frames: [
 			{ c: 5, r: 0, t: 75 },
 			{ c: 5, r: 1, t: 75 },

@@ -129,13 +129,19 @@ Player.prototype.update = function(time) {
 	if (keys[kLeft]) {
 		va -= strength;
 		controls.push('left');
-		sprite.face(-1, this.grounded);
-		this.facing = dLeft;
+
+		if (!sprite.flags.preventTurn) {
+			sprite.face(-1, this.grounded);
+			this.facing = dLeft;
+		}
 	} else if (keys[kRight]) {
 		va += strength;
 		controls.push('right');
-		sprite.face(1, this.grounded);
-		this.facing = dRight;
+
+		if (!sprite.flags.preventTurn) {
+			sprite.face(1, this.grounded);
+			this.facing = dRight;
+		}
 	}
 
 	if (keys[kJump] && floor) {

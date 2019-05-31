@@ -57,6 +57,7 @@ Rock.prototype.update = function(time) {
 	});
 
 	if (floor || wall) {
+		// TODO: bounce etc
 		game.components = game.components.filter(c => c != this);
 		return;
 	}
@@ -160,7 +161,8 @@ RockItem.prototype.use = function() {
 RockItem.prototype.thrown = function() {
 	const { game } = this;
 
-	game.inventory.remove(this);
+	// TODO
+	//game.inventory.remove(this);
 
 	game.components.push(
 		new Rock(game, {
