@@ -17,6 +17,8 @@ import krillnaImg from '../media/krillna.png';
 import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
 
+import grassTextures from './texture/grass';
+
 export default function Game(options) {
 	const { parent, width, height, scale, smoothing } = options;
 
@@ -38,12 +40,15 @@ export default function Game(options) {
 
 	this.loading = 0;
 	this.resources = [];
-	this.require('player.woody', woodyImg);
-	this.require('enemy.krillna', krillnaImg);
 	this.require('enemy.buster', busterImg);
-	this.require('grass', grassImg);
+	this.require('enemy.krillna', krillnaImg);
 	this.require('item.rock', rockImg);
-	this.require('icons', iconsImg);
+	this.require('player.woody', woodyImg);
+	this.require('tile.grass', grassImg);
+	this.require('ui.icons', iconsImg);
+
+	this.textures = {};
+	this.addTextures([grassTextures]);
 }
 
 Game.prototype.require = function(key, src) {
@@ -194,4 +199,12 @@ Game.prototype.release = function(key) {
 
 Game.prototype.remove = function(component) {
 	this.components = this.components.filter(c => c != component);
+};
+
+Game.prototype.addTextures = function(textures) {
+	textures.forEach(t => {
+		Object.keys(t).forEach(k => {
+			this.textures[k] = t[k](this);
+		});
+	});
 };

@@ -8,7 +8,7 @@ export default function Inventory(game, size = 3) {
 		money: 0,
 		health: 5,
 		keys: 0,
-		img: game.resources.icons,
+		img: game.resources['ui.icons'],
 	});
 
 	this.clear();

@@ -13,12 +13,13 @@ const enemyTypes = { buster: Buster, krillna: Krillna };
 const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
-const textures = ['grass'];
+var textures;
 const wallDirections = [1, -1];
 
 export default function Editor(options) {
 	const { data, game, parent } = options;
 
+	textures = Object.keys(game.textures);
 	game.element.addEventListener('isole.begin', () => this.onGameBegin());
 
 	this.game = game;

@@ -3,24 +3,6 @@ import { cWall } from '../colours';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { gHitboxScale, gWallGap } from '../nums';
 
-const WallController = (img, c, r) =>
-	new Controller({
-		img,
-		w: 32,
-		h: 32,
-		c,
-		r,
-		top: me => {
-			me.r = r;
-		},
-		middle: me => {
-			me.r = r + 1;
-		},
-		bottom: me => {
-			me.r = r + 2;
-		},
-	});
-
 export default function Wall(
 	game,
 	t,
@@ -28,9 +10,7 @@ export default function Wall(
 	angle,
 	direction,
 	motion = 0,
-	texture,
-	texX = 0,
-	texY = 0
+	texture
 ) {
 	const a = anglewrap(deg2rad(angle)),
 		top = t - gWallGap,
@@ -48,7 +28,7 @@ export default function Wall(
 	});
 
 	if (texture) {
-		this.sprite = WallController(game.resources[texture], texX, texY);
+		this.sprite = game.textures[texture];
 		this.scale = this.sprite.w / gHitboxScale;
 
 		if (direction < 0) {
@@ -85,10 +65,10 @@ Wall.prototype.drawLeft = function(c) {
 	var remaining = t - b,
 		r = t;
 
-	sprite.top();
+	sprite.tile('tr');
 	while (remaining > 0) {
 		if (remaining < step) {
-			sprite.bottom();
+			sprite.tile('br');
 			r = b + step;
 		}
 
@@ -107,7 +87,7 @@ Wall.prototype.drawLeft = function(c) {
 
 		remaining -= step;
 		r -= step;
-		sprite.middle();
+		sprite.tile('mr');
 	}
 };
 
@@ -119,10 +99,10 @@ Wall.prototype.drawRight = function(c) {
 	var remaining = t - b,
 		r = t;
 
-	sprite.top();
+	sprite.tile('tl');
 	while (remaining > 0) {
 		if (remaining < step) {
-			sprite.bottom();
+			sprite.tile('bl');
 			r = b + step;
 		}
 
@@ -140,7 +120,7 @@ Wall.prototype.drawRight = function(c) {
 
 		remaining -= step;
 		r -= step;
-		sprite.middle();
+		sprite.tile('ml');
 	}
 };
 

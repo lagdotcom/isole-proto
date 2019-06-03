@@ -3,34 +3,7 @@ import { cWall } from '../colours';
 import { gHitboxScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 
-const FlatController = (img, c, r) =>
-	new Controller({
-		img,
-		w: 32,
-		h: 32,
-		c,
-		r,
-		left: me => {
-			me.c = c;
-		},
-		middle: me => {
-			me.c = c + 1;
-		},
-		right: me => {
-			me.c = c + 2;
-		},
-	});
-
-export default function Flat(
-	game,
-	height,
-	angle,
-	width,
-	motion,
-	texture,
-	texX = 0,
-	texY = 0
-) {
+export default function Flat(game, height, angle, width, motion, texture) {
 	Object.assign(this, {
 		game,
 		r: height,
@@ -43,7 +16,7 @@ export default function Flat(
 	this.right = this.a + this.width;
 
 	if (texture) {
-		this.sprite = FlatController(game.resources[texture], texX, texY);
+		this.sprite = game.textures[texture];
 		this.scale = this.sprite.w / gHitboxScale;
 	}
 }
@@ -66,10 +39,10 @@ Flat.prototype.draw = function(c) {
 	var remaining = this.width * 2,
 		a = left;
 
-	sprite.left();
+	sprite.tile('tl');
 	while (remaining > 0) {
 		if (remaining < step) {
-			sprite.right();
+			sprite.tile('tr');
 			a = this.right - step;
 		}
 
@@ -86,7 +59,7 @@ Flat.prototype.draw = function(c) {
 
 		remaining -= step;
 		a += step;
-		sprite.middle();
+		sprite.tile('tm');
 	}
 };
 
