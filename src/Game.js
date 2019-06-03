@@ -12,6 +12,7 @@ import dispatch from './dispatchEvent';
 
 import busterImg from '../media/buster.png';
 import grassImg from '../media/tilesheet_grass.png';
+import iconsImg from '../media/icons.png';
 import krillnaImg from '../media/krillna.png';
 import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
@@ -42,6 +43,7 @@ export default function Game(options) {
 	this.require('enemy.buster', busterImg);
 	this.require('grass', grassImg);
 	this.require('item.rock', rockImg);
+	this.require('icons', iconsImg);
 }
 
 Game.prototype.require = function(key, src) {
@@ -141,6 +143,7 @@ Game.prototype.next = function(t) {
 
 	if (showFps) {
 		c.fillStyle = '#ffffff';
+		c.font = '12px monospace';
 		c.fillText(Math.floor(1000 / step) + 'fps', 10, 10);
 	}
 

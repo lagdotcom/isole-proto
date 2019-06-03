@@ -5,6 +5,10 @@ export default function Inventory(game, size = 3) {
 		game,
 		items: new Array(size),
 		cycling: false,
+		money: 0,
+		health: 5,
+		keys: 0,
+		img: game.resources.icons,
 	});
 
 	this.clear();
@@ -46,13 +50,27 @@ Inventory.prototype.update = function(t) {
 };
 
 Inventory.prototype.draw = function(c) {
+	const { items, money, health, keys, img } = this;
+
 	const y = 768 - 60;
 	var x = 0;
 
-	this.items.forEach(i => {
+	items.forEach(i => {
 		if (i && i.draw) i.draw(c, x, y);
 		x += 60;
 	});
+
+	c.font = '20px sans-serif';
+	c.fillStyle = '#ffffff';
+
+	c.drawImage(img, 0, 0, 36, 36, 0, 40, 36, 36);
+	c.fillText(money, 40, 64);
+
+	c.drawImage(img, 36, 0, 36, 36, 0, 76, 36, 36);
+	c.fillText(health, 40, 100);
+
+	c.drawImage(img, 72, 0, 36, 36, 0, 112, 36, 36);
+	c.fillText(keys, 40, 136);
 };
 
 Inventory.prototype.canThrow = function() {
