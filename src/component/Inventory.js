@@ -1,18 +1,22 @@
-import { kThrow } from '../keys';
+import { kCycle, kThrow } from '../keys';
 
-export default function Inventory(game) {
+export default function Inventory(game, size = 3) {
 	Object.assign(this, {
 		game,
-		items: [],
+		items: new Array(size),
+		cycling: false,
 	});
+
+	this.clear();
 }
 
 Inventory.prototype.clear = function() {
-	this.items = [];
+	this.items.fill(null);
 };
 
 Inventory.prototype.add = function(cls) {
-	this.items.push(new cls(this.game));
+	const i = this.items.indexOf(null);
+	if (i > -1) this.items[i] = new cls(this.game);
 };
 
 Inventory.prototype.remove = function(item) {
@@ -30,6 +34,15 @@ Inventory.prototype.update = function(t) {
 		// 	this.game.player.sprite.play('shrug');
 		// }
 	}
+
+	if (this.game.keys[kCycle]) {
+		if (!this.cycling) {
+			this.cycle();
+			this.cycling = true;
+		}
+	} else {
+		this.cycling = false;
+	}
 };
 
 Inventory.prototype.draw = function(c) {
@@ -37,15 +50,20 @@ Inventory.prototype.draw = function(c) {
 	var x = 0;
 
 	this.items.forEach(i => {
-		i.draw(c, x, y);
+		if (i && i.draw) i.draw(c, x, y);
 		x += 60;
 	});
 };
 
 Inventory.prototype.canThrow = function() {
-	return this.items.length > 0 && this.items[0].use;
+	return this.items[0] && this.items[0].use;
 };
 
 Inventory.prototype.throw = function() {
 	return this.items[0].use();
+};
+
+Inventory.prototype.cycle = function() {
+	const first = this.items.shift();
+	this.items = [...this.items, first];
 };
