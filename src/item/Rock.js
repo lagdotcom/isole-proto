@@ -3,7 +3,7 @@ import { aThrow } from '../anims';
 import { dLeft, dRight } from '../dirs';
 import { eThrow } from '../events';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
-import { angledist, anglewrap, cart, piHalf, scalew } from '../tools';
+import { angledist, anglewrap, cart, collides, piHalf, scalew } from '../tools';
 
 const gFloatTime = 80,
 	gWindLoss = 0.995;
@@ -31,10 +31,25 @@ function Rock(game, options = {}) {
 
 Rock.prototype.update = function(time) {
 	var { game, va, vfa, vr, a, r, float } = this,
-		{ floors, walls } = game,
+		{ enemies, floors, walls } = game,
 		tscale = time / gTimeScale;
 
 	const { b, t } = this.getHitbox();
+	var enemy = null;
+	enemies.forEach(e => {
+		if (collides({ b, t }, e.getHitbox())) {
+			enemy = e;
+			return;
+		}
+	});
+
+	if (enemy) {
+		// TODO: bounce etc
+		game.remove(this);
+		enemy.va += va * 0.2; // knock back a bit
+		enemy.last = {}; // unstick krillna
+		return;
+	}
 
 	this.tscale = tscale;
 	float -= tscale;
@@ -44,7 +59,7 @@ Rock.prototype.update = function(time) {
 
 	var floor = null;
 	if (vr < 0) {
-		floors.forEach((f, i) => {
+		floors.forEach(f => {
 			var da = angledist(a, f.a);
 			if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) floor = f;
 		});
@@ -58,7 +73,7 @@ Rock.prototype.update = function(time) {
 
 	if (floor || wall) {
 		// TODO: bounce etc
-		game.components = game.components.filter(c => c != this);
+		game.remove(this);
 		return;
 	}
 

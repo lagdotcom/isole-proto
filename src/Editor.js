@@ -74,7 +74,7 @@ export default function Editor(options) {
 				texture: 'grass',
 			},
 		],
-		player: { a: 270, r: 300, item: null },
+		player: { a: 270, r: 300, item: 'rock' },
 		enemies: [
 			{
 				type: 'krillna',

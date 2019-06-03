@@ -38,6 +38,7 @@ export default function Buster(game, options = {}) {
 		this,
 		{
 			game,
+			name: 'Buster',
 			width: 35,
 			height: 35,
 			a: 0,

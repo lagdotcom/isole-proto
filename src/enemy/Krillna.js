@@ -33,6 +33,7 @@ export default function Krillna(game, options = {}) {
 		this,
 		{
 			game,
+			name: 'Krillna',
 			dir: dRight,
 			speed: gKrillnaSpeed,
 			last: {},

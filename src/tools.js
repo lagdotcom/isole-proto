@@ -61,3 +61,10 @@ export function any(a, fn) {
 
 	return false;
 }
+
+export function collides(a, b) {
+	// TODO: should this also check .t.al?
+	return (
+		a.b.r <= b.t.r && a.t.r >= b.b.r && a.b.ar >= b.b.al && a.b.al <= b.b.ar
+	);
+}

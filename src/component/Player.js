@@ -31,6 +31,7 @@ export default function Player(game, options = {}) {
 		this,
 		{
 			game,
+			name: 'Woody',
 			w: 30,
 			h: 34,
 			steph: 10,

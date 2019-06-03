@@ -188,3 +188,7 @@ Game.prototype.press = function(key) {
 Game.prototype.release = function(key) {
 	this.keys[key] = false;
 };
+
+Game.prototype.remove = function(component) {
+	this.components = this.components.filter(c => c != component);
+};
