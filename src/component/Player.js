@@ -1,3 +1,4 @@
+import { cHurt, cStep } from '../colours';
 import { dLeft, dRight } from '../dirs';
 import { kLeft, kRight, kJump, kThrow } from '../keys';
 import {
@@ -228,14 +229,14 @@ Player.prototype.drawHitbox = function(c) {
 	const { cx, cy } = game;
 	const { b, t, s } = this.getHitbox();
 
-	c.strokeStyle = '#ffff00';
+	c.strokeStyle = cHurt;
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
 
-	c.strokeStyle = '#888800';
+	c.strokeStyle = cStep;
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, s.r, s.ar, s.al, true);

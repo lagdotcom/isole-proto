@@ -1,4 +1,5 @@
 import Controller from '../Controller';
+import { cWall } from '../colours';
 import { gHitboxScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 
@@ -93,7 +94,7 @@ Flat.prototype.drawHitbox = function(c) {
 	const { r, a, width, left, right } = this;
 	const { cx, cy } = this.game;
 
-	c.strokeStyle = '#888888';
+	c.strokeStyle = cWall;
 	c.beginPath();
 	c.arc(cx, cy, r, left, right);
 	c.stroke();

@@ -1,3 +1,4 @@
+import { cAI, cHurt } from '../colours';
 import {
 	gGravityStrength,
 	gGroundFriction,
@@ -209,21 +210,21 @@ Buster.prototype.drawHitbox = function(c) {
 	const { cx, cy } = game;
 	const { b, t, a, n } = this.getHitbox();
 
-	c.strokeStyle = '#ffff00';
+	c.strokeStyle = cHurt;
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
 
-	c.strokeStyle = '#ff0000';
+	c.strokeStyle = cAI;
 	c.beginPath();
 	c.arc(cx, cy, a.r, a.al, a.ar);
 	c.arc(cx, cy, t.r, a.ar, a.al, true);
 	c.arc(cx, cy, a.r, a.al, a.ar);
 	c.stroke();
 
-	c.strokeStyle = '#880000';
+	c.strokeStyle = cAI;
 	c.beginPath();
 	c.arc(cx, cy, n.r, n.al, n.ar);
 	c.arc(cx, cy, t.r, n.ar, n.al, true);

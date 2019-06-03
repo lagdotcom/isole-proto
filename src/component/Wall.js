@@ -1,4 +1,5 @@
 import Controller from '../Controller';
+import { cWall } from '../colours';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { gHitboxScale, gWallGap } from '../nums';
 
@@ -147,7 +148,7 @@ Wall.prototype.drawHitbox = function(c) {
 	const { game, sx, sy, ex, ey } = this;
 	const { cx, cy } = game;
 
-	c.strokeStyle = '#888888';
+	c.strokeStyle = cWall;
 	c.beginPath();
 	c.moveTo(sx + cx, sy + cy);
 	c.lineTo(ex + cx, ey + cy);

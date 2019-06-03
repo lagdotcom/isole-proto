@@ -1,5 +1,6 @@
 import Controller from '../Controller';
 import { aThrow } from '../anims';
+import { cHit } from '../colours';
 import { dLeft, dRight } from '../dirs';
 import { eThrow } from '../events';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
@@ -114,7 +115,7 @@ Rock.prototype.drawHitbox = function(c) {
 	const { cx, cy } = game;
 	const { b, t } = this.getHitbox();
 
-	c.strokeStyle = '#ffff00';
+	c.strokeStyle = cHit;
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, t.r, t.ar, t.al, true);

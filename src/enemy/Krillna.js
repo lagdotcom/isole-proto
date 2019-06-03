@@ -1,3 +1,4 @@
+import { cHurt } from '../colours';
 import { dRight, dDown, dLeft, dUp } from '../dirs';
 import {
 	gAirWalk,
@@ -263,7 +264,7 @@ Krillna.prototype.drawHitbox = function(c) {
 	const { cx, cy } = game;
 	const { b, t, s } = this.getHitbox();
 
-	c.strokeStyle = '#ffff00';
+	c.strokeStyle = cHurt;
 	c.beginPath();
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
