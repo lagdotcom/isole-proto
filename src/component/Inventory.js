@@ -50,27 +50,30 @@ Inventory.prototype.update = function(t) {
 };
 
 Inventory.prototype.draw = function(c) {
-	const { items, money, health, keys, img } = this;
+	const { game, items, money, health, keys, img } = this;
 
-	const y = 768 - 60;
+	const y = game.options.height - 48;
 	var x = 0;
 
 	items.forEach(i => {
 		if (i && i.draw) i.draw(c, x, y);
-		x += 60;
+		x += 48;
 	});
 
 	c.font = '20px sans-serif';
 	c.fillStyle = '#ffffff';
 
-	c.drawImage(img, 0, 0, 36, 36, 0, 40, 36, 36);
-	c.fillText(money, 40, 64);
+	x = 0;
+	for (var i = 0; i < health; i++) {
+		c.drawImage(img, 36, 0, 36, 36, x, 0, 36, 36);
+		x += 27;
+	}
 
-	c.drawImage(img, 36, 0, 36, 36, 0, 76, 36, 36);
-	c.fillText(health, 40, 100);
+	c.drawImage(img, 0, 0, 36, 36, 0, 36, 36, 36);
+	c.fillText(money, 40, 60);
 
-	c.drawImage(img, 72, 0, 36, 36, 0, 112, 36, 36);
-	c.fillText(keys, 40, 136);
+	c.drawImage(img, 72, 0, 36, 36, 0, 72, 36, 36);
+	c.fillText(keys, 40, 96);
 };
 
 Inventory.prototype.canThrow = function() {

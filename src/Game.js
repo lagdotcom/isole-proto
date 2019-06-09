@@ -125,7 +125,7 @@ Game.prototype.start = function() {
 };
 
 Game.prototype.next = function(t) {
-	const { width, height, showFps } = this.options;
+	const { width, height, showFps, showHitboxes } = this.options;
 	const step = min(t - this.time, gMaxTimeStep);
 	var c = this.context;
 
@@ -137,7 +137,7 @@ Game.prototype.next = function(t) {
 	this.components.forEach(co => co.update && co.update(step));
 	this.components.forEach(co => co.draw && co.draw(c));
 
-	if (this.options.showHitboxes) {
+	if (showHitboxes) {
 		c.beginPath();
 		c.rect(0, 0, width, height);
 		c.fillStyle = 'rgba(0,0,0,0.5)';
@@ -149,7 +149,7 @@ Game.prototype.next = function(t) {
 	if (showFps) {
 		c.fillStyle = '#ffffff';
 		c.font = '12px monospace';
-		c.fillText(Math.floor(1000 / step) + 'fps', 10, 10);
+		c.fillText(Math.floor(1000 / step) + 'fps', width - 40, 10);
 	}
 
 	this.time = t;
