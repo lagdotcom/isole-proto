@@ -33,6 +33,7 @@ export default function Krillna(game, options = {}) {
 	Object.assign(
 		this,
 		{
+			isEnemy: true,
 			game,
 			name: 'Krillna',
 			dir: dRight,
@@ -49,6 +50,8 @@ export default function Krillna(game, options = {}) {
 			tscale: 0,
 			movefn: (fr, n) => gFrameMotion[fr] * n,
 			sprite: controller(game.resources[options.img || 'enemy.krillna']),
+			health: 5,
+			damage: 1,
 		},
 		options
 	);

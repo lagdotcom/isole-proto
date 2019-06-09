@@ -68,3 +68,33 @@ export function collides(a, b) {
 		a.b.r <= b.t.r && a.t.r >= b.b.r && a.b.ar >= b.b.al && a.b.al <= b.b.ar
 	);
 }
+
+export function damage(target, attacker, n) {
+	const { game } = target;
+
+	if (target.invincible) return;
+
+	target.health -= n;
+
+	if (target.health <= 0) {
+		if (target.die) target.die();
+		else game.remove(target);
+	} else {
+		if (target.hurt) target.hurt(attacker);
+		if (attacker.hit) attacker.hit(target);
+	}
+
+	if (target === game.player) {
+		game.inventory.health = target.health;
+	}
+}
+
+export function dirv(x, y) {
+	const rd = x.r - y.r;
+	const ad = x.a - y.a;
+	const t = Math.abs(rd + ad);
+	const r = rd / t;
+	const a = ad / t;
+
+	return { r, a };
+}

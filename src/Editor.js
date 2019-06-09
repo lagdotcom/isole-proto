@@ -136,6 +136,7 @@ Editor.prototype.onGameBegin = function() {
 
 	game.inventory.clear();
 	if (player.item) game.inventory.add(itemTypes[player.item]);
+	game.inventory.health = game.player.health;
 
 	game.components = [
 		...game.floors,

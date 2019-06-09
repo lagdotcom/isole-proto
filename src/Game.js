@@ -199,6 +199,9 @@ Game.prototype.release = function(key) {
 
 Game.prototype.remove = function(component) {
 	this.components = this.components.filter(c => c != component);
+
+	if (component.isEnemy)
+		this.enemies = this.enemies.filter(c => c != component);
 };
 
 Game.prototype.addTextures = function(textures) {

@@ -23,6 +23,9 @@ import {
 	pi,
 	piHalf,
 	scalew,
+	collides,
+	damage,
+	dirv,
 } from '../tools';
 import mel from '../makeElement';
 import WoodyController from '../spr/woody';
@@ -48,6 +51,7 @@ export default function Player(game, options = {}) {
 			sprite: new WoodyController(
 				game.resources[options.img || 'player.woody']
 			),
+			health: 5,
 		},
 		options
 	);
@@ -63,7 +67,7 @@ export default function Player(game, options = {}) {
 
 Player.prototype.update = function(time) {
 	var { a, r, va, vr, vfa, game, sprite } = this;
-	const { walls, ceilings, floors, keys } = game,
+	const { walls, ceilings, floors, keys, enemies } = game,
 		tscale = time / gTimeScale;
 	this.tscale = tscale;
 	const { b, t, s } = this.getHitbox();
@@ -110,7 +114,33 @@ Player.prototype.update = function(time) {
 		});
 	}
 
+	var hurtenemy = null;
+	if (vr < 0) {
+		enemies.forEach((e, i) => {
+			if (collides({ b, t: s }, e.getHitbox())) {
+				debug += `jumped on e${i}: ${e.name}<br>`;
+				hurtenemy = e;
+			}
+		});
+	}
+
+	var hitenemy = null;
+	enemies.forEach((e, i) => {
+		if (collides({ b, t }, e.getHitbox())) {
+			debug += `hit by e${i}: ${e.name}<br>`;
+			hitenemy = e;
+		}
+	});
+
 	this.jumpt -= tscale;
+
+	if (hurtenemy) {
+		vr = gJumpStrength * 0.75;
+		damage(hurtenemy, this, 1);
+	}
+	if (hitenemy && hurtenemy !== hitenemy) {
+		damage(this, hitenemy, hitenemy.damage || 1);
+	}
 
 	if (floor && this.jumpt <= 0) {
 		this.grounded = true;
@@ -195,6 +225,8 @@ Player.prototype.update = function(time) {
 	if (this.jumpt > 0) flags.push('jump');
 	if (this.grounded) flags.push('grounded');
 
+	this.hurtTimer(time);
+
 	if (game.options.showDebug)
 		this.del.innerHTML = jbr(
 			`controls: ${controls.join(' ')}`,
@@ -209,7 +241,7 @@ Player.prototype.update = function(time) {
 };
 
 Player.prototype.draw = function(c) {
-	const { a, r, game, sprite } = this;
+	const { a, r, game, sprite, invincible } = this;
 	const { cx, cy } = game;
 	const normal = a + piHalf;
 
@@ -218,7 +250,9 @@ Player.prototype.draw = function(c) {
 	c.translate(x + cx, y + cy);
 	c.rotate(normal);
 
+	if (invincible) c.globalAlpha = 0.5;
 	sprite.draw(c);
+	if (invincible) c.globalAlpha = 1;
 
 	c.rotate(-normal);
 	c.translate(-x - cx, -y - cy);
@@ -279,4 +313,19 @@ Player.prototype.getHitbox = function() {
 			ar: amod + saw,
 		},
 	};
+};
+
+Player.prototype.hurt = function(by) {
+	this.invincible = true;
+	this.invtimer = 1000;
+
+	// TODO: is this working?
+	const dv = dirv(this, by);
+	this.va += dv.a * 5;
+	this.vr += dv.r * 5;
+};
+
+Player.prototype.hurtTimer = function(t) {
+	this.invtimer -= t;
+	if (this.invtimer <= 0) this.invincible = false;
 };

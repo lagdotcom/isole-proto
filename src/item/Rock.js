@@ -4,7 +4,15 @@ import { cHit } from '../colours';
 import { dLeft, dRight } from '../dirs';
 import { eThrow } from '../events';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
-import { angledist, anglewrap, cart, collides, piHalf, scalew } from '../tools';
+import {
+	angledist,
+	anglewrap,
+	cart,
+	collides,
+	piHalf,
+	scalew,
+	damage,
+} from '../tools';
 
 const gFloatTime = 80,
 	gWindLoss = 0.995;
@@ -49,6 +57,7 @@ Rock.prototype.update = function(time) {
 		game.remove(this);
 		enemy.va += va * 0.2; // knock back a bit
 		enemy.last = {}; // unstick krillna
+		damage(enemy, this.owner, 1);
 		return;
 	}
 
@@ -183,6 +192,7 @@ RockItem.prototype.thrown = function() {
 			a: game.player.a,
 			va: game.player.facing === dLeft ? -1 : 1,
 			float: gFloatTime,
+			owner: game.player,
 		})
 	);
 };
