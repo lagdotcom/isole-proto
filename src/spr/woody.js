@@ -106,11 +106,8 @@ export default class WoodyController extends AnimController {
 			img,
 			w: 80,
 			h: 80,
-			c: 0,
-			row: 0,
 			xo: -40,
 			yo: -74,
-			flip: false,
 			facing: 1,
 		});
 	}

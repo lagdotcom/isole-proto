@@ -25,8 +25,6 @@ export default img =>
 		img,
 		w: 72,
 		h: 72,
-		c: 0,
-		r: 0,
 		xo: -36,
 		yo: -58,
 		walktimer: 0,

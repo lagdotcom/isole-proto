@@ -15,8 +15,6 @@ export default img =>
 		img,
 		w: 84,
 		h: 56,
-		c: Math.floor(Math.random() * 2),
-		r: 0,
 		xo: -42,
 		yo: -52,
 		timer: 0,

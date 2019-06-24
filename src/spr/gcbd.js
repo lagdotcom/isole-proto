@@ -6,7 +6,6 @@ export default img =>
 		w: 56,
 		h: 48,
 		c: Math.floor(Math.random() * 2),
-		r: 0,
 		xo: -28,
 		yo: -39,
 		walktimer: 0,
