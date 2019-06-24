@@ -32,7 +32,7 @@ export default function Editor(options) {
 				w: 60,
 				th: 32,
 				motion: 4,
-				texture: 'grass',
+				texture: 'bluegrass',
 			},
 			{
 				h: 250,

@@ -10,6 +10,7 @@ import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 import mel from './makeElement';
 import dispatch from './dispatchEvent';
 
+import bluegrassImg from '../media/tilesheet_bluegrass.png';
 import busterImg from '../media/buster.png';
 import flazzaImg from '../media/flazza.png';
 import grassImg from '../media/tilesheet_grass.png';
@@ -18,6 +19,7 @@ import krillnaImg from '../media/krillna.png';
 import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
 
+import bluegrassTextures from './texture/bluegrass';
 import grassTextures from './texture/grass';
 
 export default function Game(options) {
@@ -47,10 +49,11 @@ export default function Game(options) {
 	this.require('item.rock', rockImg);
 	this.require('player.woody', woodyImg);
 	this.require('tile.grass', grassImg);
+	this.require('tile.bluegrass', bluegrassImg);
 	this.require('ui.icons', iconsImg);
 
 	this.textures = {};
-	this.addTextures([grassTextures]);
+	this.addTextures([grassTextures, bluegrassTextures]);
 }
 
 Game.prototype.require = function(key, src) {

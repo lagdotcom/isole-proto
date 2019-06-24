@@ -1,23 +1,4 @@
-import Controller from '../Controller';
-
-class TileController extends Controller {
-	constructor(img, tiles) {
-		super({
-			img,
-			w: 32,
-			h: 32,
-		});
-		this.tiles = tiles;
-	}
-
-	tile(n) {
-		const t = this.tiles[n];
-		if (t) {
-			this.c = t.c;
-			this.r = t.r;
-		}
-	}
-}
+import TileController from './TileController';
 
 const tcm = (resource, tiles) => game =>
 	new TileController(game.resources[resource], tiles);
