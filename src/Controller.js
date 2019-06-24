@@ -1,7 +1,11 @@
 export default class Controller {
 	constructor(options) {
 		Object.entries(
-			Object.assign({}, { c: 0, r: 0, xo: 0, yo: 0 }, options)
+			Object.assign(
+				{},
+				{ c: 0, r: 0, xo: 0, yo: 0, leftflip: true, flip: false },
+				options
+			)
 		).forEach(e => {
 			const [key, val] = e;
 			if (typeof val === 'function') {
@@ -15,11 +19,11 @@ export default class Controller {
 	}
 
 	right() {
-		this.flip = false;
+		this.flip = !this.leftflip;
 	}
 
 	left() {
-		this.flip = true;
+		this.flip = this.leftflip;
 	}
 
 	play(state, column, row) {

@@ -11,6 +11,7 @@ import mel from './makeElement';
 import dispatch from './dispatchEvent';
 
 import busterImg from '../media/buster.png';
+import flazzaImg from '../media/flazza.png';
 import grassImg from '../media/tilesheet_grass.png';
 import iconsImg from '../media/icons.png';
 import krillnaImg from '../media/krillna.png';
@@ -41,6 +42,7 @@ export default function Game(options) {
 	this.loading = 0;
 	this.resources = [];
 	this.require('enemy.buster', busterImg);
+	this.require('enemy.flazza', flazzaImg);
 	this.require('enemy.krillna', krillnaImg);
 	this.require('item.rock', rockImg);
 	this.require('player.woody', woodyImg);

@@ -1,5 +1,6 @@
 import Buster from './enemy/Buster';
 import Flat from './component/Flat';
+import Flazza from './enemy/Flazza';
 import Krillna from './enemy/Krillna';
 import Player from './component/Player';
 import Rock from './item/Rock';
@@ -9,7 +10,7 @@ import clearChildren from './clearChildren';
 import { alla, deg2rad } from './tools';
 import { dLeft, dRight } from './dirs';
 
-const enemyTypes = { buster: Buster, krillna: Krillna };
+const enemyTypes = { buster: Buster, krillna: Krillna, flazza: Flazza };
 const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
@@ -93,6 +94,12 @@ export default function Editor(options) {
 				type: 'buster',
 				a: 0,
 				r: 250,
+			},
+			{
+				type: 'flazza',
+				a: 90,
+				r: 400,
+				dir: dLeft,
 			},
 		],
 	};
