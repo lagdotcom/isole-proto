@@ -6,8 +6,6 @@ import {
 	gGravityStrength,
 	gGroundFriction,
 	gGroundWalk,
-	gJumpStrength,
-	gJumpTimer,
 	gMaxVA,
 	gStandThreshold,
 	gTimeScale,
@@ -29,6 +27,11 @@ import {
 } from '../tools';
 import mel from '../makeElement';
 import WoodyController from '../spr/woody';
+
+const gJumpAffectStrength = 0.15,
+	gJumpAffectTimer = -10,
+	gJumpStrength = 4,
+	gJumpTimer = 8;
 
 export default function Player(game, options = {}) {
 	Object.assign(
@@ -176,10 +179,15 @@ Player.prototype.update = function(time) {
 		}
 	}
 
-	if (keys[kJump] && floor) {
-		vr += gJumpStrength;
-		this.jumpt = gJumpTimer;
-		controls.push('jump');
+	if (keys[kJump]) {
+		if (floor) {
+			vr += gJumpStrength;
+			this.jumpt = gJumpTimer;
+			controls.push('jump');
+		} else if (this.jumpt >= gJumpAffectTimer) {
+			vr += gJumpAffectStrength;
+			controls.push('jump+');
+		}
 	}
 
 	if (keys[kThrow]) {
