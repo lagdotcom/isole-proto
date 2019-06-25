@@ -33,15 +33,6 @@ const sProwling = 'prowling',
 	sSlam = 'slam',
 	sRecovery = 'recovery';
 
-function getLowestFloor(g) {
-	var best = 999999999;
-	g.floors.forEach(f => {
-		if (f.r < best) best = f.r;
-	});
-
-	return best;
-}
-
 export default function Flazza(game, options = {}) {
 	Object.assign(
 		this,
@@ -54,7 +45,6 @@ export default function Flazza(game, options = {}) {
 			a: 0,
 			r: 250,
 			rtop: options.r || 250,
-			rbot: getLowestFloor(game),
 			dir: dLeft,
 			speed: gSpeed,
 			dropSpeed: gDropSpeed,
@@ -79,7 +69,6 @@ Flazza.prototype.update = function(time) {
 	var {
 		a,
 		r,
-		rbot,
 		rtop,
 		va,
 		vr,
@@ -91,12 +80,12 @@ Flazza.prototype.update = function(time) {
 		dropSpeed,
 		recoverSpeed,
 	} = this;
-	const { player, walls, ceilings, floors } = game,
+	const { player } = game,
 		tscale = time / gTimeScale;
 
 	switch (state) {
 		case sProwling:
-			if (this.shouldAttack(game.player)) {
+			if (this.shouldAttack(player)) {
 				state = sFlop;
 				va = 0;
 			} else {
@@ -106,8 +95,9 @@ Flazza.prototype.update = function(time) {
 			break;
 
 		case sDrop:
-			if (r <= rbot) {
-				r = rbot;
+			var floor = this.getFloor();
+			if (floor) {
+				r = floor.r;
 				vr = 0;
 				state = sSlam;
 			} else {
@@ -235,6 +225,20 @@ Flazza.prototype.getHitbox = function() {
 			ar: amod + aaw,
 		},
 	};
+};
+
+Flazza.prototype.getFloor = function() {
+	const { b, t } = this.getHitbox();
+	const { a, game } = this;
+	var floor = null;
+
+	game.floors.forEach((f, i) => {
+		var da = angledist(a, f.a);
+
+		if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) floor = f;
+	});
+
+	return floor;
 };
 
 Flazza.prototype.shouldAttack = function(target) {
