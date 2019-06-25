@@ -9,6 +9,7 @@ export default function Flat(game, height, angle, width, motion, texture) {
 		isFlat: true,
 		layer: zStructure,
 		game,
+		attachments: [],
 		r: height,
 		a: deg2rad(angle),
 		width: deg2rad(width) / 2,
@@ -21,6 +22,9 @@ export default function Flat(game, height, angle, width, motion, texture) {
 	if (texture) {
 		this.sprite = game.textures[texture];
 		this.scale = this.sprite.w / gHitboxScale;
+		game.materials[texture].spawner(this);
+	} else {
+		this.draw = null;
 	}
 }
 
@@ -33,20 +37,18 @@ Flat.prototype.update = function(time) {
 };
 
 Flat.prototype.draw = function(c) {
-	if (!this.sprite) return;
-
-	const { left, right, r, game, scale, sprite } = this;
+	const { left, right, r, game, scale, sprite, width } = this;
 	const { cx, cy } = game;
 	const step = scalew(scale, r),
 		offset = scalew(scale / 2, r);
-	var remaining = this.width * 2,
+	var remaining = width * 2,
 		a = left;
 
 	sprite.tile('tl');
 	while (remaining > 0) {
 		if (remaining < step) {
 			sprite.tile('tr');
-			a = this.right - step;
+			a = right - step;
 		}
 
 		var normal = a + offset + piHalf;

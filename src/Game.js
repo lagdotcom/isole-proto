@@ -4,6 +4,7 @@ import Inventory from './component/Inventory';
 import Krillna from './enemy/Krillna';
 import Player from './component/Player';
 import Wall from './component/Wall';
+import { eGameBegin, eGameReady } from './events';
 import { kLeft, kRight, kJump, kThrow } from './keys';
 import { any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
@@ -19,8 +20,8 @@ import krillnaImg from '../media/krillna.png';
 import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
 
-import bluegrassTextures from './texture/bluegrass';
-import grassTextures from './texture/grass';
+import bluegrassMaterials from './material/bluegrass';
+import grassMaterials from './material/grass';
 
 export default function Game(options) {
 	const { parent, width, height, scale, smoothing } = options;
@@ -52,8 +53,9 @@ export default function Game(options) {
 	this.require('tile.bluegrass', bluegrassImg);
 	this.require('ui.icons', iconsImg);
 
+	this.materials = {};
 	this.textures = {};
-	this.addTextures([grassTextures, bluegrassTextures]);
+	this.addMaterials([grassMaterials, bluegrassMaterials]);
 }
 
 Game.prototype.require = function(key, src) {
@@ -75,7 +77,18 @@ Game.prototype.begin = function() {
 	this.enemies = [];
 	this.redraw = true;
 
-	dispatch(this.element, 'isole.begin');
+	dispatch(this.element, eGameBegin);
+	dispatch(this.element, eGameReady);
+	this.ready();
+};
+
+Game.prototype.ready = function() {
+	this.components.forEach(co => {
+		co.attachments &&
+			co.attachments.forEach(a => {
+				this.components.push(a);
+			});
+	});
 };
 
 Game.prototype.makeCanvas = function(parent) {
@@ -89,11 +102,11 @@ Game.prototype.addPlatform = function({
 	w,
 	th,
 	motion = 0,
-	texture = null,
+	material = null,
 	texX = 0,
 	texY = 0,
 }) {
-	var floor = new Flat(this, h, a, w, motion, texture, texX, texY),
+	var floor = new Flat(this, h, a, w, motion, material, texX, texY),
 		ceiling = new Flat(this, h - th, a, w, motion),
 		left = new Wall(this, h, h - th, a - w / 2, 1, motion),
 		right = new Wall(this, h, h - th, a + w / 2, -1, motion);
@@ -221,10 +234,15 @@ Game.prototype.remove = function(component) {
 	this.drawn = this.drawn.filter(match);
 };
 
-Game.prototype.addTextures = function(textures) {
-	textures.forEach(t => {
+Game.prototype.addMaterials = function(materials) {
+	materials.forEach(t => {
 		Object.keys(t).forEach(k => {
-			this.textures[k] = t[k](this);
+			this.materials[k] = {
+				texture: t[k].texture(this),
+				spawner: t[k].spawner || (() => {}),
+			};
+
+			this.textures[k] = this.materials[k].texture;
 		});
 	});
 };

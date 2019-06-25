@@ -7,6 +7,7 @@ import Rock from './item/Rock';
 import Wall from './component/Wall';
 import mel from './makeElement';
 import clearChildren from './clearChildren';
+import { eGameBegin } from './events';
 import { alla, deg2rad } from './tools';
 import { dLeft, dRight } from './dirs';
 
@@ -14,14 +15,14 @@ const enemyTypes = { buster: Buster, krillna: Krillna, flazza: Flazza };
 const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
-var textures;
+var materials;
 const wallDirections = [1, -1];
 
 export default function Editor(options) {
 	const { data, game, parent } = options;
 
-	textures = Object.keys(game.textures);
-	game.element.addEventListener('isole.begin', () => this.onGameBegin());
+	materials = Object.keys(game.materials);
+	game.element.addEventListener(eGameBegin, () => this.onGameBegin());
 
 	this.game = game;
 	this.data = data || {
@@ -32,7 +33,7 @@ export default function Editor(options) {
 				w: 60,
 				th: 32,
 				motion: 4,
-				texture: 'bluegrass',
+				material: 'bluegrass',
 			},
 			{
 				h: 250,
@@ -40,7 +41,7 @@ export default function Editor(options) {
 				w: 240,
 				th: 32,
 				motion: 4,
-				texture: 'grass',
+				material: 'grass',
 			},
 			{
 				h: 150,
@@ -48,7 +49,7 @@ export default function Editor(options) {
 				w: 320,
 				th: 32,
 				motion: -4,
-				texture: 'grass',
+				material: 'grass',
 			},
 		],
 		walls: [
@@ -58,14 +59,14 @@ export default function Editor(options) {
 				a: 350,
 				dir: 1,
 				motion: 0,
-				texture: 'grass',
+				material: 'grass',
 			},
 			{
 				top: 218,
 				bottom: 150,
 				a: 10,
 				dir: -1,
-				texture: 'grass',
+				material: 'grass',
 			},
 		],
 		floors: [
@@ -73,7 +74,7 @@ export default function Editor(options) {
 				h: 50,
 				a: 0,
 				w: 360,
-				texture: 'grass',
+				material: 'grass',
 			},
 		],
 		player: { a: 270, r: 300, item: 'rock' },
@@ -124,12 +125,12 @@ Editor.prototype.onGameBegin = function() {
 
 	walls.forEach(w => {
 		game.walls.push(
-			new Wall(game, w.top, w.bottom, w.a, w.dir, w.motion, w.texture)
+			new Wall(game, w.top, w.bottom, w.a, w.dir, w.motion, w.material)
 		);
 	});
 
 	floors.forEach(f => {
-		game.floors.push(new Flat(game, f.h, f.a, f.w, f.motion, f.texture));
+		game.floors.push(new Flat(game, f.h, f.a, f.w, f.motion, f.material));
 	});
 
 	enemies.forEach(e => {
@@ -183,7 +184,7 @@ Editor.prototype.makeDom = function(parent) {
 		a: 0,
 		w: 90,
 		th: 32,
-		texture: 'grass',
+		material: 'grass',
 	});
 	this.makeSection(c, 'walls', 'Walls', 'makeWallDom', {
 		top: 100,
@@ -191,14 +192,14 @@ Editor.prototype.makeDom = function(parent) {
 		a: 0,
 		m: 0,
 		dir: dLeft,
-		texture: 'grass',
+		material: 'grass',
 	});
 	this.makeSection(c, 'floors', 'Floors', 'makeFloorDom', {
 		h: 200,
 		a: 0,
 		w: 90,
 		th: 32,
-		texture: 'grass',
+		material: 'grass',
 	});
 	this.makeSection(c, 'enemies', 'Enemies', 'makeEnemyDom', {
 		type: 'buster',
@@ -355,7 +356,7 @@ Editor.prototype.makePlatformDom = function(parent, o) {
 	this.makeAngleInput(e, o, 'Width', 'w');
 	this.makeNumInput(e, o, 'Thickness', 'th');
 	this.makeNumInput(e, o, 'Motion', 'motion');
-	this.makeChoiceInput(e, o, 'Texture', 'texture', textures);
+	this.makeChoiceInput(e, o, 'Material', 'material', materials);
 };
 
 Editor.prototype.makeWallDom = function(parent, o) {
@@ -366,7 +367,7 @@ Editor.prototype.makeWallDom = function(parent, o) {
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeNumInput(e, o, 'Motion', 'motion');
 	this.makeChoiceInput(e, o, 'Direction', 'dir', wallDirections);
-	this.makeChoiceInput(e, o, 'Texture', 'texture', textures);
+	this.makeChoiceInput(e, o, 'Material', 'material', materials);
 };
 
 Editor.prototype.makeFloorDom = function(parent, o) {
@@ -376,7 +377,7 @@ Editor.prototype.makeFloorDom = function(parent, o) {
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeNumInput(e, o, 'Width', 'w');
 	this.makeNumInput(e, o, 'Motion', 'motion');
-	this.makeChoiceInput(e, o, 'Texture', 'texture', textures);
+	this.makeChoiceInput(e, o, 'Material', 'material', materials);
 };
 
 Editor.prototype.makeEnemyDom = function(parent, o) {
