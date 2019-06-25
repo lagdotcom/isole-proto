@@ -23,8 +23,9 @@ import {
 } from '../tools';
 import controller from '../spr/flazza';
 
-const gAttackWidth = 60,
+const gAttackWidth = 120,
 	gSpeed = 0.2,
+	gFlopSpeed = 1.5,
 	gDropSpeed = -7,
 	gRecoverSpeed = 0.75;
 const sProwling = 'prowling',
@@ -87,21 +88,24 @@ Flazza.prototype.update = function(time) {
 		case sProwling:
 			if (this.shouldAttack(player)) {
 				state = sFlop;
-				va = 0;
 			} else {
 				va = dir === dLeft ? -speed : speed;
 			}
 
 			break;
 
+		case sFlop:
+			vr = gFlopSpeed;
+			break;
+
 		case sDrop:
+			va = 0;
 			var floor = this.getFloor();
 			if (floor) {
 				r = floor.r;
 				vr = 0;
 				state = sSlam;
 			} else {
-				va = 0;
 				vr = dropSpeed;
 			}
 			break;
