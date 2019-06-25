@@ -2,6 +2,7 @@ import Controller from '../Controller';
 import { cWall } from '../colours';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { gHitboxScale, gWallGap } from '../nums';
+import { zStructure } from '../layers';
 
 export default function Wall(
 	game,
@@ -17,6 +18,8 @@ export default function Wall(
 		bottom = b + gWallGap;
 
 	Object.assign(this, {
+		isWall: true,
+		layer: zStructure,
 		game,
 		top,
 		bottom,

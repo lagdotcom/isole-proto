@@ -1,7 +1,9 @@
 import { kCycle, kThrow } from '../keys';
+import { zUI } from '../layers';
 
 export default function Inventory(game, size = 3) {
 	Object.assign(this, {
+		layer: zUI,
 		game,
 		items: new Array(size),
 		cycling: false,

@@ -73,6 +73,7 @@ Game.prototype.begin = function() {
 	this.ceilings = [];
 	this.walls = [];
 	this.enemies = [];
+	this.redraw = true;
 
 	dispatch(this.element, 'isole.begin');
 };
@@ -140,7 +141,15 @@ Game.prototype.next = function(t) {
 	if (this.pads.length) this.readGamepads();
 
 	this.components.forEach(co => co.update && co.update(step));
-	this.components.forEach(co => co.draw && co.draw(c));
+
+	if (this.redraw) {
+		this.redraw = false;
+		this.drawn = this.components
+			.filter(co => co.draw)
+			.sort((a, b) => a.layer - b.layer);
+	}
+
+	this.drawn.forEach(co => co.draw(c));
 
 	if (showHitboxes) {
 		c.beginPath();
@@ -203,10 +212,13 @@ Game.prototype.release = function(key) {
 };
 
 Game.prototype.remove = function(component) {
-	this.components = this.components.filter(c => c != component);
+	const match = c => c != component;
 
-	if (component.isEnemy)
-		this.enemies = this.enemies.filter(c => c != component);
+	this.components = this.components.filter(match);
+
+	if (component.isEnemy) this.enemies = this.enemies.filter(match);
+
+	this.drawn = this.drawn.filter(match);
 };
 
 Game.prototype.addTextures = function(textures) {

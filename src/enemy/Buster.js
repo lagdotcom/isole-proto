@@ -20,6 +20,7 @@ import {
 	unscalew,
 } from '../tools';
 import controller from '../spr/buster';
+import { zEnemy } from '../layers';
 
 const gJumpDelay = 150,
 	gJumpSide = 0.4,
@@ -39,6 +40,7 @@ export default function Buster(game, options = {}) {
 		this,
 		{
 			isEnemy: true,
+			layer: zEnemy,
 			game,
 			name: 'Buster',
 			width: 35,

@@ -27,6 +27,7 @@ import {
 } from '../tools';
 import mel from '../makeElement';
 import WoodyController from '../spr/woody';
+import { zPlayer } from '../layers';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
@@ -37,6 +38,8 @@ export default function Player(game, options = {}) {
 	Object.assign(
 		this,
 		{
+			isPlayer: true,
+			layer: zPlayer,
 			game,
 			name: 'Woody',
 			w: 30,

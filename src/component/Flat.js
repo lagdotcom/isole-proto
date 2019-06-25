@@ -2,9 +2,12 @@ import Controller from '../Controller';
 import { cWall } from '../colours';
 import { gHitboxScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
+import { zStructure } from '../layers';
 
 export default function Flat(game, height, angle, width, motion, texture) {
 	Object.assign(this, {
+		isFlat: true,
+		layer: zStructure,
 		game,
 		r: height,
 		a: deg2rad(angle),

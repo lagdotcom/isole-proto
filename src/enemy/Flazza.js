@@ -22,6 +22,7 @@ import {
 	unscalew,
 } from '../tools';
 import controller from '../spr/flazza';
+import { zFlying } from '../layers';
 
 const gAttackWidth = 120,
 	gSpeed = 0.2,
@@ -39,6 +40,7 @@ export default function Flazza(game, options = {}) {
 		this,
 		{
 			isEnemy: true,
+			layer: zFlying,
 			game,
 			name: 'Flazza',
 			width: 45,

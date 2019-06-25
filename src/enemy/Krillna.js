@@ -24,6 +24,7 @@ import {
 	scalew,
 } from '../tools';
 import controller from '../spr/krillna';
+import { zEnemy } from '../layers';
 
 const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
 	gKrillnaSpeed = 0.16,
@@ -34,6 +35,7 @@ export default function Krillna(game, options = {}) {
 		this,
 		{
 			isEnemy: true,
+			layer: zEnemy,
 			game,
 			name: 'Krillna',
 			dir: dRight,

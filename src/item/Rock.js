@@ -13,6 +13,7 @@ import {
 	scalew,
 	damage,
 } from '../tools';
+import { zFlying } from '../layers';
 
 const gFloatTime = 80,
 	gWindLoss = 0.995;
@@ -23,6 +24,7 @@ function Rock(game, options = {}) {
 	Object.assign(
 		this,
 		{
+			layer: zFlying,
 			game,
 			sprite: controller(game.resources['item.rock']),
 			w: 28,
@@ -186,6 +188,7 @@ RockItem.prototype.thrown = function() {
 	// TODO
 	//game.inventory.remove(this);
 
+	game.redraw = true;
 	game.components.push(
 		new Rock(game, {
 			r: game.player.r + 10,
