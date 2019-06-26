@@ -135,7 +135,7 @@ Player.prototype.update = function(time) {
 
 	var hitenemy = null;
 	enemies.forEach((e, i) => {
-		if (collides({ b, t }, e.getHitbox())) {
+		if (e !== hurtenemy && collides({ b, t }, e.getHitbox())) {
 			debug += `hit by e${i}: ${e.name}<br>`;
 			hitenemy = e;
 		}
