@@ -31,6 +31,7 @@ import { zPlayer } from '../layers';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
+	gJumpDoubleTimer = -10,
 	gJumpStrength = 4,
 	gJumpTimer = 8;
 
@@ -53,6 +54,8 @@ export default function Player(game, options = {}) {
 			vfr: 0,
 			facing: dRight,
 			jumpt: 0,
+			jumpd: true,
+			jumplg: false,
 			tscale: 0,
 			sprite: new WoodyController(
 				game.resources[options.img || 'player.woody']
@@ -72,7 +75,7 @@ export default function Player(game, options = {}) {
 }
 
 Player.prototype.update = function(time) {
-	var { a, r, va, vr, vfa, game, sprite } = this;
+	var { a, r, va, vr, vfa, game, sprite, jumpd, jumplg } = this;
 	const { walls, ceilings, floors, keys, enemies } = game,
 		tscale = time / gTimeScale;
 	this.tscale = tscale;
@@ -150,6 +153,7 @@ Player.prototype.update = function(time) {
 
 	if (floor && this.jumpt <= 0) {
 		this.grounded = true;
+		this.jumpd = true;
 
 		r = floor.r;
 		vr = 0;
@@ -187,10 +191,19 @@ Player.prototype.update = function(time) {
 			vr += gJumpStrength;
 			this.jumpt = gJumpTimer;
 			controls.push('jump');
-		} else if (this.jumpt >= gJumpAffectTimer) {
+		} else if (this.jumpt < gJumpDoubleTimer && jumpd && jumplg) {
+			this.jumpt = gJumpTimer;
+			this.jumpd = false;
+			vr = gJumpStrength;
+			controls.push('jumpd');
+		} else if (this.jumpt >= gJumpAffectTimer && !jumplg) {
 			vr += gJumpAffectStrength;
 			controls.push('jump+');
 		}
+
+		this.jumplg = false;
+	} else {
+		this.jumplg = true;
 	}
 
 	if (keys[kThrow]) {
