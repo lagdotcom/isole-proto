@@ -5,6 +5,8 @@ import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { zStructure } from '../layers';
 
 export default function Flat(game, height, angle, width, motion, texture) {
+	this.circle = width >= 360;
+
 	Object.assign(this, {
 		isFlat: true,
 		layer: zStructure,
@@ -44,10 +46,10 @@ Flat.prototype.draw = function(c) {
 	var remaining = width * 2,
 		a = left;
 
-	sprite.tile('tl');
+	sprite.tile(this.circle ? 'tm' : 'tl');
 	while (remaining > 0) {
 		if (remaining < step) {
-			sprite.tile('tr');
+			if (!this.circle) sprite.tile('tr');
 			a = right - step;
 		}
 
