@@ -2,20 +2,24 @@ import TileController from './TileController';
 
 /* todo: grass tops */
 
-const tcm = (resource, tiles) => game =>
-	new TileController(game.resources[resource], tiles);
+const tcm = (resource, tiles, options) => game =>
+	new TileController(game.resources[resource], tiles, options);
 
-const bluegrass = tcm('tile.bluegrass', {
-	tl: { c: 0, r: 1 },
-	tm: { c: 1, r: 1 },
-	tr: { c: 2, r: 1 },
-	ml: { c: 0, r: 1 },
-	mm: { c: 1, r: 1 },
-	mr: { c: 2, r: 1 },
-	bl: { c: 0, r: 1 },
-	bm: { c: 1, r: 1 },
-	br: { c: 2, r: 1 },
-});
+const bluegrass = tcm(
+	'tile.bluegrass',
+	{
+		tl: { c: 1, r: 5 },
+		tm: { c: 2, r: 5, cycle: 4 },
+		tr: { c: 6, r: 5 },
+		ml: { c: 2, r: 9 },
+		mm: { c: 3, r: 9, cycle: 4 },
+		mr: { c: 5, r: 9 },
+		bl: { c: 2, r: 10 },
+		bm: { c: 3, r: 10, cycle: 2 },
+		br: { c: 5, r: 10 },
+	},
+	{ w: 16, h: 16 }
+);
 
 export default {
 	bluegrass,

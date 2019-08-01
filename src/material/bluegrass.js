@@ -4,23 +4,21 @@ import { zDecal } from '../layers';
 import { cart, piHalf, scalew } from '../tools';
 
 const bluegrassTips = game =>
-	new TileController(game.resources['tile.bluegrass'], {
-		tl: { c: 0, r: 0 },
-		tm: { c: 1, r: 0 },
-		tr: { c: 2, r: 0 },
-		ml: { c: 0, r: 0 },
-		mm: { c: 1, r: 0 },
-		mr: { c: 2, r: 0 },
-		bl: { c: 0, r: 0 },
-		bm: { c: 1, r: 0 },
-		br: { c: 2, r: 0 },
-	});
+	new TileController(
+		game.resources['tile.bluegrass'],
+		{
+			tl: { c: 1, r: 4 },
+			tm: { c: 2, r: 4, cycle: 4 },
+			tr: { c: 6, r: 4 },
+		},
+		{ w: 16, h: 16 }
+	);
 
 function GrassTips(flat) {
 	Object.assign(this, {
 		flat,
 		layer: zDecal,
-		r: flat.r + 30,
+		r: flat.r + 14,
 		sprite: bluegrassTips(flat.game),
 	});
 }
