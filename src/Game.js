@@ -10,18 +10,7 @@ import { any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 import mel from './makeElement';
 import dispatch from './dispatchEvent';
-
-import bluegrassImg from '../media/tilesheet_bluegrass.png';
-import busterImg from '../media/buster.png';
-import flazzaImg from '../media/flazza.png';
-import grassImg from '../media/tilesheet_grass.png';
-import iconsImg from '../media/icons.png';
-import krillnaImg from '../media/krillna.png';
-import rockImg from '../media/rock.png';
-import woodyImg from '../media/woody.png';
-
-import bluegrassMaterials from './material/bluegrass';
-import grassMaterials from './material/grass';
+import addResources from './resources';
 
 export default function Game(options) {
 	const { parent, width, height, scale, smoothing } = options;
@@ -44,18 +33,9 @@ export default function Game(options) {
 
 	this.loading = 0;
 	this.resources = [];
-	this.require('enemy.buster', busterImg);
-	this.require('enemy.flazza', flazzaImg);
-	this.require('enemy.krillna', krillnaImg);
-	this.require('item.rock', rockImg);
-	this.require('player.woody', woodyImg);
-	this.require('tile.grass', grassImg);
-	this.require('tile.bluegrass', bluegrassImg);
-	this.require('ui.icons', iconsImg);
-
 	this.materials = {};
 	this.textures = {};
-	this.addMaterials([grassMaterials, bluegrassMaterials]);
+	addResources(this);
 }
 
 Game.prototype.require = function(key, src) {
