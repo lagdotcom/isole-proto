@@ -35,6 +35,7 @@ export default function Game(options) {
 	this.resources = [];
 	this.materials = {};
 	this.textures = {};
+	this.objects = {};
 	addResources(this);
 }
 
@@ -212,17 +213,4 @@ Game.prototype.remove = function(component) {
 	if (component.isEnemy) this.enemies = this.enemies.filter(match);
 
 	this.drawn = this.drawn.filter(match);
-};
-
-Game.prototype.addMaterials = function(materials) {
-	materials.forEach(t => {
-		Object.keys(t).forEach(k => {
-			this.materials[k] = {
-				texture: t[k].texture(this),
-				spawner: t[k].spawner || (() => {}),
-			};
-
-			this.textures[k] = this.materials[k].texture;
-		});
-	});
 };

@@ -10,6 +10,29 @@ import woodyImg from '../media/woody.png';
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
 
+import bluegrassObjects from './object/bluegrass';
+
+function addMaterials(game, materials) {
+	materials.forEach(t => {
+		Object.keys(t).forEach(k => {
+			game.materials[k] = {
+				texture: t[k].texture(game),
+				spawner: t[k].spawner || (() => {}),
+			};
+
+			game.textures[k] = game.materials[k].texture;
+		});
+	});
+}
+
+function addObjects(game, objects) {
+	objects.forEach(t => {
+		Object.keys(t).forEach(k => {
+			game.objects[k] = t[k](game);
+		});
+	});
+}
+
 export default function(game) {
 	game.require('enemy.buster', busterImg);
 	game.require('enemy.flazza', flazzaImg);
@@ -20,5 +43,6 @@ export default function(game) {
 	game.require('tile.bluegrass', bluegrassImg);
 	game.require('ui.icons', iconsImg);
 
-	game.addMaterials([grassMaterials, bluegrassMaterials]);
+	addMaterials(game, [grassMaterials, bluegrassMaterials]);
+	addObjects(game, [bluegrassObjects]);
 }

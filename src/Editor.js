@@ -1,4 +1,5 @@
 import Buster from './enemy/Buster';
+import Decal from './component/Decal';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
 import Krillna from './enemy/Krillna';
@@ -16,12 +17,14 @@ const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
 var materials;
+var objects;
 const wallDirections = [1, -1];
 
 export default function Editor(options) {
 	const { data, game, parent } = options;
 
 	materials = Object.keys(game.materials);
+	objects = Object.keys(game.objects);
 	game.element.addEventListener(eGameBegin, () => this.onGameBegin());
 
 	this.game = game;
@@ -77,6 +80,7 @@ export default function Editor(options) {
 				material: 'grass',
 			},
 		],
+		objects: [{ h: 250, a: 225, motion: 4, object: 'bluerntree' }],
 		player: { a: 270, r: 300, item: 'rock' },
 		enemies: [
 			{
@@ -110,7 +114,7 @@ export default function Editor(options) {
 
 Editor.prototype.onGameBegin = function() {
 	const { data, game } = this;
-	const { platforms, walls, floors, player, enemies } = data;
+	const { platforms, walls, floors, objects, player, enemies } = data;
 
 	if (game.options.debugContainer) clearChildren(game.options.debugContainer);
 
@@ -118,6 +122,7 @@ Editor.prototype.onGameBegin = function() {
 	game.ceilings = [];
 	game.walls = [];
 	game.enemies = [];
+	game.decals = [];
 
 	platforms.forEach(p => {
 		game.addPlatform(p);
@@ -131,6 +136,10 @@ Editor.prototype.onGameBegin = function() {
 
 	floors.forEach(f => {
 		game.floors.push(new Flat(game, f.h, f.a, f.w, f.motion, f.material));
+	});
+
+	objects.forEach(o => {
+		game.decals.push(new Decal(game, o.h, o.a, o.motion, o.object));
 	});
 
 	enemies.forEach(e => {
@@ -151,6 +160,7 @@ Editor.prototype.onGameBegin = function() {
 		...game.ceilings,
 		...game.walls,
 		...game.enemies,
+		...game.decals,
 		game.player,
 		game.inventory,
 	];
@@ -184,13 +194,14 @@ Editor.prototype.makeDom = function(parent) {
 		a: 0,
 		w: 90,
 		th: 32,
+		motion: 0,
 		material: 'grass',
 	});
 	this.makeSection(c, 'walls', 'Walls', 'makeWallDom', {
 		top: 100,
 		bottom: 50,
 		a: 0,
-		m: 0,
+		motion: 0,
 		dir: dLeft,
 		material: 'grass',
 	});
@@ -198,8 +209,14 @@ Editor.prototype.makeDom = function(parent) {
 		h: 200,
 		a: 0,
 		w: 90,
-		th: 32,
+		motion: 0,
 		material: 'grass',
+	});
+	this.makeSection(c, 'objects', 'Objects', 'makeObjectDom', {
+		h: 200,
+		a: 0,
+		motion: 0,
+		object: 'greenflower',
 	});
 	this.makeSection(c, 'enemies', 'Enemies', 'makeEnemyDom', {
 		type: 'buster',
@@ -378,6 +395,15 @@ Editor.prototype.makeFloorDom = function(parent, o) {
 	this.makeNumInput(e, o, 'Width', 'w');
 	this.makeNumInput(e, o, 'Motion', 'motion');
 	this.makeChoiceInput(e, o, 'Material', 'material', materials);
+};
+
+Editor.prototype.makeObjectDom = function(parent, o) {
+	const e = mel(parent, 'div', { className: 'entry' });
+	this.makeDel(e, o, 'objects');
+	this.makeNumInput(e, o, 'Height', 'h');
+	this.makeAngleInput(e, o, 'Angle', 'a');
+	this.makeNumInput(e, o, 'Motion', 'motion');
+	this.makeChoiceInput(e, o, 'Object', 'object', objects);
 };
 
 Editor.prototype.makeEnemyDom = function(parent, o) {
