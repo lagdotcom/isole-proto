@@ -69,4 +69,5 @@ export default {
 		texture: textures.bluegrass2,
 		spawner: tipsSpawner,
 	},
+	cloud: { texture: textures.cloud },
 };

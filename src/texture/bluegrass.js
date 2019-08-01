@@ -35,7 +35,24 @@ const bluegrass2 = tcm(
 	{ w: 16, h: 16 }
 );
 
+const cloud = tcm(
+	'tile.bluegrass',
+	{
+		tl: { c: 9, r: 2 },
+		tm: { c: 10, r: 2, cycle: 4 },
+		tr: { c: 14, r: 2 },
+		ml: { c: 9, r: 2 },
+		mm: { c: 10, r: 2, cycle: 4 },
+		mr: { c: 14, r: 2 },
+		bl: { c: 9, r: 2 },
+		bm: { c: 10, r: 2, cycle: 4 },
+		br: { c: 14, r: 2 },
+	},
+	{ w: 16, h: 16 }
+);
+
 export default {
 	bluegrass,
 	bluegrass2,
+	cloud,
 };
