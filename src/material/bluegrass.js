@@ -56,11 +56,17 @@ GrassTips.prototype.draw = function(c) {
 	}
 };
 
+const tipsSpawner = flat => {
+	flat.attachments.push(new GrassTips(flat));
+};
+
 export default {
 	bluegrass: {
 		texture: textures.bluegrass,
-		spawner: flat => {
-			flat.attachments.push(new GrassTips(flat));
-		},
+		spawner: tipsSpawner,
+	},
+	bluegrass2: {
+		texture: textures.bluegrass2,
+		spawner: tipsSpawner,
 	},
 };
