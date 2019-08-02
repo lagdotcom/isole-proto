@@ -222,12 +222,12 @@ Editor.prototype.makeDom = function(parent) {
 		material: 'grass',
 	});
 	this.makeSection(c, 'objects', 'Objects', 'makeObjectDom', {
-		h: 200,
+		r: 200,
 		a: 0,
 		layer: zBackground,
 		motion: 0,
 		parallax: 0,
-		object: 'greenflower',
+		object: objects[0],
 	});
 	this.makeSection(c, 'enemies', 'Enemies', 'makeEnemyDom', {
 		type: 'buster',
