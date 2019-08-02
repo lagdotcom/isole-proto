@@ -77,6 +77,7 @@ export function damage(target, attacker, n) {
 	target.health -= n;
 
 	if (target.health <= 0) {
+		target.alive = false;
 		if (target.die) target.die();
 		else game.remove(target);
 	} else {

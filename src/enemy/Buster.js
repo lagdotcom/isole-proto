@@ -54,6 +54,7 @@ export default function Buster(game, options = {}) {
 			fatigue: 0,
 			state: sIdle,
 			sprite: controller(game.resources[options.img || 'enemy.buster']),
+			alive: true,
 			health: 3,
 			damage: 1,
 		},
@@ -69,8 +70,8 @@ Buster.prototype.update = function(time) {
 		tscale = time / gTimeScale;
 	const { b, t } = this.getHitbox();
 	const playerDist = unscalew(angledist(a, player.a), r),
-		attackable = player.health && playerDist - player.w <= gAttackWidth,
-		near = player.health && playerDist - player.w <= gNearWidth;
+		attackable = player.alive && playerDist - player.w <= gAttackWidth,
+		near = player.alive && playerDist - player.w <= gNearWidth;
 
 	var floor = null;
 	if (vr <= 0) {

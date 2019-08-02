@@ -37,7 +37,7 @@ Decal.prototype.update = function(time) {
 		amod += time * motion;
 	}
 
-	if (parallax) {
+	if (parallax && game.player.alive) {
 		amod += (game.player.va / gTimeScale + game.player.vfa) * parallax;
 	}
 

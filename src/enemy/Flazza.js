@@ -59,6 +59,7 @@ export default function Flazza(game, options = {}) {
 				this,
 				game.resources[options.img || 'enemy.flazza']
 			),
+			alive: true,
 			health: 2,
 			damage: 1,
 		},

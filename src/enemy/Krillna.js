@@ -52,6 +52,7 @@ export default function Krillna(game, options = {}) {
 			tscale: 0,
 			movefn: (fr, n) => gFrameMotion[fr] * n,
 			sprite: controller(game.resources[options.img || 'enemy.krillna']),
+			alive: true,
 			health: 5,
 			damage: 1,
 		},

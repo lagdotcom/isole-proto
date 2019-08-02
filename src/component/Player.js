@@ -60,6 +60,7 @@ export default function Player(game, options = {}) {
 			sprite: new WoodyController(
 				game.resources[options.img || 'player.woody']
 			),
+			alive: true,
 			health: 5,
 		},
 		options
