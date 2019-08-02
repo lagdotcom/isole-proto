@@ -139,7 +139,15 @@ Editor.prototype.onGameBegin = function() {
 	});
 
 	objects.forEach(o => {
-		game.decals.push(new Decal(game, o.h, o.a, o.motion, o.object));
+		game.decals.push(
+			new Decal(game, {
+				r: o.h,
+				a: o.a,
+				motion: o.motion,
+				parallax: o.parallax,
+				object: o.object,
+			})
+		);
 	});
 
 	enemies.forEach(e => {
@@ -403,6 +411,7 @@ Editor.prototype.makeObjectDom = function(parent, o) {
 	this.makeNumInput(e, o, 'Height', 'h');
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeNumInput(e, o, 'Motion', 'motion');
+	this.makeNumInput(e, o, 'Parallax', 'parallax');
 	this.makeChoiceInput(e, o, 'Object', 'object', objects);
 };
 

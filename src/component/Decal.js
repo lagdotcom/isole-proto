@@ -1,31 +1,47 @@
 import Controller from '../Controller';
 import { cIgnore } from '../colours';
+import { gTimeScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { zBackground } from '../layers';
 
-export default function Decal(game, height, angle, motion, object) {
-	const sprite = game.objects[object];
+export default function Decal(game, options) {
+	const sprite = game.objects[options.object];
 
-	Object.assign(this, {
-		isDecal: true,
-		layer: zBackground,
-		game,
-		r: height,
-		a: anglewrap(deg2rad(angle)),
-		motion: deg2rad(motion / 100 || 0),
-		object,
-		sprite,
-		width: sprite.w,
-		height: sprite.h,
-	});
+	Object.assign(
+		this,
+		{
+			isDecal: true,
+			layer: zBackground,
+			game,
+			r: 0,
+			a: 0,
+			motion: 0,
+			parallax: 0,
+			sprite,
+			width: sprite.w,
+			height: sprite.h,
+		},
+		options
+	);
+
+	this.a = anglewrap(deg2rad(this.a));
+	this.motion = deg2rad(this.motion / 100);
+	this.parallax /= 10;
 }
 
 Decal.prototype.update = function(time) {
-	if (this.motion) {
-		this.a = anglewrap(this.a + time * this.motion);
-		this.left = this.a - this.width;
-		this.right = this.a + this.width;
+	const { a, game, motion, parallax } = this;
+	var amod = 0;
+
+	if (motion) {
+		amod += time * motion;
 	}
+
+	if (parallax) {
+		amod += (game.player.va / gTimeScale + game.player.vfa) * parallax;
+	}
+
+	this.a = anglewrap(a + amod);
 };
 
 Decal.prototype.draw = function(c) {
