@@ -10,6 +10,7 @@ import mel from './makeElement';
 import clearChildren from './clearChildren';
 import { eGameBegin } from './events';
 import { alla, deg2rad } from './tools';
+import layers, { zBackground } from './layers';
 import { dLeft, dRight } from './dirs';
 
 const enemyTypes = { buster: Buster, krillna: Krillna, flazza: Flazza };
@@ -80,7 +81,15 @@ export default function Editor(options) {
 				material: 'grass',
 			},
 		],
-		objects: [{ h: 250, a: 225, motion: 4, object: 'bluerntree' }],
+		objects: [
+			{
+				r: 250,
+				a: 225,
+				motion: 4,
+				layer: zBackground,
+				object: 'bluerntree',
+			},
+		],
 		player: { a: 270, r: 300, item: 'rock' },
 		enemies: [
 			{
@@ -139,15 +148,7 @@ Editor.prototype.onGameBegin = function() {
 	});
 
 	objects.forEach(o => {
-		game.decals.push(
-			new Decal(game, {
-				r: o.h,
-				a: o.a,
-				motion: o.motion,
-				parallax: o.parallax,
-				object: o.object,
-			})
-		);
+		game.decals.push(new Decal(game, o));
 	});
 
 	enemies.forEach(e => {
@@ -223,7 +224,9 @@ Editor.prototype.makeDom = function(parent) {
 	this.makeSection(c, 'objects', 'Objects', 'makeObjectDom', {
 		h: 200,
 		a: 0,
+		layer: zBackground,
 		motion: 0,
+		parallax: 0,
 		object: 'greenflower',
 	});
 	this.makeSection(c, 'enemies', 'Enemies', 'makeEnemyDom', {
@@ -310,7 +313,8 @@ Editor.prototype.makeChoiceInput = function(
 	object,
 	label,
 	attribute,
-	choices
+	choices,
+	parser = x => x
 ) {
 	const el = mel(
 		mel(parent, 'label', { className: 'input choice', innerText: label }),
@@ -318,19 +322,29 @@ Editor.prototype.makeChoiceInput = function(
 		{},
 		{
 			change: e => {
-				object[attribute] = el.value;
+				object[attribute] = parser(el.value);
 				this.game.begin();
 			},
 		}
 	);
 
-	choices.forEach(value => {
-		mel(el, 'option', {
-			innerText: value,
-			selected: object[attribute] === value,
-			value,
+	if (Array.isArray(choices))
+		choices.forEach(value => {
+			mel(el, 'option', {
+				innerText: value,
+				selected: object[attribute] === value,
+				value,
+			});
 		});
-	});
+	else
+		Object.keys(choices).forEach(innerText => {
+			const value = choices[innerText];
+			mel(el, 'option', {
+				innerText,
+				selected: object[attribute] === value,
+				value,
+			});
+		});
 
 	return el;
 };
@@ -408,10 +422,11 @@ Editor.prototype.makeFloorDom = function(parent, o) {
 Editor.prototype.makeObjectDom = function(parent, o) {
 	const e = mel(parent, 'div', { className: 'entry' });
 	this.makeDel(e, o, 'objects');
-	this.makeNumInput(e, o, 'Height', 'h');
+	this.makeNumInput(e, o, 'Height', 'r');
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeNumInput(e, o, 'Motion', 'motion');
 	this.makeNumInput(e, o, 'Parallax', 'parallax');
+	this.makeChoiceInput(e, o, 'Layer', 'layer', layers, x => parseInt(x, 10));
 	this.makeChoiceInput(e, o, 'Object', 'object', objects);
 };
 
