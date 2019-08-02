@@ -35,7 +35,7 @@ export default function Editor(options) {
 				h: 250,
 				a: 225,
 				w: 60,
-				th: 16,
+				th: 32,
 				motion: 4,
 				material: 'bluegrass',
 			},

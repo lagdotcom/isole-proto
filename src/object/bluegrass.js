@@ -12,15 +12,15 @@ const decal = (resource, x, y, w, h) => (game, options) =>
 	});
 
 export default {
-	greenfl: decal('tile.bluegrass', 10, 317, 26, 36),
-	redfl: decal('tile.bluegrass', 59, 317, 26, 36),
-	bluefl: decal('tile.bluegrass', 106, 317, 26, 36),
+	greenfl: decal('tile.bluegrass', 20, 634, 52, 72),
+	redfl: decal('tile.bluegrass', 118, 634, 52, 72),
+	bluefl: decal('tile.bluegrass', 212, 634, 52, 72),
 
-	greensfl: decal('tile.bluegrass', 19, 370, 10, 14),
-	redsfl: decal('tile.bluegrass', 51, 370, 10, 14),
-	bluesfl: decal('tile.bluegrass', 83, 370, 10, 14),
-	stalk: decal('tile.bluegrass', 116, 370, 6, 14),
+	greensfl: decal('tile.bluegrass', 38, 740, 20, 28),
+	redsfl: decal('tile.bluegrass', 102, 740, 20, 28),
+	bluesfl: decal('tile.bluegrass', 166, 740, 20, 28),
+	stalk: decal('tile.bluegrass', 232, 740, 12, 28),
 
-	bluesqtree: decal('tile.bluegrass', 142, 242, 48, 111),
-	bluerntree: decal('tile.bluegrass', 205, 248, 49, 104),
+	bluesqtree: decal('tile.bluegrass', 284, 484, 96, 222),
+	bluerntree: decal('tile.bluegrass', 410, 496, 98, 208),
 };
