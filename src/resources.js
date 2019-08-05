@@ -6,6 +6,10 @@ import iconsImg from '../media/icons.png';
 import krillnaImg from '../media/krillna.png';
 import rockImg from '../media/rock.png';
 import woodyImg from '../media/woody.png';
+import rwbgtreeImg from '../media/tilesheet_rwbgtree.png';
+import rwbgrocksImg from '../media/tilesheet_rwbgrocks.png';
+import rwfartreesImg from '../media/tilesheet_rwfartrees.png';
+import rwbgcanopyImg from '../media/tilesheet_rwbgcanopy.png';
 
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
@@ -42,6 +46,10 @@ export default function(game) {
 	game.require('tile.grass', grassImg);
 	game.require('tile.bluegrass', bluegrassImg);
 	game.require('ui.icons', iconsImg);
+	game.require('tile.rwbgtree',rwbgtreeImg);
+	game.require('tile.rwbgrocks',rwbgrocksImg);
+	game.require('tile.rwfartrees',rwfartreesImg);
+	game.require('tile.rwbgcanopy',rwbgcanopyImg);
 
 	addMaterials(game, [grassMaterials, bluegrassMaterials]);
 	addObjects(game, [bluegrassObjects]);
