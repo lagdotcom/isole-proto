@@ -30,9 +30,9 @@ export default {
 	sqrock: decal('tile.rwbgrocks', 0, 0, 320, 144),
 	rnrock: decal('tile.rwbgrocks', 352, 32, 224, 112),
 
-	fartree1: decal('tile.rwfartrees', 32, 32, 384, 672),
-	fartree2: decal('tile.rwfartrees', 480, 64, 342, 640),
-	fartree3: decal('tile.rwfartrees', 864, 32, 320, 672),
+	fartree1: decal('tile.rwfartrees', 32, 32, 352, 672),
+	fartree2: decal('tile.rwfartrees', 512, 96, 288, 608),
+	fartree3: decal('tile.rwfartrees', 864, 32, 288, 672),
 
 	bgcanopy: decal('tile.rwbgcanopy', 32, 0, 1312, 416),
 };
