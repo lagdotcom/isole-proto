@@ -1,5 +1,5 @@
 import Buster from './enemy/Buster';
-import Decal from './component/Decal';
+import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
 import Krillna from './enemy/Krillna';
@@ -20,6 +20,7 @@ const items = ['', ...Object.keys(itemTypes)];
 var materials;
 var objects;
 const wallDirections = [1, -1];
+const objectPositions = [normalPosition, staticPosition];
 
 export default function Editor(options) {
 	const { data, game, parent } = options;
@@ -83,6 +84,7 @@ export default function Editor(options) {
 		],
 		objects: [
 			{
+				position: normalPosition,
 				r: 250,
 				a: 225,
 				motion: 4,
@@ -422,8 +424,9 @@ Editor.prototype.makeFloorDom = function(parent, o) {
 Editor.prototype.makeObjectDom = function(parent, o) {
 	const e = mel(parent, 'div', { className: 'entry' });
 	this.makeDel(e, o, 'objects');
-	this.makeNumInput(e, o, 'Height', 'r');
-	this.makeAngleInput(e, o, 'Angle', 'a');
+	this.makeChoiceInput(e, o, 'Position', 'position', objectPositions);
+	this.makeNumInput(e, o, 'Height/Y', 'r');
+	this.makeAngleInput(e, o, 'Angle/X', 'a');
 	this.makeNumInput(e, o, 'Motion', 'motion');
 	this.makeNumInput(e, o, 'Parallax', 'parallax');
 	this.makeChoiceInput(e, o, 'Layer', 'layer', layers, x => parseInt(x, 10));

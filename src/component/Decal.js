@@ -4,6 +4,9 @@ import { gTimeScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { zBackground } from '../layers';
 
+export const normalPosition = 'normal';
+export const staticPosition = 'static';
+
 export default function Decal(game, options) {
 	const sprite = game.objects[options.object];
 
@@ -17,9 +20,12 @@ export default function Decal(game, options) {
 			a: 0,
 			motion: 0,
 			parallax: 0,
+			position: normalPosition,
 			sprite,
 			width: sprite.w,
 			height: sprite.h,
+			x: options.a || 0,
+			y: options.r || 0,
 		},
 		options
 	);
@@ -27,6 +33,12 @@ export default function Decal(game, options) {
 	this.a = anglewrap(deg2rad(this.a));
 	this.motion = deg2rad(this.motion / 100);
 	this.parallax /= 10;
+
+	if (this.position === staticPosition) {
+		this.update = null;
+		this.draw = this.drawStatic;
+		this.drawHitbox = null;
+	}
 }
 
 Decal.prototype.update = function(time) {
@@ -57,6 +69,17 @@ Decal.prototype.draw = function(c) {
 	sprite.draw(c);
 
 	c.rotate(-normal);
+	c.translate(-x - cx, -y - cy);
+};
+
+Decal.prototype.drawStatic = function(c) {
+	const { x, y, game, sprite } = this;
+	const { cx, cy } = game;
+
+	c.translate(x + cx, y + cy);
+
+	sprite.draw(c);
+
 	c.translate(-x - cx, -y - cy);
 };
 
