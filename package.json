@@ -1,5 +1,6 @@
 {
 	"name": "isole-proto",
+	"repository": "https://lagdotcom@bitbucket.org/lagdotcom/isole.git",
 	"version": "0.1.0",
 	"description": "",
 	"main": "index.html",
@@ -19,6 +20,6 @@
 		"style-loader": "^0.23.1",
 		"webpack": "^4.39.1",
 		"webpack-cli": "^3.3.6",
-		"webpack-dev-server": "^3.7.2"
+		"webpack-dev-server": "^3.8.0"
 	}
 }

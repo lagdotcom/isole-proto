@@ -100,12 +100,12 @@ export function dirv(x, y) {
 	return { r, a };
 }
 
-export function displace(origin, hotspots = [], flip = false) {
+export function displace(origin, offsets = [], flip = false) {
 	const { a, r } = origin;
 	var x = 0,
 		y = 0;
 
-	hotspots.forEach(h => {
+	offsets.forEach(h => {
 		x += h.x;
 		y += h.y;
 	});
