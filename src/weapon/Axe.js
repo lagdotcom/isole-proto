@@ -13,7 +13,7 @@ import { aAxe } from '../anims';
 import { eAnimationEnded } from '../events';
 import { cHit, cHotspot } from '../colours';
 
-const gCooldown = 1000;
+const gCooldown = 700;
 
 const aIdle = 'idle',
 	aSwing = 'swing';
@@ -30,9 +30,9 @@ const animations = {
 
 	[aSwing]: {
 		frames: [
-			{ c: 1, r: 0, t: 225 },
-			{ c: 1, r: 1, t: 75, hitbox: { x: 60, y: -10, w: 60, h: 60 } },
-			{ c: 1, r: 2, t: 75, hitbox: { x: 60, y: -10, w: 60, h: 60 } },
+			{ c: 1, r: 0, t: 225, hitbox: {x: -60, y: 15, w: 55, h: 53 } },
+			{ c: 1, r: 1, t: 75, hitbox: { x: 65, y: -19, w: 55, h: 60 } },
+			{ c: 1, r: 2, t: 75, hitbox: { x: 65, y: -19, w: 55, h: 60 } },
 			{ c: 1, r: 3, t: 150 },
 		],
 	},
