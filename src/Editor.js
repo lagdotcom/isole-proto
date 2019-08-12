@@ -1,3 +1,4 @@
+import Axe from './weapon/axe';
 import Buster from './enemy/Buster';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
@@ -17,6 +18,8 @@ const enemyTypes = { buster: Buster, krillna: Krillna, flazza: Flazza };
 const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
+const weaponTypes = { axe: Axe };
+const weapons = ['', ...Object.keys(weaponTypes)];
 var materials;
 var objects;
 const wallDirections = [1, -1];
@@ -92,7 +95,7 @@ export default function Editor(options) {
 				object: 'bluerntree',
 			},
 		],
-		player: { a: 270, r: 300, item: 'rock' },
+		player: { a: 270, r: 100, item: 'rock', weapon: 'axe' },
 		enemies: [
 			{
 				type: 'krillna',
@@ -164,6 +167,8 @@ Editor.prototype.onGameBegin = function() {
 
 	game.inventory.clear();
 	if (player.item) game.inventory.add(itemTypes[player.item]);
+	if (player.weapon)
+		game.inventory.weapon = new weaponTypes[player.weapon](game);
 	game.inventory.health = game.player.health;
 
 	game.components = [
@@ -387,6 +392,7 @@ Editor.prototype.makePlayerDom = function(parent, o) {
 	this.makeNumInput(e, o, 'Height', 'r');
 	this.makeAngleInput(e, o, 'Angle', 'a');
 	this.makeChoiceInput(e, o, 'Item', 'item', items);
+	this.makeChoiceInput(e, o, 'Weapon', 'weapon', weapons);
 };
 
 Editor.prototype.makePlatformDom = function(parent, o) {

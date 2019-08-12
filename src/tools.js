@@ -99,3 +99,18 @@ export function dirv(x, y) {
 
 	return { r, a };
 }
+
+export function displace(origin, hotspots = [], flip = false) {
+	const { a, r } = origin;
+	var x = 0,
+		y = 0;
+
+	hotspots.forEach(h => {
+		x += h.x;
+		y += h.y;
+	});
+
+	if (flip) x = 0 - x;
+
+	return { a: a + scalew(x, r + y), r: r + y };
+}

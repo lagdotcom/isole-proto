@@ -1,4 +1,4 @@
-import { kCycle, kThrow } from '../keys';
+import { kCycle, kThrow, kSwing } from '../keys';
 import { zUI } from '../layers';
 
 export default function Inventory(game, size = 3) {
@@ -6,6 +6,7 @@ export default function Inventory(game, size = 3) {
 		layer: zUI,
 		game,
 		items: new Array(size),
+		weapon: null,
 		cycling: false,
 		money: 0,
 		health: 5,
@@ -30,7 +31,17 @@ Inventory.prototype.remove = function(item) {
 };
 
 Inventory.prototype.update = function(t) {
-	if (this.game.keys[kThrow]) {
+	const { game, weapon } = this;
+
+	if (weapon && weapon.update) weapon.update(t);
+
+	if (game.keys[kSwing]) {
+		if (weapon && weapon.canUse()) {
+			weapon.use();
+		}
+	}
+
+	if (game.keys[kThrow]) {
 		if (this.canThrow()) {
 			this.throw();
 		}
@@ -41,7 +52,7 @@ Inventory.prototype.update = function(t) {
 		// }
 	}
 
-	if (this.game.keys[kCycle]) {
+	if (game.keys[kCycle]) {
 		if (!this.cycling) {
 			this.cycle();
 			this.cycling = true;
@@ -52,10 +63,12 @@ Inventory.prototype.update = function(t) {
 };
 
 Inventory.prototype.draw = function(c) {
-	const { game, items, money, health, keys, img } = this;
+	const { game, items, money, health, keys, img, weapon } = this;
 
 	const y = game.options.height - 48;
 	var x = 0;
+
+	if (weapon) weapon.draw(c, game.options.width - 48, y);
 
 	items.forEach(i => {
 		if (i && i.draw) i.draw(c, x, y);

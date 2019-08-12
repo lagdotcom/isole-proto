@@ -3,4 +3,5 @@ export const cHurt = '#ffff00',
 	cHit = '#ff0000',
 	cAI = '#00ffff',
 	cIgnore = '#444444',
-	cWall = '#888888';
+	cWall = '#888888',
+	cHotspot = '#ff00ff';

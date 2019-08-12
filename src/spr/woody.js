@@ -8,8 +8,9 @@ import {
 	aFall,
 	aLand,
 	aThrow,
+	aAxe,
 } from '../anims';
-import { eThrow } from '../events';
+import { eThrow, eSwing } from '../events';
 
 /*
 Spritesheet Layout (72x72)
@@ -95,6 +96,19 @@ const animations = {
 			{ c: 5, r: 3, t: 75, event: eThrow },
 			{ c: 5, r: 4, t: 75 },
 			{ c: 5, r: 5, t: 150 },
+		],
+	},
+
+	[aAxe]: {
+		priority: 2,
+		flags: { preventTurn: true },
+		frames: [
+			{ c: 5, r: 0, t: 75, hotspot: { x: -48, y: 44 } },
+			{ c: 5, r: 1, t: 75, hotspot: { x: -48, y: 44 } },
+			{ c: 5, r: 2, t: 75, hotspot: { x: -48, y: 44 } },
+			{ c: 5, r: 3, t: 75, hotspot: { x: 24, y: 20 }, event: eSwing },
+			{ c: 5, r: 4, t: 75, hotspot: { x: 24, y: 20 } },
+			{ c: 5, r: 5, t: 150, hotspot: { x: 24, y: 20 } },
 		],
 	},
 };

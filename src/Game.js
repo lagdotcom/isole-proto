@@ -5,7 +5,7 @@ import Krillna from './enemy/Krillna';
 import Player from './component/Player';
 import Wall from './component/Wall';
 import { eGameBegin, eGameReady } from './events';
-import { kLeft, kRight, kJump, kThrow } from './keys';
+import { kLeft, kRight, kJump, kThrow, kSwing } from './keys';
 import { any, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 import mel from './makeElement';
@@ -194,6 +194,7 @@ Game.prototype.readGamepads = function() {
 		this.keys[kRight] = axes[0] > gPadAxisThreshold;
 		this.keys[kJump] = buttons[0].pressed;
 		this.keys[kThrow] = buttons[1].pressed;
+		this.keys[kSwing] = buttons[2].pressed;
 	});
 };
 

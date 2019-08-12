@@ -5,4 +5,5 @@ export const aStand = 'stand',
 	aJump = 'jump',
 	aFall = 'fall',
 	aLand = 'land',
-	aThrow = 'throw';
+	aThrow = 'throw',
+	aAxe = 'axe';

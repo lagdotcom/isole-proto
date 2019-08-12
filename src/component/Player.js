@@ -1,6 +1,6 @@
-import { cHurt, cStep } from '../colours';
+import { cHurt, cStep, cHotspot } from '../colours';
 import { dLeft, dRight } from '../dirs';
-import { kLeft, kRight, kJump, kThrow } from '../keys';
+import { kLeft, kRight, kJump, kThrow, kSwing } from '../keys';
 import {
 	gAirWalk,
 	gGravityStrength,
@@ -24,6 +24,7 @@ import {
 	collides,
 	damage,
 	dirv,
+	displace,
 } from '../tools';
 import mel from '../makeElement';
 import WoodyController from '../spr/woody';
@@ -207,9 +208,8 @@ Player.prototype.update = function(time) {
 		this.jumplg = true;
 	}
 
-	if (keys[kThrow]) {
-		controls.push('throw');
-	}
+	if (keys[kSwing]) controls.push('swing');
+	if (keys[kThrow]) controls.push('throw');
 
 	if (wall && !ceiling) {
 		flags.push('wall');
@@ -284,7 +284,7 @@ Player.prototype.draw = function(c) {
 };
 
 Player.prototype.drawHitbox = function(c) {
-	const { game } = this;
+	const { game, sprite } = this;
 	const { cx, cy } = game;
 	const { b, t, s } = this.getHitbox();
 
@@ -300,6 +300,16 @@ Player.prototype.drawHitbox = function(c) {
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.arc(cx, cy, s.r, s.ar, s.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
+	c.stroke();
+
+	const p = cart(this.a, this.r);
+	const { a, r } = displace(this, [sprite.hotspot], sprite.flip);
+	const h = cart(a, r);
+	c.strokeStyle = cHotspot;
+	c.beginPath();
+	c.strokeRect(cx + h.x - 4, cy + h.y - 4, 9, 9);
+	c.moveTo(cx + h.x, cy + h.y);
+	c.lineTo(cx + p.x, cy + p.y);
 	c.stroke();
 };
 

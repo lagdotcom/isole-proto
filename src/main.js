@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
 		showDebug: true,
 		debugContainer: debug,
 		showFps: true,
-		showHitboxes: false,
+		showHitboxes: true,
 	});
 	window.G = G;
 

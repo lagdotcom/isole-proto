@@ -20,6 +20,10 @@ export default class AnimController extends Controller {
 		Object.values(data.animations).forEach(a => {
 			a.last = a.frames.length - 1;
 			a.priority = a.priority || 0;
+
+			a.frames.forEach(f => {
+				f.hotspot = f.hotspot || { x: 0, y: 0 };
+			});
 		});
 	}
 
@@ -74,6 +78,7 @@ export default class AnimController extends Controller {
 		this.ae = this.acf.event;
 		this.c = this.acf.c;
 		this.r = this.acf.r;
+		this.hotspot = this.acf.hotspot;
 	}
 
 	dispatch(e, details) {
