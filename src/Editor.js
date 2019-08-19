@@ -1,4 +1,5 @@
 import Axe from './weapon/axe';
+import Bat from './enemy/bat';
 import Buster from './enemy/Buster';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
@@ -14,7 +15,12 @@ import { alla, deg2rad } from './tools';
 import layers, { zBackground } from './layers';
 import { dLeft, dRight } from './dirs';
 
-const enemyTypes = { buster: Buster, krillna: Krillna, flazza: Flazza };
+const enemyTypes = {
+	bat: Bat,
+	buster: Buster,
+	krillna: Krillna,
+	flazza: Flazza,
+};
 const enemies = Object.keys(enemyTypes);
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
@@ -110,14 +116,9 @@ export default function Editor(options) {
 				dir: dLeft,
 			},
 			{
-				type: 'buster',
-				a: 0,
-				r: 250,
-			},
-			{
-				type: 'flazza',
+				type: 'bat',
 				a: 90,
-				r: 400,
+				r: 300,
 				dir: dLeft,
 			},
 		],
