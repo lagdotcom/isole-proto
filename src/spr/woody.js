@@ -25,14 +25,6 @@ Stand	FlipL	Run1	Jump1	JFlipL	Throw1
 				Run8	Land2
 */
 
-const tFlip = 75,
-	tJump = 75,
-	tFall = 75,
-	tLand = 75,
-	tWalk = 85,
-	tThrow = 75,
-	tThrowLast = 150;
-
 const animations = {
 	[aStand]: {
 		extend: true,

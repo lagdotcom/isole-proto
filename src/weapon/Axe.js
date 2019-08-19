@@ -192,8 +192,6 @@ export default function AxeWeapon(game) {
 	Object.assign(this, {
 		game,
 		sprite: controller(game.resources['weapon.axe']),
-		xo: -90,
-		yo: -90,
 		cooldown: 0,
 	});
 }
@@ -207,11 +205,9 @@ AxeWeapon.prototype.canUse = function() {
 };
 
 AxeWeapon.prototype.draw = function(c, x, y) {
-	const { xo, yo } = this;
-
-	c.translate(x + xo, y + yo);
+	c.translate(x, y);
 	this.sprite.draw(c);
-	c.translate(-x - xo, -y - yo);
+	c.translate(-x, -y);
 };
 
 AxeWeapon.prototype.use = function() {
