@@ -26,11 +26,11 @@ window.addEventListener('load', () => {
 		width: 1024,
 		height: 768,
 		scale: 1,
-		smoothing: false,
+		smoothing: true,
 		showDebug: true,
 		debugContainer: debug,
 		showFps: true,
-		showHitboxes: true,
+		showHitboxes: false,
 	});
 	window.G = G;
 

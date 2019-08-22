@@ -46,6 +46,7 @@ Flat.prototype.draw = function(c) {
 	var remaining = width * 2,
 		a = left;
 
+	sprite.reset();
 	sprite.tile(this.circle ? 'tm' : 'tl');
 	while (remaining > 0) {
 		if (remaining < step) {
@@ -53,8 +54,8 @@ Flat.prototype.draw = function(c) {
 			a = right - step;
 		}
 
-		var normal = a + offset + piHalf;
-		var { x, y } = cart(a, r);
+		const normal = a + offset + piHalf;
+		const { x, y } = cart(a, r);
 
 		c.translate(x + cx, y + cy);
 		c.rotate(normal);

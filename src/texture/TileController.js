@@ -9,6 +9,7 @@ export default class TileController extends Controller {
 					img,
 					w: 32,
 					h: 32,
+					count: 0,
 				},
 				options
 			)
@@ -33,5 +34,9 @@ export default class TileController extends Controller {
 		}
 
 		this.tname = n;
+	}
+
+	reset() {
+		this.count = 0;
 	}
 }

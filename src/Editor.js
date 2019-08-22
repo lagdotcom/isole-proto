@@ -40,87 +40,19 @@ export default function Editor(options) {
 
 	this.game = game;
 	this.data = data || {
-		platforms: [
-			{
-				h: 250,
-				a: 225,
-				w: 60,
-				th: 32,
-				motion: 4,
-				material: 'bluegrass',
-			},
-			{
-				h: 250,
-				a: 45,
-				w: 240,
-				th: 32,
-				motion: 4,
-				material: 'grass',
-			},
-			{
-				h: 150,
-				a: 135,
-				w: 320,
-				th: 32,
-				motion: -4,
-				material: 'grass',
-			},
-		],
-		walls: [
-			{
-				top: 218,
-				bottom: 150,
-				a: 350,
-				dir: 1,
-				motion: 0,
-				material: 'grass',
-			},
-			{
-				top: 218,
-				bottom: 150,
-				a: 10,
-				dir: -1,
-				material: 'grass',
-			},
-		],
+		platforms: [],
+		walls: [],
 		floors: [
-			{
-				h: 50,
-				a: 0,
-				w: 360,
-				material: 'grass',
-			},
+			{ h: 150, a: 0, w: 360, material: 'bluegrass' },
+			{ h: 300, a: 180, w: 30, motion: 2, material: 'cloud' },
+			{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
 		],
-		objects: [
-			{
-				position: normalPosition,
-				r: 250,
-				a: 225,
-				motion: 4,
-				layer: zBackground,
-				object: 'bluerntree',
-			},
-		],
-		player: { a: 270, r: 100, item: 'rock', weapon: 'axe' },
+		objects: [],
+		player: { a: 270, r: 150, item: 'rock', weapon: 'axe' },
 		enemies: [
-			{
-				type: 'krillna',
-				a: 90,
-				r: 200,
-				dir: dRight,
-			},
-			{
-				type: 'krillna',
-				a: 180,
-				r: 300,
-				dir: dLeft,
-			},
-			{
-				type: 'bat',
-				a: 90,
-				r: 300,
-				dir: dLeft,
-			},
+			{ type: 'bat', a: 200, r: 250, dir: 'L' },
+			{ type: 'buster', a: 0, r: 150, dir: 'L' },
+			{ type: 'krillna', a: 150, r: 150, dir: 'R' },
 		],
 	};
 
