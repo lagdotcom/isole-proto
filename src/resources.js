@@ -47,29 +47,44 @@ function addObjects(game, objects) {
 	});
 }
 
-export default function(game) {
-	game.require('enemy.bat', batImg);
-	game.require('enemy.buster', busterImg);
-	game.require('enemy.flazza', flazzaImg);
-	game.require('enemy.krillna', krillnaImg);
-	game.require('item.rock', rockImg);
-	game.require('weapon.axe', axeImg);
-	game.require('player.woody', woodyImg);
-	game.require('tile.grass', grassImg);
-	game.require('tile.bluegrass', bluegrassImg);
-	game.require('ui.icons', iconsImg);
-	game.require('tile.rwbgtree', rwbgtreeImg);
-	game.require('tile.rwbgrocks', rwbgrocksImg);
-	game.require('tile.rwfartrees', rwfartreesImg);
-	game.require('tile.rwbgcanopy', rwbgcanopyImg);
+function image(fn, onload) {
+	var el = document.createElement('img');
+	el.onload = onload;
+	el.src = fn;
 
-	game.require('player.bonk', bonkSnd);
-	game.require('player.bop', bopSnd);
-	game.require('player.dead', deathSnd);
-	game.require('player.jump', jumpSnd);
-	game.require('player.step1', step1Snd);
-	game.require('player.step2', step2Snd);
-	game.require('woody.hurt', woodyHurtSnd);
+	return el;
+}
+
+function sound(fn, onload) {
+	var el = new Audio(fn);
+	el.oncanplaythrough = onload;
+
+	return el;
+}
+
+export default function(game) {
+	game.require('enemy.bat', image, batImg);
+	game.require('enemy.buster', image, busterImg);
+	game.require('enemy.flazza', image, flazzaImg);
+	game.require('enemy.krillna', image, krillnaImg);
+	game.require('item.rock', image, rockImg);
+	game.require('weapon.axe', image, axeImg);
+	game.require('player.woody', image, woodyImg);
+	game.require('tile.grass', image, grassImg);
+	game.require('tile.bluegrass', image, bluegrassImg);
+	game.require('ui.icons', image, iconsImg);
+	game.require('tile.rwbgtree', image, rwbgtreeImg);
+	game.require('tile.rwbgrocks', image, rwbgrocksImg);
+	game.require('tile.rwfartrees', image, rwfartreesImg);
+	game.require('tile.rwbgcanopy', image, rwbgcanopyImg);
+
+	game.require('player.bonk', sound, bonkSnd);
+	game.require('player.bop', sound, bopSnd);
+	game.require('player.dead', sound, deathSnd);
+	game.require('player.jump', sound, jumpSnd);
+	game.require('player.step1', sound, step1Snd);
+	game.require('player.step2', sound, step2Snd);
+	game.require('woody.hurt', sound, woodyHurtSnd);
 
 	addMaterials(game, [grassMaterials, bluegrassMaterials]);
 	addObjects(game, [bluegrassObjects]);

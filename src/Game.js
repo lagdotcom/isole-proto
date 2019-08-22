@@ -39,19 +39,13 @@ export default function Game(options) {
 	addResources(this);
 }
 
-Game.prototype.require = function(key, src) {
+Game.prototype.require = function(key, typ, src) {
 	const me = this;
-	var el = document.createElement(mediatag(src));
-	el.onload = () => {
-		me.loading--;
-	};
-	el.oncanplaythrough = () => {
-		me.loading--;
-	};
-	el.src = src;
 
-	this.resources[key] = el;
 	this.loading++;
+	this.resources[key] = typ(src, () => {
+		me.loading--;
+	});
 };
 
 Game.prototype.begin = function() {
