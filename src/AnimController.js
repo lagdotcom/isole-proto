@@ -83,5 +83,6 @@ export default class AnimController extends Controller {
 
 	dispatch(e, details) {
 		if (this.al[e]) this.al[e](details);
+		if (this[e]) this[e](details);
 	}
 }

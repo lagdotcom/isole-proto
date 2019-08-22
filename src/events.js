@@ -1,5 +1,5 @@
-export const eAnimationEnded = 'animend',
+export const eAnimationEnded = 'onanimend',
 	eGameBegin = 'begin.isole',
 	eGameReady = 'ready.isole',
-	eThrow = 'throw',
-	eSwing = 'swing';
+	eThrow = 'onthrow',
+	eSwing = 'onswing';

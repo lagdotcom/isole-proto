@@ -9,6 +9,7 @@ module.exports = {
 	module: {
 		rules: [
 			{ test: /\.png$/, use: 'file-loader' },
+			{ test: /\.wav$/, use: 'file-loader' },
 			{
 				test: /.css$/,
 				use: ['style-loader', 'css-loader'],

@@ -41,11 +41,11 @@ const animations = {
 		frames: [
 			{ c: 2, r: 0, t: 85 },
 			{ c: 2, r: 1, t: 85 },
-			{ c: 2, r: 2, t: 85 },
+			{ c: 2, r: 2, t: 85, event: 'onstep' },
 			{ c: 2, r: 3, t: 85 },
 			{ c: 2, r: 4, t: 85 },
 			{ c: 2, r: 5, t: 85 },
-			{ c: 2, r: 6, t: 85 },
+			{ c: 2, r: 6, t: 85, event: 'onstep' },
 			{ c: 2, r: 7, t: 85 },
 		],
 	},
@@ -106,9 +106,10 @@ const animations = {
 };
 
 export default class WoodyController extends AnimController {
-	constructor(img) {
+	constructor(parent, img) {
 		super({
 			animations,
+			parent,
 			img,
 			w: 80,
 			h: 80,
@@ -162,5 +163,11 @@ export default class WoodyController extends AnimController {
 
 	throw() {
 		this.play(aThrow);
+	}
+
+	onstep() {
+		const snd = this.step ? 'player.step2' : 'player.step1';
+		this.step = !this.step;
+		this.parent.body.play(snd);
 	}
 }

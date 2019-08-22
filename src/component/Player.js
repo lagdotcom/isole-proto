@@ -29,6 +29,7 @@ import {
 import mel from '../makeElement';
 import WoodyController from '../spr/woody';
 import { zPlayer } from '../layers';
+import Channel from '../Channel';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
@@ -40,6 +41,8 @@ export default function Player(game, options = {}) {
 	Object.assign(
 		this,
 		{
+			body: new Channel(game, 'Woody Body'),
+			voice: new Channel(game, 'Woody Voice'),
 			isPlayer: true,
 			layer: zPlayer,
 			game,
@@ -59,6 +62,7 @@ export default function Player(game, options = {}) {
 			jumplg: false,
 			tscale: 0,
 			sprite: new WoodyController(
+				this,
 				game.resources[options.img || 'player.woody']
 			),
 			alive: true,
@@ -109,6 +113,7 @@ Player.prototype.update = function(time) {
 		});
 		if (ceiling) {
 			flags.push('ceiling');
+			if (vr > 0) this.body.play('player.bonk');
 			vr = 0;
 		}
 	}
@@ -148,6 +153,7 @@ Player.prototype.update = function(time) {
 	if (hurtenemy) {
 		vr = gJumpStrength * 0.75;
 		damage(hurtenemy, this, 1);
+		this.body.play('player.bop');
 	}
 	if (hitenemy && hurtenemy !== hitenemy) {
 		damage(this, hitenemy, hitenemy.damage || 1);
@@ -193,11 +199,13 @@ Player.prototype.update = function(time) {
 			vr += gJumpStrength;
 			this.jumpt = gJumpTimer;
 			controls.push('jump');
+			this.body.play('player.jump');
 		} else if (this.jumpt < gJumpDoubleTimer && jumpd && jumplg) {
 			this.jumpt = gJumpTimer;
 			this.jumpd = false;
 			vr = gJumpStrength;
 			controls.push('jumpd');
+			this.body.play('player.jump');
 		} else if (this.jumpt >= gJumpAffectTimer && !jumplg) {
 			vr += gJumpAffectStrength;
 			controls.push('jump+');
@@ -358,9 +366,16 @@ Player.prototype.hurt = function(by) {
 	const dv = dirv(this, by);
 	this.va += dv.a * 5;
 	this.vr += dv.r * 5;
+
+	this.voice.play('woody.hurt');
 };
 
 Player.prototype.hurtTimer = function(t) {
 	this.invtimer -= t;
 	if (this.invtimer <= 0) this.invincible = false;
+};
+
+Player.prototype.die = function() {
+	this.voice.play('player.dead');
+	this.game.remove(this);
 };

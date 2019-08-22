@@ -114,3 +114,9 @@ export function displace(origin, offsets = [], flip = false) {
 
 	return { a: a + scalew(x, r + y), r: r + y };
 }
+
+const mediatypes = { png: 'img', wav: 'audio' };
+export function mediatag(fn) {
+	const ext = fn.split('.').pop();
+	return mediatypes[ext.toLowerCase()];
+}

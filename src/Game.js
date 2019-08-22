@@ -6,7 +6,7 @@ import Player from './component/Player';
 import Wall from './component/Wall';
 import { eGameBegin, eGameReady } from './events';
 import { kLeft, kRight, kJump, kThrow, kSwing } from './keys';
-import { any, min, pi, piHalf } from './tools';
+import { any, mediatag, min, pi, piHalf } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
 import mel from './makeElement';
 import dispatch from './dispatchEvent';
@@ -41,8 +41,11 @@ export default function Game(options) {
 
 Game.prototype.require = function(key, src) {
 	const me = this;
-	var el = document.createElement('img');
+	var el = document.createElement(mediatag(src));
 	el.onload = () => {
+		me.loading--;
+	};
+	el.oncanplaythrough = () => {
 		me.loading--;
 	};
 	el.src = src;
