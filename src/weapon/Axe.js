@@ -204,7 +204,13 @@ AxeWeapon.prototype.update = function(t) {
 };
 
 AxeWeapon.prototype.canUse = function() {
-	return this.game.player.alive && this.cooldown <= 0;
+	const player = this.game.player;
+	return (
+		this.cooldown <= 0 &&
+		player.alive &&
+		!player.sprite.flags.noAttack &&
+		!player.sprite.flags.noControl
+	);
 };
 
 AxeWeapon.prototype.draw = function(c, x, y) {

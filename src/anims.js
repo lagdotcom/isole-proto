@@ -6,4 +6,6 @@ export const aStand = 'stand',
 	aFall = 'fall',
 	aLand = 'land',
 	aThrow = 'throw',
-	aAxe = 'axe';
+	aAxe = 'axe',
+	aHurt = 'hurt',
+	aStatus = 'status';

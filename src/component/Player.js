@@ -175,50 +175,52 @@ Player.prototype.update = function(time) {
 		vfa = 0;
 	}
 
-	var controls = [],
-		strength = this.grounded ? gGroundWalk : gAirWalk;
-	if (keys[kLeft]) {
-		va -= strength;
-		controls.push('left');
+	var controls = [];
+	if (!sprite.flags.noControl) {
+		var strength = this.grounded ? gGroundWalk : gAirWalk;
+		if (keys[kLeft]) {
+			va -= strength;
+			controls.push('left');
 
-		if (!sprite.flags.preventTurn) {
-			sprite.face(-1, this.grounded);
-			this.facing = dLeft;
-		}
-	} else if (keys[kRight]) {
-		va += strength;
-		controls.push('right');
+			if (!sprite.flags.noTurn) {
+				sprite.face(-1, this.grounded);
+				this.facing = dLeft;
+			}
+		} else if (keys[kRight]) {
+			va += strength;
+			controls.push('right');
 
-		if (!sprite.flags.preventTurn) {
-			sprite.face(1, this.grounded);
-			this.facing = dRight;
-		}
-	}
-
-	if (keys[kJump]) {
-		if (floor) {
-			vr += gJumpStrength;
-			this.jumpt = gJumpTimer;
-			controls.push('jump');
-			this.body.play('player.jump');
-		} else if (this.jumpt < gJumpDoubleTimer && jumpd && jumplg) {
-			this.jumpt = gJumpTimer;
-			this.jumpd = false;
-			vr = gJumpStrength;
-			controls.push('jumpd');
-			this.body.play('player.jump');
-		} else if (this.jumpt >= gJumpAffectTimer && !jumplg) {
-			vr += gJumpAffectStrength;
-			controls.push('jump+');
+			if (!sprite.flags.noTurn) {
+				sprite.face(1, this.grounded);
+				this.facing = dRight;
+			}
 		}
 
-		this.jumplg = false;
-	} else {
-		this.jumplg = true;
-	}
+		if (keys[kJump]) {
+			if (floor) {
+				vr += gJumpStrength;
+				this.jumpt = gJumpTimer;
+				controls.push('jump');
+				this.body.play('player.jump');
+			} else if (this.jumpt < gJumpDoubleTimer && jumpd && jumplg) {
+				this.jumpt = gJumpTimer;
+				this.jumpd = false;
+				vr = gJumpStrength;
+				controls.push('jumpd');
+				this.body.play('player.jump');
+			} else if (this.jumpt >= gJumpAffectTimer && !jumplg) {
+				vr += gJumpAffectStrength;
+				controls.push('jump+');
+			}
 
-	if (keys[kSwing]) controls.push('swing');
-	if (keys[kThrow]) controls.push('throw');
+			this.jumplg = false;
+		} else {
+			this.jumplg = true;
+		}
+
+		if (keys[kSwing]) controls.push('swing');
+		if (keys[kThrow]) controls.push('throw');
+	} else controls.push('nocontrol');
 
 	if (wall && !ceiling) {
 		flags.push('wall');
@@ -370,6 +372,7 @@ Player.prototype.hurt = function(by, damage) {
 
 	this.game.fire(ePlayerHurt, { by, damage });
 	this.voice.play('woody.hurt');
+	this.sprite.hurt();
 };
 
 Player.prototype.hurtTimer = function(t) {

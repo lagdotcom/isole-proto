@@ -92,7 +92,7 @@ Inventory.prototype.draw = function(c) {
 };
 
 Inventory.prototype.canThrow = function() {
-	return this.items[0] && this.items[0].use;
+	return this.items[0] && this.items[0].canUse();
 };
 
 Inventory.prototype.throw = function() {

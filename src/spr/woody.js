@@ -9,21 +9,10 @@ import {
 	aLand,
 	aThrow,
 	aAxe,
+	aHurt,
+	aStatus,
 } from '../anims';
 import { eThrow, eSwing } from '../events';
-
-/*
-Spritesheet Layout (72x72)
-
-Stand	FlipL	Run1	Jump1	JFlipL	Throw1
-		FlipR	Run2	Jump2	JFlipR	Throw2
-				Run3	Jump3			Throw3
-				Run4	Fall1			Throw4
-				Run5	Fall2			Throw5
-				Run6	Fall3			Throw6
-				Run7	Land1
-				Run8	Land2
-*/
 
 const animations = {
 	[aStand]: {
@@ -80,7 +69,7 @@ const animations = {
 
 	[aThrow]: {
 		priority: 2,
-		flags: { preventTurn: true },
+		flags: { noAttack: true, noTurn: true },
 		frames: [
 			{ c: 5, r: 0, t: 75 },
 			{ c: 5, r: 1, t: 75 },
@@ -93,7 +82,7 @@ const animations = {
 
 	[aAxe]: {
 		priority: 8,
-		flags: { preventTurn: true },
+		flags: { noAttack: true, noTurn: true },
 		frames: [
 			{ c: 5, r: 0, t: 75, hotspot: { x: -48, y: 44 } },
 			{ c: 5, r: 1, t: 75, hotspot: { x: -48, y: 44 } },
@@ -101,6 +90,29 @@ const animations = {
 			{ c: 5, r: 3, t: 75, hotspot: { x: 24, y: 20 }, event: eSwing },
 			{ c: 5, r: 4, t: 75, hotspot: { x: 24, y: 20 } },
 			{ c: 5, r: 5, t: 150, hotspot: { x: 24, y: 20 } },
+		],
+	},
+
+	[aHurt]: {
+		priority: 10,
+		flags: { noControl: true },
+		frames: [
+			{ c: 6, r: 0, t: 75 },
+			{ c: 6, r: 1, t: 75 },
+			{ c: 6, r: 2, t: 300 },
+		],
+	},
+
+	[aStatus]: {
+		priority: 20,
+		loop: true,
+		frames: [
+			{ c: 7, r: 0, t: 90 },
+			{ c: 7, r: 1, t: 90 },
+			{ c: 7, r: 2, t: 90 },
+			{ c: 7, r: 3, t: 90 },
+			{ c: 7, r: 4, t: 90 },
+			{ c: 7, r: 5, t: 90 },
 		],
 	},
 };
@@ -163,6 +175,10 @@ export default class WoodyController extends AnimController {
 
 	throw() {
 		this.play(aThrow);
+	}
+
+	hurt() {
+		this.play(aHurt);
 	}
 
 	onstep() {

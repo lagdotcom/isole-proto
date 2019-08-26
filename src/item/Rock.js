@@ -178,6 +178,15 @@ RockItem.prototype.draw = function(c, x, y) {
 	c.translate(-x, -y);
 };
 
+RockItem.prototype.canUse = function() {
+	const player = this.game.player;
+	return (
+		player.alive &&
+		!player.sprite.flags.noAttack &&
+		!player.sprite.flags.noControl
+	);
+};
+
 RockItem.prototype.use = function() {
 	this.game.player.sprite.play(aThrow, false, { [eThrow]: this.thrown });
 };
