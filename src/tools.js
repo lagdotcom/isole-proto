@@ -81,7 +81,7 @@ export function damage(target, attacker, n) {
 		if (target.die) target.die();
 		else game.remove(target);
 	} else {
-		if (target.hurt) target.hurt(attacker);
+		if (target.hurt) target.hurt(attacker, n);
 		if (attacker.hit) attacker.hit(target);
 	}
 

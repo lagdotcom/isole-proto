@@ -92,7 +92,7 @@ const animations = {
 	},
 
 	[aAxe]: {
-		priority: 2,
+		priority: 8,
 		flags: { preventTurn: true },
 		frames: [
 			{ c: 5, r: 0, t: 75, hotspot: { x: -48, y: 44 } },

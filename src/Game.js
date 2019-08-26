@@ -31,6 +31,7 @@ export default function Game(options) {
 	this.start = this.start.bind(this);
 	this.next = this.next.bind(this);
 
+	this.loaded = 0;
 	this.loading = 0;
 	this.resources = [];
 	this.materials = {};
@@ -44,7 +45,7 @@ Game.prototype.require = function(key, typ, src) {
 
 	this.loading++;
 	this.resources[key] = typ(src, () => {
-		me.loading--;
+		me.loaded++;
 	});
 };
 
@@ -55,9 +56,21 @@ Game.prototype.begin = function() {
 	this.enemies = [];
 	this.redraw = true;
 
-	dispatch(this.element, eGameBegin);
-	dispatch(this.element, eGameReady);
+	this.fire(eGameBegin);
+	this.fire(eGameReady);
 	this.ready();
+};
+
+Game.prototype.fire = function(event, detail) {
+	dispatch(this.element, event, detail);
+};
+
+Game.prototype.on = function(event, handler) {
+	this.element.addEventListener(event, handler);
+};
+
+Game.prototype.off = function(event, handler) {
+	this.element.removeEventListener(event, handler);
 };
 
 Game.prototype.ready = function() {
@@ -108,8 +121,8 @@ Game.prototype.addPlatform = function({
 };
 
 Game.prototype.start = function() {
-	if (this.loading) {
-		// TODO: show loading screen
+	if (this.loaded < this.loading) {
+		this.showLoadScreen();
 		requestAnimationFrame(this.start);
 		return;
 	}
@@ -119,6 +132,19 @@ Game.prototype.start = function() {
 
 	this.running = true;
 	requestAnimationFrame(this.next);
+};
+
+Game.prototype.showLoadScreen = function() {
+	const { width, height } = this.options;
+	const { loaded, loading } = this;
+	var c = this.context;
+
+	c.fillStyle = '#000000';
+	c.fillRect(0, 0, width, height);
+
+	c.fillStyle = '#ffffff';
+	c.font = '40px sans-serif';
+	c.fillText(`Loading: ${loaded} / ${loading}`, 100, 100);
 };
 
 Game.prototype.next = function(t) {

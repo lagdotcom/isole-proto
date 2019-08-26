@@ -36,7 +36,7 @@ export default function Editor(options) {
 
 	materials = Object.keys(game.materials);
 	objects = Object.keys(game.objects);
-	game.element.addEventListener(eGameBegin, () => this.onGameBegin());
+	game.on(eGameBegin, () => this.onGameBegin());
 
 	this.game = game;
 	this.data = data || {

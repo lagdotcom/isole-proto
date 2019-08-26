@@ -1,5 +1,5 @@
 import AnimController from '../AnimController';
-import { zPlayer } from '../layers';
+import { zSpark } from '../layers';
 import {
 	piHalf,
 	cart,
@@ -10,7 +10,7 @@ import {
 	dirv,
 } from '../tools';
 import { aAxe } from '../anims';
-import { eAnimationEnded } from '../events';
+import { eAnimationEnded, ePlayerHurt } from '../events';
 import { cHit, cHotspot } from '../colours';
 
 const gCooldown = 700;
@@ -63,7 +63,7 @@ function Axe(game) {
 			game.resources['weapon.axe'],
 			game.player.sprite.flip
 		),
-		layer: zPlayer,
+		layer: zSpark,
 		hits: [],
 	});
 
@@ -193,7 +193,10 @@ export default function AxeWeapon(game) {
 		game,
 		sprite: controller(game.resources['weapon.axe']),
 		cooldown: 0,
+		axe: null,
 	});
+
+	game.on(ePlayerHurt, this.detach.bind(this));
 }
 
 AxeWeapon.prototype.update = function(t) {
@@ -215,8 +218,14 @@ AxeWeapon.prototype.use = function() {
 
 	this.cooldown = gCooldown;
 
+	this.axe = new Axe(game);
+
 	game.redraw = true;
-	game.components.push(new Axe(game));
+	game.components.push(this.axe);
 
 	game.player.sprite.play(aAxe);
+};
+
+AxeWeapon.prototype.detach = function() {
+	if (this.axe) this.axe.done();
 };

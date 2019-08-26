@@ -1,5 +1,6 @@
 import { cHurt, cStep, cHotspot } from '../colours';
 import { dLeft, dRight } from '../dirs';
+import { ePlayerDied, ePlayerHurt } from '../events';
 import { kLeft, kRight, kJump, kThrow, kSwing } from '../keys';
 import {
 	gAirWalk,
@@ -358,7 +359,7 @@ Player.prototype.getHitbox = function() {
 	};
 };
 
-Player.prototype.hurt = function(by) {
+Player.prototype.hurt = function(by, damage) {
 	this.invincible = true;
 	this.invtimer = 1000;
 
@@ -367,6 +368,7 @@ Player.prototype.hurt = function(by) {
 	this.va += dv.a * 5;
 	this.vr += dv.r * 5;
 
+	this.game.fire(ePlayerHurt, { by, damage });
 	this.voice.play('woody.hurt');
 };
 
@@ -376,6 +378,7 @@ Player.prototype.hurtTimer = function(t) {
 };
 
 Player.prototype.die = function() {
+	this.game.fire(ePlayerDied);
 	this.voice.play('player.dead');
 	this.game.remove(this);
 };
