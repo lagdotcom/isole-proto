@@ -13,6 +13,7 @@ import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
 import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
 import batImg from '../media/gfx/mon/bat.png';
 
+import batPunchSnd from '../media/sfx/bat-punch.wav';
 import bonkSnd from '../media/sfx/Head_Bonk.wav';
 import bopSnd from '../media/sfx/Enemy_Bop.wav';
 import deathSnd from '../media/sfx/Player_Death.wav';
@@ -85,6 +86,8 @@ export default function(game) {
 	game.require('player.step1', sound, step1Snd);
 	game.require('player.step2', sound, step2Snd);
 	game.require('woody.hurt', sound, woodyHurtSnd);
+
+	game.require('enemy.bat.punch', sound, batPunchSnd);
 
 	addMaterials(game, [grassMaterials, bluegrassMaterials]);
 	addObjects(game, [bluegrassObjects]);

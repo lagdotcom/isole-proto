@@ -17,20 +17,34 @@ import {
 	angledist,
 	anglewrap,
 	cart,
+	collides,
 	deg2rad,
+	fittest,
 	pi,
 	piHalf,
+	rnd,
+	rndr,
 	scalew,
 	unscalew,
 } from '../tools';
 import controller from '../spr/bat';
 import { zFlying } from '../layers';
+import Channel from '../Channel';
 
-const gNormalSpeed = 0.2,
+const gAttackFar = 160,
+	gAttackNear = 30,
+	gNormalSpeed = 0.2,
 	gFastSpeed = 0.4,
+	gLungeSpeed = 0.4,
+	gPullbackSpeed = 0.12,
 	gSlowSpeed = 0.08,
 	gSubstateChange = 2000,
 	gSubstateChance = 0.2,
+	gVerticalAcceleration = 0.0005,
+	gVerticalChange = 3000,
+	gVerticalChance = 0.1,
+	gVerticalNear = 50,
+	gVerticalSlowdown = 0.75,
 	gZeroThreshold = 0.01;
 
 const sProwling = 'prowling',
@@ -50,23 +64,19 @@ const ssNormal = 'Normal',
 	ssFast = 'Fast',
 	ssTurn = 'Turn';
 
-function drift(n) {
-	return Math.random() * (n * 2) - n;
-}
-
 function lerp(a, b, f = 0.03) {
 	return a * (1 - f) + b * f;
 }
 
 function choose(a) {
-	const i = Math.floor(Math.random() * a.length);
-	return a[i];
+	return a[rndr(0, a.length)];
 }
 
 export default function Bat(game, options = {}) {
 	Object.assign(
 		this,
 		{
+			channel: new Channel(game, 'Bat'),
 			isEnemy: true,
 			layer: zFlying,
 			game,
@@ -82,6 +92,7 @@ export default function Bat(game, options = {}) {
 			state: sFlying,
 			substate: ssNormal,
 			substateTimer: gSubstateChange,
+			verticalTimer: gVerticalChange,
 			sprite: new controller(
 				this,
 				game.resources[options.img || 'enemy.bat']
@@ -97,12 +108,19 @@ export default function Bat(game, options = {}) {
 }
 
 Bat.prototype.update = function(time) {
+	if (!this.minradius)
+		this.minradius = fittest(this.game.floors, fl => -fl.r).r;
+
+	if (!this.maxradius)
+		this.maxradius = fittest(this.game.floors, fl => fl.r).r + this.height;
+
+	if (!this.targetradius) this.targetradius = this.r;
+
 	this[this.state + 'Update'](time);
 };
 
-Bat.prototype.flyingUpdate = function(time) {
+Bat.prototype.physics = function(time, va, vr) {
 	const tscale = time / gTimeScale;
-	const { va, vr } = this['flying' + this.substate + 'Update'](time);
 
 	var { a, r } = this;
 
@@ -114,23 +132,34 @@ Bat.prototype.flyingUpdate = function(time) {
 		a += pi;
 	}
 
-	Object.assign(this, { a: anglewrap(a), r, va, vr });
+	Object.assign(this, { a: anglewrap(a), r, va, vr, tscale });
+};
 
+Bat.prototype.flyingUpdate = function(time) {
+	if (this.canAttack()) {
+		this.channel.play('enemy.bat.punch');
+		this.state = 'punch';
+		return this.punchUpdate(time);
+	}
+
+	const va = this['flying' + this.substate + 'Update'](time);
+	const vr = this.flyingVerticalUpdate(time);
+	this.physics(time, va, vr);
 	this.sprite.move(time);
 };
 
 Bat.prototype.flyingNormalUpdate = function(time) {
-	var { dir, va, vr } = this;
+	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gNormalSpeed);
 	else va = lerp(va, -gNormalSpeed);
 
 	this.checkChangeSubstate(time);
-	return { va, vr };
+	return va;
 };
 
 Bat.prototype.flyingTurnUpdate = function(time) {
-	var { dir, va, vr } = this;
+	var { dir, va } = this;
 
 	va = lerp(va, 0);
 	if (Math.abs(va) < gZeroThreshold) {
@@ -148,32 +177,52 @@ Bat.prototype.flyingTurnUpdate = function(time) {
 	}
 
 	this.checkChangeSubstate(time);
-	return { va, vr };
+	return va;
 };
 
 Bat.prototype.flyingFastUpdate = function(time) {
-	var { dir, va, vr } = this;
+	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gFastSpeed);
 	else va = lerp(va, -gFastSpeed);
 
 	this.checkChangeSubstate(time);
-	return { va, vr };
+	return va;
 };
 
 Bat.prototype.flyingSlowUpdate = function(time) {
-	var { dir, va, vr } = this;
+	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gSlowSpeed);
 	else va = lerp(va, -gSlowSpeed);
 
 	this.checkChangeSubstate(time);
-	return { va, vr };
+	return va;
+};
+
+Bat.prototype.flyingVerticalUpdate = function(time) {
+	var { r, minradius, maxradius, targetradius, vr } = this;
+
+	const rdiff = targetradius - r;
+	vr = gVerticalAcceleration * time * rdiff;
+
+	if (Math.abs(rdiff) < gVerticalNear) vr *= gVerticalSlowdown;
+
+	if (this.verticalTimer <= 0) {
+		if (rnd() * time < gVerticalChance) {
+			this.targetradius = rndr(minradius, maxradius);
+			this.verticalTimer = gVerticalChange;
+		}
+	} else {
+		this.verticalTimer -= time;
+	}
+
+	return vr;
 };
 
 Bat.prototype.checkChangeSubstate = function(time) {
 	if (this.substateTimer <= 0) {
-		if (Math.random() * time < gSubstateChance) this.changeSubstate();
+		if (rnd() * time < gSubstateChance) this.changeSubstate();
 	} else {
 		this.substateTimer -= time;
 	}
@@ -182,6 +231,28 @@ Bat.prototype.checkChangeSubstate = function(time) {
 Bat.prototype.changeSubstate = function() {
 	this.substate = choose([ssNormal, ssTurn, ssFast, ssSlow]);
 	this.substateTimer = gSubstateChange;
+};
+
+Bat.prototype.canAttack = function() {
+	const { a } = this.getHitbox();
+	return this.game.player.alive && collides(a, this.game.player.getHitbox());
+};
+
+Bat.prototype.punchUpdate = function(time) {
+	this.physics(time, this.va, this.vr);
+	this.sprite.punch(time);
+};
+
+Bat.prototype.onpunchpullback = function() {
+	this.va = this.dir === dLeft ? gPullbackSpeed : -gPullbackSpeed;
+};
+
+Bat.prototype.onpunchforward = function() {
+	this.va = this.dir === dLeft ? -gLungeSpeed : gLungeSpeed;
+};
+
+Bat.prototype.onpunchdone = function() {
+	this.state = 'flying';
 };
 
 Bat.prototype.draw = function(c) {
@@ -211,12 +282,22 @@ Bat.prototype.drawHitbox = function(c) {
 	c.arc(cx, cy, t.r, t.ar, t.al, true);
 	c.arc(cx, cy, b.r, b.al, b.ar);
 	c.stroke();
+
+	c.strokeStyle = cAI;
+	c.beginPath();
+	c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
+	c.arc(cx, cy, a.t.r, a.b.ar, a.b.al, true);
+	c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
+	c.stroke();
 };
 
 Bat.prototype.getHitbox = function() {
-	const { r, a, va, vr, width, height, tscale } = this;
+	const { r, a, va, vr, width, height, tscale, dir } = this;
 	const baw = scalew(width, r),
-		taw = scalew(width, r + height);
+		taw = scalew(width, r + height),
+		naw = scalew(gAttackNear, r),
+		faw = scalew(gAttackFar, r),
+		left = dir === dLeft;
 	var amod,
 		vbr = 0,
 		vtr = 0;
@@ -239,6 +320,20 @@ Bat.prototype.getHitbox = function() {
 			aw: taw,
 			al: amod - taw,
 			ar: amod + taw,
+		},
+		a: {
+			b: {
+				r: r + vbr,
+				aw: faw - naw,
+				al: left ? amod - faw : amod + naw,
+				ar: left ? amod - naw : amod + faw,
+			},
+			t: {
+				r: r + height + vbr,
+				aw: faw - naw,
+				al: left ? amod - faw : amod + naw,
+				ar: left ? amod - naw : amod + faw,
+			},
 		},
 	};
 };

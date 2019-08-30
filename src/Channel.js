@@ -4,9 +4,15 @@ export default class Channel {
 	}
 
 	play(name) {
+		const snd = this.g.resources[name];
+		if (!snd) {
+			console.log('resource not loaded:', name);
+			return;
+		}
+
 		this.a.pause();
 
-		this.a.src = this.g.resources[name].src;
+		this.a.src = snd.src;
 		this.a.play();
 	}
 }

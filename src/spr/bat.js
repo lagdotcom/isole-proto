@@ -34,10 +34,10 @@ const animations = {
 		frames: [
 			{ c: 1, r: 0, t: 40 },
 			{ c: 1, r: 1, t: 40 },
-			{ c: 1, r: 2, t: 75 },
+			{ c: 1, r: 2, t: 75, event: 'onpunchpullback' },
 			{ c: 1, r: 3, t: 75 },
 			{ c: 1, r: 4, t: 75 },
-			{ c: 1, r: 5, t: 50 },
+			{ c: 1, r: 5, t: 50, event: 'onpunchforward' },
 			{ c: 1, r: 6, t: 50 },
 			{ c: 1, r: 7, t: 50 },
 			{ c: 1, r: 5, t: 50 },
@@ -49,7 +49,7 @@ const animations = {
 			{ c: 1, r: 5, t: 50 },
 			{ c: 1, r: 6, t: 50 },
 			{ c: 1, r: 7, t: 50 },
-			{ c: 1, r: 8, t: 40 },
+			{ c: 1, r: 8, t: 40, event: 'onpunchdone' },
 		],
 	},
 

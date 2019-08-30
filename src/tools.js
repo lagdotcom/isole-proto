@@ -114,3 +114,23 @@ export function displace(origin, offsets = [], flip = false) {
 
 	return { a: a + scalew(x, r + y), r: r + y };
 }
+
+export function fittest(objects, scorer) {
+	var bestScore = -Infinity,
+		best = null;
+	objects.forEach(o => {
+		var score = scorer(o);
+		if (score > bestScore) {
+			bestScore = score;
+			best = o;
+		}
+	});
+
+	return best;
+}
+
+export const rnd = Math.random;
+
+export function rndr(min, max) {
+	return Math.floor(rnd() * (max - min)) + min;
+}
