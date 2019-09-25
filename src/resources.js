@@ -63,7 +63,7 @@ function sound(fn, onload) {
 	return el;
 }
 
-export default function(game) {
+export default function PreloadResources(game) {
 	game.require('enemy.bat', image, batImg);
 	game.require('enemy.buster', image, busterImg);
 	game.require('enemy.flazza', image, flazzaImg);
