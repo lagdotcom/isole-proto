@@ -20,6 +20,7 @@ import {
 	collides,
 	deg2rad,
 	fittest,
+	min,
 	pi,
 	piHalf,
 	rnd,
@@ -68,6 +69,12 @@ function choose(a) {
 	return a[rndr(0, a.length)];
 }
 
+/**
+ * Create a new Bat
+ * @constructor
+ * @param {Game} game game instance
+ * @param {BatOptions} options options
+ */
 export default function Bat(game, options = {}) {
 	Object.assign(
 		this,
@@ -268,24 +275,11 @@ Bat.prototype.canRoost = function() {
 };
 
 Bat.prototype.getNearestCeiling = function() {
-	var best = null,
-		bestd = Infinity;
-
-	this.game.ceilings.forEach(c => {
-		// TODO: roost on moving ceilings
-		if (c.motion) return;
-
+	return fittest(this.game.ceilings, c => {
 		const dl = angledist(this.a, c.left);
 		const dr = angledist(this.a, c.right);
-		const db = Math.min(dl, dr);
-
-		if (db < bestd) {
-			best = c;
-			bestd = db;
-		}
+		return -min(dl, dr);
 	});
-
-	return best;
 };
 
 Bat.prototype[sRoosting + 'Update'] = function(time) {

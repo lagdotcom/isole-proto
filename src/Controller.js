@@ -1,4 +1,9 @@
+/** Image Controller */
 export default class Controller {
+	/**
+	 * Make a new Controller
+	 * @param {ControllerOptions} options options
+	 */
 	constructor(options) {
 		Object.entries(
 			Object.assign(
@@ -18,15 +23,28 @@ export default class Controller {
 		});
 	}
 
+	/**
+	 * Face right
+	 */
 	right() {
 		this.flip = !this.leftflip;
 	}
 
+	/**
+	 * Face left
+	 */
 	left() {
 		this.flip = this.leftflip;
 	}
 
-	play(state, column, row) {
+	/**
+	 * Play or continue an animation
+	 * @param {string} state name
+	 * @param {number} column sprite column
+	 * @param {number} row sprite row
+	 * @returns {boolean} true if already playing that animation
+	 */
+	show(state, column, row) {
 		if (this.state !== state) {
 			this.state = state;
 			this.c = column;
@@ -38,6 +56,10 @@ export default class Controller {
 		}
 	}
 
+	/**
+	 * Draw the image
+	 * @param {CanvasRenderingContext2D} ctx image context
+	 */
 	draw(ctx) {
 		const { w, c, h, r, flip, img, xo, yo } = this,
 			sx = w * c,

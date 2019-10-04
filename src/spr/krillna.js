@@ -69,7 +69,7 @@ export default img =>
 				if (fliptwice) me.flip = !me.flip;
 			}
 
-			if (me.play('walk', 0, 0)) {
+			if (me.show('walk', 0, 0)) {
 				me.timer += t;
 				if (me.timer >= moveTimes[me.r]) {
 					me.timer = 0;

@@ -4,12 +4,23 @@ export const pi = Math.PI,
 	pi2 = pi * 2,
 	piHalf = pi / 2;
 
+/**
+ * Wrap an angle over 2π
+ * @param {number} a angle
+ * @returns {number} wrapped angle
+ */
 export function anglewrap(a) {
 	a = a % pi2;
 	if (a < 0) a += pi2;
 	return a;
 }
 
+/**
+ * Find the distance between two angles
+ * @param {number} a first angle
+ * @param {number} b second angle
+ * @returns {number} angle distance
+ */
 export function angledist(a, b) {
 	var d = a - b;
 	if (d > pi) d -= pi2;
@@ -17,6 +28,11 @@ export function angledist(a, b) {
 	return Math.abs(d);
 }
 
+/**
+ * Join with BR tags
+ * @param {...string} var_args items
+ * @returns {string} joined items
+ */
 export function jbr() {
 	var s = '';
 	for (var i = 0; i < arguments.length; i++) {
@@ -27,6 +43,12 @@ export function jbr() {
 	return s;
 }
 
+/**
+ * Convert polar to cartesian
+ * @param {number} a angle
+ * @param {number} r radius
+ * @return {XYCoord}
+ */
 export function cart(a, r) {
 	return {
 		x: Math.cos(a) * r,
@@ -34,26 +56,44 @@ export function cart(a, r) {
 	};
 }
 
+/**
+ * Scale a width according to its radius
+ * @param {number} w width
+ * @param {number} r radius
+ * @returns {number} scaled width
+ */
 export function scalew(w, r) {
 	return (w / r) * gHitboxScale;
 }
 
+/**
+ * Unscale a width according to its radius
+ * @param {number} ws scaled width
+ * @param {number} r radius
+ * @returns {number} width
+ */
 export function unscalew(ws, r) {
 	return (ws / gHitboxScale) * r;
 }
 
+/**
+ * Convert degrees to radians
+ * @param {number} a angle in degrees
+ * @return {number} angle in radians
+ */
 export function deg2rad(a) {
 	return (pi2 * a) / 360;
 }
 
-export function max(a, b) {
-	return a > b ? a : b;
-}
+export const max = Math.max;
+export const min = Math.min;
 
-export function min(a, b) {
-	return a < b ? a : b;
-}
-
+/**
+ * Check if any item matches a predicate
+ * @param {any[]} a items
+ * @param {(any) => boolean} fn callback
+ * @returns {boolean} match found
+ */
 export function any(a, fn) {
 	for (var i = a.length - 1; i >= 0; i--) {
 		if (fn(a[i])) return true;
@@ -62,6 +102,12 @@ export function any(a, fn) {
 	return false;
 }
 
+/**
+ * Check if two hitboxes overlap
+ * @param {Hitbox} a first hitbox
+ * @param {Hitbox} b second hitbox
+ * @returns {boolean} overlap found
+ */
 export function collides(a, b) {
 	// TODO: should this also check .t.al?
 	return (
@@ -69,6 +115,12 @@ export function collides(a, b) {
 	);
 }
 
+/**
+ * Damage something
+ * @param {Component} target target
+ * @param {Component} attacker attacker
+ * @param {number} n amount
+ */
 export function damage(target, attacker, n) {
 	const { game } = target;
 
@@ -90,6 +142,12 @@ export function damage(target, attacker, n) {
 	}
 }
 
+/**
+ * Create a vector between two coordinates
+ * @param {RACoord} x first coord
+ * @param {RACoord} y second coord
+ * @returns {RACoord} vector
+ */
 export function dirv(x, y) {
 	const rd = x.r - y.r;
 	const ad = x.a - y.a;
@@ -100,6 +158,13 @@ export function dirv(x, y) {
 	return { r, a };
 }
 
+/**
+ * Displace a polar coordinate by a list of cartesian coordinates
+ * @param {RACoord} origin origin
+ * @param {XYCoord[]} offsets offset list
+ * @param {boolean} flip flip on X axis
+ * @returns {RACoord} final position
+ */
 export function displace(origin, offsets = [], flip = false) {
 	const { a, r } = origin;
 	var x = 0,
@@ -115,6 +180,12 @@ export function displace(origin, offsets = [], flip = false) {
 	return { a: a + scalew(x, r + y), r: r + y };
 }
 
+/**
+ * Find the fittest item from a list
+ * @param {any[]} objects item list
+ * @param {(any) => number} scorer scoring function
+ * @returns {any} best object
+ */
 export function fittest(objects, scorer) {
 	var bestScore = -Infinity,
 		best = null;
@@ -131,10 +202,21 @@ export function fittest(objects, scorer) {
 
 export const rnd = Math.random;
 
+/**
+ * Return a random number within a range
+ * @param {number} min minimum bound
+ * @param {number} max maximum bound
+ * @param {(number) => number} rounder rounding function (defaults to floor)
+ */
 export function rndr(min, max, rounder = Math.floor) {
 	return rounder(rnd() * (max - min)) + min;
 }
 
+/**
+ * Return a random angle within a range
+ * @param {number} min minimum angle
+ * @param {number} max maximum angle
+ */
 export function rnda(min, max) {
 	return anglewrap(rndr(min, max, n => n));
 }

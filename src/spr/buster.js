@@ -20,7 +20,7 @@ export default img =>
 		timer: 0,
 
 		land: (me, t) => {
-			if (me.play(aLand, 1, 8)) {
+			if (me.show(aLand, 1, 8)) {
 				me.timer += t;
 				if (me.timer >= 75) {
 					me.r++;
@@ -37,11 +37,11 @@ export default img =>
 				if (!me.land(t)) return;
 			}
 
-			me.play('idle', 0, 0);
+			me.show('idle', 0, 0);
 		},
 
 		near: (me, t) => {
-			if (me.play('near', 0, 1)) {
+			if (me.show('near', 0, 1)) {
 				me.timer += t;
 				if (me.timer >= 75) {
 					me.r++;
@@ -52,7 +52,7 @@ export default img =>
 		},
 
 		jump: (me, t) => {
-			if (me.play('jump', 1, 0)) {
+			if (me.show('jump', 1, 0)) {
 				me.timer += t;
 				if (me.timer >= 75 && me.r < 1) {
 					me.r++;
@@ -62,7 +62,7 @@ export default img =>
 		},
 
 		rise: (me, t) => {
-			if (me.play('rise', 1, 2)) {
+			if (me.show('rise', 1, 2)) {
 				me.timer += t;
 				if (me.timer >= 75 && me.r < 3) {
 					me.r++;
@@ -72,7 +72,7 @@ export default img =>
 		},
 
 		fall: (me, t) => {
-			if (me.play(aFall, 1, 4)) {
+			if (me.show(aFall, 1, 4)) {
 				me.timer += t;
 				if (me.timer >= 75 && me.r < 7) {
 					me.r++;

@@ -1,7 +1,15 @@
 import Controller from './Controller';
 import { eAnimationEnded } from './events';
 
+/**
+ * Animation Controller
+ * @extends {Controller}
+ */
 export default class AnimController extends Controller {
+	/**
+	 * Make a new AnimController
+	 * @param {AnimControllerOptions} data options
+	 */
 	constructor(data) {
 		super({
 			...data,
@@ -27,6 +35,12 @@ export default class AnimController extends Controller {
 		});
 	}
 
+	/**
+	 * Play an animation
+	 * @param {string} animation name
+	 * @param {boolean} force always play
+	 * @param {ListenerMap} listeners event listener map
+	 */
 	play(animation, force = false, listeners = {}) {
 		if (this.a !== animation) {
 			if (
@@ -45,6 +59,10 @@ export default class AnimController extends Controller {
 		}
 	}
 
+	/**
+	 * Continue the current animation
+	 * @param {number} t time
+	 */
 	next(t) {
 		const { a, ac, acf, ae, afi, ar } = this,
 			last = afi === ac.last;
@@ -70,6 +88,10 @@ export default class AnimController extends Controller {
 		this.ar = null;
 	}
 
+	/**
+	 * Change current frame
+	 * @param {number} n frame index
+	 */
 	frame(n) {
 		this.afi = n;
 		this.at = 0;
@@ -81,6 +103,11 @@ export default class AnimController extends Controller {
 		this.hotspot = this.acf.hotspot;
 	}
 
+	/**
+	 * Fire an event
+	 * @param {string} e event name
+	 * @param {any} details event details
+	 */
 	dispatch(e, details) {
 		if (this.al[e]) this.al[e](details);
 		if (this[e]) this[e](details);

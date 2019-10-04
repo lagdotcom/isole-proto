@@ -4,10 +4,20 @@ import Editor from './Editor';
 import Game from './Game';
 import mel from './makeElement';
 
-var options, G;
+var options;
 
+/** @var {Game} */
+var G;
+
+/**
+ * Create a checkbox
+ * @param {string} text label text
+ * @param {boolean} checked already checked?
+ * @param {(Event) => void} change change event handler
+ * @returns {HTMLInputElement} check box
+ */
 function addCheckbox(text, checked, change) {
-	mel(
+	return mel(
 		mel(options, 'label', { innerText: text }),
 		'input',
 		{ type: 'checkbox', checked },

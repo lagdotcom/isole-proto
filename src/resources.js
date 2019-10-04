@@ -27,6 +27,11 @@ import grassMaterials from './material/grass';
 
 import bluegrassObjects from './object/bluegrass';
 
+/**
+ * Preload materials
+ * @param {Game} game game instance
+ * @param {MaterialMap[]} materials material list
+ */
 function addMaterials(game, materials) {
 	materials.forEach(t => {
 		Object.keys(t).forEach(k => {
@@ -40,6 +45,11 @@ function addMaterials(game, materials) {
 	});
 }
 
+/**
+ * Preload objects
+ * @param {Game} game game
+ * @param {ObjectMap[]} objects object lis
+ */
 function addObjects(game, objects) {
 	objects.forEach(t => {
 		Object.keys(t).forEach(k => {
@@ -48,6 +58,12 @@ function addObjects(game, objects) {
 	});
 }
 
+/**
+ * Load an image resource
+ * @param {string} fn filename
+ * @param {(Event) => void} onload callback
+ * @returns {HTMLImageElement} image element
+ */
 function image(fn, onload) {
 	var el = document.createElement('img');
 	el.onload = onload;
@@ -56,6 +72,12 @@ function image(fn, onload) {
 	return el;
 }
 
+/**
+ * Load an image resource
+ * @param {string} fn filename
+ * @param {(Event) => void} onload callback
+ * @returns {HTMLAudioElement} audio element
+ */
 function sound(fn, onload) {
 	var el = new Audio(fn);
 	el.oncanplaythrough = onload;
@@ -63,6 +85,10 @@ function sound(fn, onload) {
 	return el;
 }
 
+/**
+ * Preload resources
+ * @param {Game} game game instance
+ */
 export default function PreloadResources(game) {
 	game.require('enemy.bat', image, batImg);
 	game.require('enemy.buster', image, busterImg);
