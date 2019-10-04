@@ -23,9 +23,9 @@ import {
 	pi,
 	piHalf,
 	rnd,
+	rnda,
 	rndr,
 	scalew,
-	unscalew,
 } from '../tools';
 import controller from '../spr/bat';
 import { zFlying } from '../layers';
@@ -37,6 +37,7 @@ const gAttackFar = 160,
 	gFastSpeed = 0.4,
 	gLungeSpeed = 0.4,
 	gPullbackSpeed = 0.12,
+	gRoostChance = 1, // TEST
 	gSlowSpeed = 0.08,
 	gSubstateChange = 2000,
 	gSubstateChance = 0.2,
@@ -45,13 +46,8 @@ const gAttackFar = 160,
 	gVerticalChance = 0.1,
 	gVerticalNear = 50,
 	gVerticalSlowdown = 0.75,
-	gZeroThreshold = 0.01;
-
-const sProwling = 'prowling',
-	sFlop = 'flop',
-	sDrop = 'drop',
-	sSlam = 'slam',
-	sRecovery = 'recovery';
+	gZeroAngleThreshold = 0.01,
+	gZeroRadiusThreshold = 2;
 
 const sFlying = 'flying',
 	sRoosting = 'roosting',
@@ -135,20 +131,37 @@ Bat.prototype.physics = function(time, va, vr) {
 	Object.assign(this, { a: anglewrap(a), r, va, vr, tscale });
 };
 
-Bat.prototype.flyingUpdate = function(time) {
-	if (this.canAttack()) {
-		this.channel.play('enemy.bat.punch');
-		this.state = 'punch';
-		return this.punchUpdate(time);
+Bat.prototype.turn = function() {
+	if (this.dir === dLeft) {
+		this.dir = dRight;
+		this.sprite.right();
+	} else {
+		this.dir = dLeft;
+		this.sprite.left();
 	}
 
-	const va = this['flying' + this.substate + 'Update'](time);
+	this.sprite.turn();
+};
+
+Bat.prototype[sFlying + 'Update'] = function(time) {
+	if (this.canAttack()) {
+		this.channel.play('enemy.bat.punch');
+		this.state = sPunching;
+		return this.punchingUpdate(time);
+	}
+
+	if (this.canRoost()) {
+		this.state = sRoosting;
+		return this.roostingUpdate(time);
+	}
+
+	const va = this[sFlying + this.substate + 'Update'](time);
 	const vr = this.flyingVerticalUpdate(time);
 	this.physics(time, va, vr);
 	this.sprite.move(time);
 };
 
-Bat.prototype.flyingNormalUpdate = function(time) {
+Bat.prototype[sFlying + ssNormal + 'Update'] = function(time) {
 	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gNormalSpeed);
@@ -158,20 +171,12 @@ Bat.prototype.flyingNormalUpdate = function(time) {
 	return va;
 };
 
-Bat.prototype.flyingTurnUpdate = function(time) {
+Bat.prototype[sFlying + ssTurn + 'Update'] = function(time) {
 	var { dir, va } = this;
 
 	va = lerp(va, 0);
-	if (Math.abs(va) < gZeroThreshold) {
-		if (dir === dLeft) {
-			this.dir = dRight;
-			this.sprite.right();
-		} else {
-			this.dir = dLeft;
-			this.sprite.left();
-		}
-
-		this.sprite.turn();
+	if (Math.abs(va) < gZeroAngleThreshold) {
+		this.turn();
 
 		while (this.substate === ssTurn) this.changeSubstate();
 	}
@@ -180,7 +185,7 @@ Bat.prototype.flyingTurnUpdate = function(time) {
 	return va;
 };
 
-Bat.prototype.flyingFastUpdate = function(time) {
+Bat.prototype[sFlying + ssFast + 'Update'] = function(time) {
 	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gFastSpeed);
@@ -190,7 +195,7 @@ Bat.prototype.flyingFastUpdate = function(time) {
 	return va;
 };
 
-Bat.prototype.flyingSlowUpdate = function(time) {
+Bat.prototype[sFlying + ssSlow + 'Update'] = function(time) {
 	var { dir, va } = this;
 
 	if (dir === dRight) va = lerp(va, gSlowSpeed);
@@ -238,7 +243,7 @@ Bat.prototype.canAttack = function() {
 	return this.game.player.alive && collides(a, this.game.player.getHitbox());
 };
 
-Bat.prototype.punchUpdate = function(time) {
+Bat.prototype[sPunching + 'Update'] = function(time) {
 	this.physics(time, this.va, this.vr);
 	this.sprite.punch(time);
 };
@@ -252,7 +257,87 @@ Bat.prototype.onpunchforward = function() {
 };
 
 Bat.prototype.onpunchdone = function() {
-	this.state = 'flying';
+	this.state = sFlying;
+};
+
+Bat.prototype.canRoost = function() {
+	if (rnd() >= gRoostChance) return false;
+	this.roost = this.getNearestCeiling();
+	this.roostangle = null;
+	return !!this.roost;
+};
+
+Bat.prototype.getNearestCeiling = function() {
+	var best = null,
+		bestd = Infinity;
+
+	this.game.ceilings.forEach(c => {
+		// TODO: roost on moving ceilings
+		if (c.motion) return;
+
+		const dl = angledist(this.a, c.left);
+		const dr = angledist(this.a, c.right);
+		const db = Math.min(dl, dr);
+
+		if (db < bestd) {
+			best = c;
+			bestd = db;
+		}
+	});
+
+	return best;
+};
+
+Bat.prototype[sRoosting + 'Update'] = function(time) {
+	if (!this.roostangle) {
+		this.roostangle = rnda(this.roost.left, this.roost.right);
+		this.roostradius = this.roost.r - this.height;
+
+		const nd = this.roostangle > this.a ? dRight : dLeft;
+		if (nd !== this.dir) this.turn();
+	}
+
+	const va = this.roostingAngleUpdate(time);
+	const vr = this.roostingRadiusUpdate(time);
+	this.physics(time, va, vr);
+
+	if (va === 0 && vr === 0) this.state = sSleeping;
+
+	this.sprite.move(time);
+};
+
+Bat.prototype.roostingAngleUpdate = function(time) {
+	var { dir, va } = this;
+
+	const adiff = angledist(this.a, this.roostangle);
+	if (adiff < gZeroAngleThreshold) {
+		this.a = this.roostangle;
+		return 0;
+	}
+
+	if (dir === dRight) va = lerp(va, gSlowSpeed);
+	else va = lerp(va, -gSlowSpeed);
+
+	return va;
+};
+
+Bat.prototype.roostingRadiusUpdate = function(time) {
+	var { r, roostradius, vr } = this;
+
+	const rdiff = roostradius - r;
+	if (rdiff < gZeroRadiusThreshold) {
+		this.r = roostradius;
+		return 0;
+	}
+
+	vr = gVerticalAcceleration * time * rdiff;
+	if (Math.abs(rdiff) < gVerticalNear) vr *= gVerticalSlowdown;
+
+	return vr;
+};
+
+Bat.prototype[sSleeping + 'Update'] = function(time) {
+	this.sprite.sleep(time);
 };
 
 Bat.prototype.draw = function(c) {

@@ -131,6 +131,10 @@ export function fittest(objects, scorer) {
 
 export const rnd = Math.random;
 
-export function rndr(min, max) {
-	return Math.floor(rnd() * (max - min)) + min;
+export function rndr(min, max, rounder = Math.floor) {
+	return rounder(rnd() * (max - min)) + min;
+}
+
+export function rnda(min, max) {
+	return anglewrap(rndr(min, max, n => n));
 }

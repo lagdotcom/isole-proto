@@ -40,7 +40,9 @@ export default function Editor(options) {
 
 	this.game = game;
 	this.data = data || {
-		platforms: [],
+		platforms: [
+			{ h: 340, a: 235, w: 30, th: 32, motion: 0, material: 'grass2' },
+		],
 		walls: [],
 		floors: [
 			{ h: 150, a: 0, w: 360, material: 'bluegrass' },
