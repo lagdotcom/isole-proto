@@ -1,0 +1,260 @@
+import { gHitboxScale } from './nums';
+import CoordAR from './CoordAR';
+import CoordXY from './CoordXY';
+import Hitbox from './Hitbox';
+import Damageable from './Damageable';
+
+export const pi = Math.PI,
+	pi2 = pi * 2,
+	piHalf = pi / 2;
+
+/**
+ * Wrap an angle over 2π
+ * @param {number} a angle
+ * @returns {number} wrapped angle
+ */
+export function anglewrap(a: number): number {
+	a = a % pi2;
+	if (a < 0) a += pi2;
+	return a;
+}
+
+/**
+ * Find the distance between two angles
+ * @param {number} a first angle
+ * @param {number} b second angle
+ * @returns {number} angle distance
+ */
+export function angledist(a: number, b: number): number {
+	var d = a - b;
+	if (d > pi) d -= pi2;
+	else if (d < -pi) d += pi2;
+	return Math.abs(d);
+}
+
+/**
+ * Join with BR tags
+ * @param {...string} var_args items
+ * @returns {string} joined items
+ */
+export function jbr(...args: string[]): string {
+	var s = '';
+	for (var i = 0; i < args.length; i++) {
+		if (i) s += '<br>';
+		s += args[i];
+	}
+
+	return s;
+}
+
+/**
+ * Convert polar to cartesian
+ * @param {number} a angle
+ * @param {number} r radius
+ * @return {CoordXY}
+ */
+export function cart(a: number, r: number): CoordXY {
+	return {
+		x: Math.cos(a) * r,
+		y: Math.sin(a) * r,
+	};
+}
+
+/**
+ * Scale a width according to its radius
+ * @param {number} w width
+ * @param {number} r radius
+ * @returns {number} scaled width
+ */
+export function scalew(w: number, r: number): number {
+	return (w / r) * gHitboxScale;
+}
+
+/**
+ * Unscale a width according to its radius
+ * @param {number} ws scaled width
+ * @param {number} r radius
+ * @returns {number} width
+ */
+export function unscalew(ws: number, r: number): number {
+	return (ws / gHitboxScale) * r;
+}
+
+/**
+ * Convert degrees to radians
+ * @param {number} a angle in degrees
+ * @return {number} angle in radians
+ */
+export function deg2rad(a: number): number {
+	return (pi2 * a) / 360;
+}
+
+export const max = Math.max;
+export const min = Math.min;
+
+/**
+ * Check if any item matches a predicate
+ * @param {any[]} a items
+ * @param {(any) => boolean} fn callback
+ * @returns {boolean} match found
+ */
+export function any(a: any[], fn: (value: any) => boolean): boolean {
+	for (var i = a.length - 1; i >= 0; i--) {
+		if (fn(a[i])) return true;
+	}
+
+	return false;
+}
+
+/**
+ * Find the first item in a list that matches a predicate
+ * @param {T[]} a item list
+ * @param {(T, number) => boolean} fn check function
+ * @returns {T|null} first matching item or null
+ */
+export function first<T>(
+	a: T[],
+	fn: (object: T, index?: number) => boolean
+): T | null {
+	for (var i = 0; i < a.length; i++) {
+		if (fn(a[i], i)) return a[i];
+	}
+
+	return null;
+}
+
+/**
+ * Check if two hitboxes overlap
+ * @param {Hitbox} a first hitbox
+ * @param {Hitbox} b second hitbox
+ * @returns {boolean} overlap found
+ */
+export function collides(a: Hitbox, b: Hitbox): boolean {
+	// TODO: should this also check .t.al?
+	return (
+		a.b.r <= b.t.r && a.t.r >= b.b.r && a.b.ar >= b.b.al && a.b.al <= b.b.ar
+	);
+}
+
+/**
+ * Damage something
+ * @param {Damageable} target target
+ * @param {Damageable} attacker attacker
+ * @param {number} n amount
+ */
+export function damage(
+	target: Damageable,
+	attacker: Damageable,
+	n: number
+): void {
+	const { game } = target;
+
+	if (target.invincible) return;
+
+	target.health -= n;
+
+	if (target.health <= 0) {
+		target.alive = false;
+		if (target.die) target.die();
+		else game.remove(target);
+	} else {
+		if (target.hurt) target.hurt(attacker, n);
+		if (attacker.hit) attacker.hit(target);
+	}
+
+	if (target === game.player) {
+		game.inventory.health = target.health;
+	}
+}
+
+/**
+ * Create a vector between two coordinates
+ * @param {CoordAR} x first coord
+ * @param {CoordAR} y second coord
+ * @returns {CoordAR} vector
+ */
+export function dirv(x: CoordAR, y: CoordAR): CoordAR {
+	const rd = x.r - y.r;
+	const ad = x.a - y.a;
+	const t = Math.abs(rd + ad);
+	const r = rd / t;
+	const a = ad / t;
+
+	return { r, a };
+}
+
+/**
+ * Displace a polar coordinate by a list of cartesian coordinates
+ * @param {CoordAR} origin origin
+ * @param {CoordXY[]} offsets offset list
+ * @param {boolean} flip flip on X axis
+ * @returns {CoordAR} final position
+ */
+export function displace(
+	origin: CoordAR,
+	offsets: CoordXY[] = [],
+	flip: boolean = false
+): CoordAR {
+	const { a, r } = origin;
+	var x = 0,
+		y = 0;
+
+	offsets.forEach(h => {
+		x += h.x;
+		y += h.y;
+	});
+
+	if (flip) x = 0 - x;
+
+	return { a: a + scalew(x, r + y), r: r + y };
+}
+
+/**
+ * Find the fittest item from a list
+ * @param {T[]} objects item list
+ * @param {(T) => number} scorer scoring function
+ * @returns {T|null} best object or null (if empty list)
+ */
+export function fittest<T>(
+	objects: T[],
+	scorer: (object: T) => number
+): T | null {
+	var bestScore: number = -Infinity,
+		best: T | null = null;
+	objects.forEach(o => {
+		var score = scorer(o);
+		if (score > bestScore) {
+			bestScore = score;
+			best = o;
+		}
+	});
+
+	return best;
+}
+
+export const rnd = Math.random;
+
+/**
+ * Return a random number within a range
+ * @param {number} min minimum bound
+ * @param {number} max maximum bound
+ * @param {(number) => number} rounder rounding function (defaults to floor)
+ * @returns {number}
+ */
+export function rndr(
+	min: number,
+	max: number,
+	rounder: (value: number) => number = Math.floor
+): number {
+	return rounder(rnd() * (max - min)) + min;
+}
+
+/**
+ * Return a random angle within a range
+ * @param {number} min minimum angle
+ * @param {number} max maximum angle
+ * @returns {number}
+ */
+export function rnda(min: number, max: number): number {
+	return anglewrap(rndr(min, max, n => n));
+}
