@@ -59,7 +59,7 @@ window.addEventListener('load', () => {
 	});
 	addCheckbox('Smoothing', G.context.imageSmoothingEnabled, e => {
 		G.options.smoothing = (e.target as HTMLInputElement).checked;
-		G.context.imageSmoothingEnabled = G.options.smoothing || true;
+		G.context.imageSmoothingEnabled = G.options.smoothing;
 	});
 
 	G.start();
