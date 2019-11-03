@@ -1,4 +1,4 @@
-import JacquesController from '../spr/jacques';
+import controller from '../spr/jacques';
 import Channel from '../Channel';
 import Game from '../Game';
 import { PlayerInit } from '../Player';
@@ -12,7 +12,7 @@ export default class Jacques extends AbstractPlayer {
 			name: 'Jacques',
 			w: 30,
 			h: 50,
-			sprite: new JacquesController(
+			sprite: controller(
 				this,
 				game.resources[options.img || 'player.jacques']
 			),

@@ -1,4 +1,4 @@
-import WoodyController from '../spr/woody';
+import controller from '../spr/woody';
 import Channel from '../Channel';
 import Game from '../Game';
 import { PlayerInit } from '../Player';
@@ -12,7 +12,7 @@ export default class Woody extends AbstractPlayer {
 			name: 'Woody',
 			w: 30,
 			h: 34,
-			sprite: new WoodyController(
+			sprite: controller(
 				this,
 				game.resources[options.img || 'player.woody']
 			),
