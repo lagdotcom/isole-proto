@@ -1,13 +1,15 @@
 import AnimController from './AnimController';
+import Channel from './Channel';
 import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import { Facing } from './dirs';
-import Game from './Game';
 import Hitbox from './Hitbox';
 
 export default interface Player extends DrawnComponent, Damageable {
+	finishdeath(): void;
 	getHitbox(): Hitbox;
 
+	body: Channel;
 	facing: Facing;
 	sprite: AnimController;
 	va: number;

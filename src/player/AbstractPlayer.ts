@@ -1,6 +1,6 @@
 import { cHurt, cStep, cHotspot } from '../colours';
 import { dLeft, dRight, Facing } from '../dirs';
-import { ePlayerDied, ePlayerHurt } from '../events';
+import { ePlayerDying, ePlayerHurt, ePlayerDied } from '../events';
 import { kLeft, kRight, kJump, kThrow, kSwing } from '../keys';
 import {
 	gAirWalk,
@@ -54,6 +54,7 @@ export interface PlayerController extends AnimController {
 	walk(t: number): void;
 	throw(): void;
 	hurt(): void;
+	die(): void;
 }
 
 export default abstract class AbstractPlayer implements Player {
@@ -430,8 +431,13 @@ export default abstract class AbstractPlayer implements Player {
 	}
 
 	die(): void {
-		this.game.fire(ePlayerDied);
+		this.game.fire(ePlayerDying);
 		this.voice.play(this.deadSound);
+		this.sprite.die();
+	}
+
+	finishdeath(): void {
+		this.game.fire(ePlayerDied);
 		this.game.remove(this);
 	}
 }

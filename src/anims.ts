@@ -8,4 +8,5 @@ export const aStand = 'stand',
 	aThrow = 'throw',
 	aAxe = 'axe',
 	aHurt = 'hurt',
-	aStatus = 'status';
+	aStatus = 'status',
+	aDying = 'dying';

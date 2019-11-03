@@ -11,9 +11,11 @@ import {
 	aAxe,
 	aHurt,
 	aStatus,
+	aDying,
 } from '../anims';
 import { eThrow, eSwing } from '../events';
 import Woody from '../player/Woody';
+import Player from '../Player';
 
 const animations = {
 	[aStand]: {
@@ -116,14 +118,34 @@ const animations = {
 			{ c: 7, r: 5, t: 90 },
 		],
 	},
+
+	[aDying]: {
+		priority: 100,
+		flags: { noControl: true },
+		frames: [
+			{ c: 8, r: 0, t: 90 },
+			{ c: 8, r: 1, t: 90 },
+			{ c: 8, r: 2, t: 90 },
+			{ c: 8, r: 3, t: 90 },
+			{ c: 8, r: 4, t: 90 },
+			{ c: 8, r: 5, t: 90 },
+			{ c: 8, r: 6, t: 90 },
+			{ c: 8, r: 7, t: 90 },
+			{ c: 8, r: 8, t: 90 },
+			{ c: 8, r: 9, t: 90 },
+			{ c: 8, r: 10, t: 90 },
+			{ c: 8, r: 11, t: 90 },
+			{ c: 8, r: 11, t: 1000, event: 'ondeath' },
+		],
+	},
 };
 
 export default class WoodyController extends AnimController {
 	facing: 1 | -1;
-	parent: Woody;
+	parent: Player;
 	step?: boolean;
 
-	constructor(parent: Woody, img: CanvasImageSource) {
+	constructor(parent: Player, img: CanvasImageSource) {
 		super({
 			animations,
 			img,
@@ -187,9 +209,17 @@ export default class WoodyController extends AnimController {
 		this.play(aHurt);
 	}
 
+	die(): void {
+		this.play(aDying);
+	}
+
 	onstep(): void {
 		const snd = this.step ? 'player.step2' : 'player.step1';
 		this.step = !this.step;
 		this.parent.body.play(snd);
+	}
+
+	ondeath(): void {
+		this.parent.finishdeath();
 	}
 }
