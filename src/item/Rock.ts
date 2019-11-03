@@ -20,7 +20,7 @@ import Item from '../Item';
 import Game from '../Game';
 import DrawnComponent from '../DrawnComponent';
 import Flat from '../component/Flat';
-import Player from '../component/Player';
+import Player from '../Player';
 import Wall from '../component/Wall';
 import Hitbox from '../Hitbox';
 

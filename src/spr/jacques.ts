@@ -13,7 +13,7 @@ import {
 	aStatus,
 } from '../anims';
 import { eThrow, eSwing } from '../events';
-import Woody from '../player/Woody';
+import Jacques from '../player/Jacques';
 
 const animations = {
 	[aStand]: {
@@ -85,12 +85,12 @@ const animations = {
 		priority: 8,
 		flags: { noAttack: true, noTurn: true },
 		frames: [
-			{ c: 5, r: 0, t: 75, hotspot: { x: -48, y: 44 } },
-			{ c: 5, r: 1, t: 75, hotspot: { x: -48, y: 44 } },
-			{ c: 5, r: 2, t: 75, hotspot: { x: -48, y: 44 } },
-			{ c: 5, r: 3, t: 75, hotspot: { x: 24, y: 20 }, event: eSwing },
-			{ c: 5, r: 4, t: 75, hotspot: { x: 24, y: 20 } },
-			{ c: 5, r: 5, t: 150, hotspot: { x: 24, y: 20 } },
+			{ c: 5, r: 0, t: 75, hotspot: { x: -80, y: 60 } },
+			{ c: 5, r: 1, t: 75, hotspot: { x: -80, y: 60 } },
+			{ c: 5, r: 2, t: 75, hotspot: { x: -80, y: 60 } },
+			{ c: 5, r: 3, t: 75, hotspot: { x: 65, y: 25 }, event: eSwing },
+			{ c: 5, r: 4, t: 75, hotspot: { x: 65, y: 25 } },
+			{ c: 5, r: 5, t: 150, hotspot: { x: 65, y: 25 } },
 		],
 	},
 
@@ -118,19 +118,19 @@ const animations = {
 	},
 };
 
-export default class WoodyController extends AnimController {
+export default class JacquesController extends AnimController {
 	facing: 1 | -1;
-	parent: Woody;
+	parent: Jacques;
 	step?: boolean;
 
-	constructor(parent: Woody, img: CanvasImageSource) {
+	constructor(parent: Jacques, img: CanvasImageSource) {
 		super({
 			animations,
 			img,
-			w: 80,
-			h: 80,
-			xo: -40,
-			yo: -74,
+			w: 140,
+			h: 140,
+			xo: -70,
+			yo: -109,
 		});
 
 		this.parent = parent;

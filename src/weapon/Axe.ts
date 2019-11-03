@@ -17,7 +17,7 @@ import Game from '../Game';
 import DrawnComponent from '../DrawnComponent';
 import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
-import Player from '../component/Player';
+import Player from '../Player';
 import Weapon from '../Weapon';
 
 const gCooldown = 700;

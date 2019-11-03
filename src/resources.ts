@@ -3,6 +3,7 @@ import busterImg from '../media/gfx/mon/buster.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
 import grassImg from '../media/gfx/tile/grass.png';
 import iconsImg from '../media/gfx/icons.png';
+import jacquesImg from '../media/gfx/jacques.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
 import rockImg from '../media/gfx/it/rock.png';
 import axeImg from '../media/gfx/wp/axe.png';
@@ -20,6 +21,7 @@ import deathSnd from '../media/sfx/Player_Death.wav';
 import jumpSnd from '../media/sfx/Jump.wav';
 import step1Snd from '../media/sfx/Footstep1_Bubbly.wav';
 import step2Snd from '../media/sfx/Footstep2_Bubbly.wav';
+import jacquesHurtSnd from '../media/sfx/Player_Hurt_Jacques.wav';
 import woodyHurtSnd from '../media/sfx/Player_Hurt_Woody.wav';
 
 import bluegrassMaterials from './material/bluegrass';
@@ -122,6 +124,7 @@ export default function PreloadResources(game: Game) {
 	game.require('enemy.krillna', image, krillnaImg);
 	game.require('item.rock', image, rockImg);
 	game.require('weapon.axe', image, axeImg);
+	game.require('player.jacques', image, jacquesImg);
 	game.require('player.woody', image, woodyImg);
 	game.require('tile.grass', image, grassImg);
 	game.require('tile.bluegrass', image, bluegrassImg);
@@ -137,6 +140,7 @@ export default function PreloadResources(game: Game) {
 	game.require('player.jump', sound, jumpSnd);
 	game.require('player.step1', sound, step1Snd);
 	game.require('player.step2', sound, step2Snd);
+	game.require('jacques.hurt', sound, jacquesHurtSnd);
 	game.require('woody.hurt', sound, woodyHurtSnd);
 
 	game.require('enemy.bat.punch', sound, batPunchSnd);

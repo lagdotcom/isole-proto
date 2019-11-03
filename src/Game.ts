@@ -13,7 +13,7 @@ import DrawnComponent from './DrawnComponent';
 import Texture from './Texture';
 import Decal from './component/Decal';
 import Enemy from './Enemy';
-import Player from './component/Player';
+import Player from './Player';
 import Controller from './Controller';
 import Material from './Material';
 

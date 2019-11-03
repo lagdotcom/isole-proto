@@ -4,8 +4,8 @@ import Buster from './enemy/Buster';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
+import Jacques from './player/Jacques';
 import Krillna from './enemy/Krillna';
-import Player from './component/Player';
 import Rock from './item/Rock';
 import Wall from './component/Wall';
 import mel from './makeElement';
@@ -15,6 +15,7 @@ import layers, { zBackground } from './layers';
 import { dLeft, dRight, Facing } from './dirs';
 import Game from './Game';
 import CoordAR from './CoordAR';
+import Woody from './player/Woody';
 
 interface EditorData {
 	platforms: EditorPlatform[];
@@ -52,6 +53,7 @@ interface EditorPlatform {
 }
 
 interface EditorPlayer extends CoordAR {
+	type: string;
 	item?: string;
 	weapon?: string;
 }
@@ -78,10 +80,16 @@ const enemyTypes = {
 	flazza: Flazza,
 };
 const enemies = Object.keys(enemyTypes);
+
 const itemTypes = { rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
+
+const playerTypes = { jacques: Jacques, woody: Woody };
+const players = Object.keys(playerTypes);
+
 const weaponTypes = { axe: Axe };
 const weapons = ['', ...Object.keys(weaponTypes)];
+
 var materials: string[];
 var objects: string[];
 const wallDirections = [1, -1];
@@ -119,7 +127,13 @@ export default class Editor {
 				{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
 			],
 			objects: [],
-			player: { a: 270, r: 150, item: 'rock', weapon: 'axe' },
+			player: {
+				type: 'jacques',
+				a: 270,
+				r: 150,
+				item: 'rock',
+				weapon: 'axe',
+			},
 			enemies: [
 				{ type: 'bat', a: 200, r: 250, dir: 'L' },
 				{ type: 'buster', a: 0, r: 150, dir: 'L' },
@@ -175,10 +189,7 @@ export default class Editor {
 			game.enemies.push(this.makeEnemy(e));
 		});
 
-		game.player = new Player(game, {
-			a: player.a,
-			r: player.r,
-		});
+		game.player = this.makePlayer(player);
 
 		game.inventory.clear();
 		if (player.item) game.inventory.add(itemTypes[player.item]);
@@ -202,6 +213,10 @@ export default class Editor {
 
 	makeEnemy(e: EditorEnemy) {
 		return new enemyTypes[e.type](this.game, e);
+	}
+
+	makePlayer(p: EditorPlayer) {
+		return new playerTypes[p.type](this.game, p);
 	}
 
 	makeDom(parent?: HTMLElement) {
@@ -404,6 +419,7 @@ export default class Editor {
 
 	makePlayerDom(parent: HTMLElement, o: EditorPlayer) {
 		const e = mel(parent, 'div', { className: 'entry' });
+		this.makeChoiceInput(e, o, 'Character', 'type', players);
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeChoiceInput(e, o, 'Item', 'item', items);

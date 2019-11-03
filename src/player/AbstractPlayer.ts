@@ -29,16 +29,16 @@ import {
 	first,
 } from '../tools';
 import mel from '../makeElement';
-import WoodyController from '../spr/woody';
 import { zPlayer } from '../layers';
 import Channel from '../Channel';
-import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
 import Damageable from '../Damageable';
-import Flat from './Flat';
-import Wall from './Wall';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
 import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
+import Player, { PlayerInit } from '../Player';
+import AnimController from '../AnimController';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
@@ -46,16 +46,21 @@ const gJumpAffectStrength = 0.15,
 	gJumpStrength = 4,
 	gJumpTimer = 8;
 
-interface PlayerInit {
-	a?: number;
-	img?: string;
-	r?: number;
+export interface PlayerController extends AnimController {
+	jump(t: number): void;
+	fall(t: number): void;
+	stand(t: number): void;
+	face(vr: 1 | -1, grounded: boolean): void;
+	walk(t: number): void;
+	throw(): void;
+	hurt(): void;
 }
 
-export default class Player implements DrawnComponent, Damageable {
+export default abstract class AbstractPlayer implements Player {
 	a: number;
 	alive: boolean;
 	body: Channel;
+	deadSound: string;
 	del?: HTMLElement;
 	facing: Facing;
 	game: Game;
@@ -68,10 +73,11 @@ export default class Player implements DrawnComponent, Damageable {
 	jumplg: boolean;
 	jumpt: number;
 	health: number;
+	hurtSound: string;
 	layer: number;
 	name: string;
 	r: number;
-	sprite: WoodyController;
+	sprite: PlayerController;
 	steph: number;
 	tscale: number;
 	va: number;
@@ -84,14 +90,9 @@ export default class Player implements DrawnComponent, Damageable {
 		Object.assign(
 			this,
 			{
-				body: new Channel(game, 'Woody Body'),
-				voice: new Channel(game, 'Woody Voice'),
 				isPlayer: true,
 				layer: zPlayer,
 				game,
-				name: 'Woody',
-				w: 30,
-				h: 34,
 				steph: 10,
 				a: 0,
 				r: 300,
@@ -104,13 +105,10 @@ export default class Player implements DrawnComponent, Damageable {
 				jumpd: true,
 				jumplg: false,
 				tscale: 0,
-				sprite: new WoodyController(
-					this,
-					game.resources[options.img || 'player.woody']
-				),
 				alive: true,
 				health: 5,
 			},
+			this.getDefaultInit(game, options),
 			options
 		);
 
@@ -122,6 +120,8 @@ export default class Player implements DrawnComponent, Damageable {
 			});
 		}
 	}
+
+	abstract getDefaultInit(game: Game, options: PlayerInit): any;
 
 	update(time: number): void {
 		var { a, r, va, vr, vfa, game, sprite, jumpd, jumplg } = this;
@@ -420,7 +420,7 @@ export default class Player implements DrawnComponent, Damageable {
 		this.vr += dv.r * 5;
 
 		this.game.fire(ePlayerHurt, { by, damage });
-		this.voice.play('woody.hurt');
+		this.voice.play(this.hurtSound);
 		this.sprite.hurt();
 	}
 
@@ -431,7 +431,7 @@ export default class Player implements DrawnComponent, Damageable {
 
 	die(): void {
 		this.game.fire(ePlayerDied);
-		this.voice.play('player.dead');
+		this.voice.play(this.deadSound);
 		this.game.remove(this);
 	}
 }
