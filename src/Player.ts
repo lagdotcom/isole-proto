@@ -14,6 +14,7 @@ export default interface Player extends DrawnComponent, Damageable {
 	sprite: AnimController;
 	va: number;
 	vfa: number;
+	vr: number;
 	w: number;
 }
 

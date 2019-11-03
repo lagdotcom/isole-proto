@@ -1,18 +1,23 @@
-import bluegrassImg from '../media/gfx/tile/bluegrass.png';
-import busterImg from '../media/gfx/mon/buster.png';
-import flazzaImg from '../media/gfx/mon/flazza.png';
-import grassImg from '../media/gfx/tile/grass.png';
 import iconsImg from '../media/gfx/icons.png';
 import jacquesImg from '../media/gfx/jacques.png';
-import krillnaImg from '../media/gfx/mon/krillna.png';
-import rockImg from '../media/gfx/it/rock.png';
-import axeImg from '../media/gfx/wp/axe.png';
 import woodyImg from '../media/gfx/woody.png';
+
+import bluegrassImg from '../media/gfx/tile/bluegrass.png';
 import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
 import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
 import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
 import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
+import grassImg from '../media/gfx/tile/grass.png';
+
+import busterImg from '../media/gfx/mon/buster.png';
+import flazzaImg from '../media/gfx/mon/flazza.png';
+import krillnaImg from '../media/gfx/mon/krillna.png';
 import batImg from '../media/gfx/mon/bat.png';
+
+import bombImg from '../media/gfx/it/bomb.png';
+import rockImg from '../media/gfx/it/rock.png';
+
+import axeImg from '../media/gfx/wp/axe.png';
 
 import batPunchSnd from '../media/sfx/bat-punch.wav';
 import bonkSnd from '../media/sfx/Head_Bonk.wav';
@@ -122,6 +127,7 @@ export default function PreloadResources(game: Game) {
 	game.require('enemy.buster', image, busterImg);
 	game.require('enemy.flazza', image, flazzaImg);
 	game.require('enemy.krillna', image, krillnaImg);
+	game.require('item.bomb', image, bombImg);
 	game.require('item.rock', image, rockImg);
 	game.require('weapon.axe', image, axeImg);
 	game.require('player.jacques', image, jacquesImg);

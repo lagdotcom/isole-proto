@@ -16,6 +16,7 @@ import { dLeft, dRight, Facing } from './dirs';
 import Game from './Game';
 import CoordAR from './CoordAR';
 import Woody from './player/Woody';
+import Bomb from './item/Bomb';
 
 interface EditorData {
 	platforms: EditorPlatform[];
@@ -81,7 +82,7 @@ const enemyTypes = {
 };
 const enemies = Object.keys(enemyTypes);
 
-const itemTypes = { rock: Rock };
+const itemTypes = { bomb: Bomb, rock: Rock };
 const items = ['', ...Object.keys(itemTypes)];
 
 const playerTypes = { jacques: Jacques, woody: Woody };
