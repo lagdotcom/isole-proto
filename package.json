@@ -5,17 +5,15 @@
 	"description": "",
 	"main": "index.html",
 	"scripts": {
-		"build": "webpack --mode production",
-		"dev": "webpack --mode development",
-		"lint": "eslint src/**",
-		"start": "webpack-dev-server --no-inline",
+		"build": "webpack -p",
+		"dev": "webpack -d",
+		"start": "webpack-dev-server -d --content-base ./dist --open",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Lag.Com <lagdotcom@gmail.com>",
 	"license": "ISC",
 	"devDependencies": {
 		"css-loader": "^3.2.0",
-		"eslint": "^6.5.1",
 		"file-loader": "^4.2.0",
 		"source-map-loader": "^0.2.4",
 		"style-loader": "^1.0.0",

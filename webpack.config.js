@@ -2,14 +2,14 @@ const path = require('path');
 
 module.exports = {
 	entry: './src/main',
-	devServer: {
-		contentBase: path.join(__dirname, 'dist'),
-		open: true,
+	plugins: [],
+	output: {
+		path: __dirname + '/dist',
+		filename: 'main.js',
 	},
 	devtool: 'source-map',
 	resolve: {
-		extensions: ['.ts', '.js'],
-		modules: ['src', 'node_modules'],
+		extensions: ['.ts', '.tsx', '.js'],
 	},
 	module: {
 		rules: [
@@ -20,17 +20,9 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: ['style-loader', 'css-loader'],
+				loader: ['style-loader', 'css-loader'],
 			},
-			{
-				test: /\.tsx?$/,
-				loader: 'ts-loader',
-			},
-			{
-				enforce: 'pre',
-				test: /\.js$/,
-				loader: 'source-map-loader',
-			},
+			{ test: /\.tsx?$/, loader: 'ts-loader' },
 		],
 	},
 };
