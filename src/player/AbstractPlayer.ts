@@ -38,24 +38,13 @@ import Wall from '../component/Wall';
 import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
 import Player, { PlayerInit } from '../Player';
-import AnimController from '../AnimController';
+import PlayerController from '../spr/PlayerController';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
 	gJumpDoubleTimer = -10,
 	gJumpStrength = 4,
 	gJumpTimer = 8;
-
-export interface PlayerController extends AnimController {
-	jump(t: number): void;
-	fall(t: number): void;
-	stand(t: number): void;
-	face(vr: 1 | -1, grounded: boolean): void;
-	walk(t: number): void;
-	throw(): void;
-	hurt(): void;
-	die(): void;
-}
 
 export default abstract class AbstractPlayer implements Player {
 	a: number;
@@ -320,7 +309,7 @@ export default abstract class AbstractPlayer implements Player {
 				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
 				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
 				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
-					sprite.flip ? 'flip' : 'normal'
+				sprite.flip ? 'flip' : 'normal'
 				}`,
 				debug
 			);

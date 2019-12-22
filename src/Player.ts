@@ -1,9 +1,9 @@
-import AnimController from './AnimController';
 import Channel from './Channel';
 import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import { Facing } from './dirs';
 import Hitbox from './Hitbox';
+import PlayerController from './spr/PlayerController';
 
 export default interface Player extends DrawnComponent, Damageable {
 	finishdeath(): void;
@@ -11,7 +11,7 @@ export default interface Player extends DrawnComponent, Damageable {
 
 	body: Channel;
 	facing: Facing;
-	sprite: AnimController;
+	sprite: PlayerController;
 	va: number;
 	vfa: number;
 	vr: number;
