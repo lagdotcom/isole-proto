@@ -28,7 +28,7 @@ import {
 	rndr,
 	scalew,
 } from '../tools';
-import controller from '../spr/bat';
+import controller, { ePunchDone, ePunchForward, ePunchPullback, eWakeDone } from '../spr/bat';
 import { zFlying } from '../layers';
 import Channel from '../Channel';
 import Enemy from '../Enemy';
@@ -142,10 +142,10 @@ export default class Bat implements Enemy {
 				verticalTimer: gVerticalChange,
 				sprite: new controller(
 					{
-						onpunchdone: this.onpunchdone.bind(this),
-						onpunchforward: this.onpunchforward.bind(this),
-						onpunchpullback: this.onpunchpullback.bind(this),
-						onwakedone: this.onwakedone.bind(this),
+						[ePunchDone]: this.onpunchdone.bind(this),
+						[ePunchForward]: this.onpunchforward.bind(this),
+						[ePunchPullback]: this.onpunchpullback.bind(this),
+						[eWakeDone]: this.onwakedone.bind(this),
 					},
 					game.resources[options.img || 'enemy.bat']
 				),

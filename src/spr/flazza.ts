@@ -8,15 +8,14 @@ BODY SLAM/FLOP: Frame 1 & 2 are 75 ms, Frame 3 hangs until landing on the ground
 NOTES: After the body slam recovery, the flying animation will begin playing again, I imagine the Flazza can't belly flop again until reaching the typical height it flies above platforms, or maybe after a set time. This enemy will definitely take some playing with to get right.
 */
 
-import AnimController, { ListenerMap } from '../AnimController';
+import AnimController, { ListenerMap, Listener } from '../AnimController';
 
 const aMove = 'move',
-	aTurn = 'turn',
 	aFlop = 'flop',
 	aDrop = 'drop',
 	aSlam = 'slam';
 
-const eDrop = 'onDrop',
+export const eDrop = 'onDrop',
 	eRecover = 'onRecover';
 
 const animations = {
@@ -59,10 +58,15 @@ const animations = {
 	},
 };
 
+interface FlazzaListenerMap extends ListenerMap {
+	[eDrop]: Listener;
+	[eRecover]: Listener;
+}
+
 export default class FlazzaController extends AnimController {
 	parent: ListenerMap;
 
-	constructor(parent: ListenerMap, img: CanvasImageSource) {
+	constructor(parent: FlazzaListenerMap, img: CanvasImageSource) {
 		super({
 			animations,
 			img,

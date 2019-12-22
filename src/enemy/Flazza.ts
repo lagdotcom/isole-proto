@@ -22,7 +22,7 @@ import {
 	unscalew,
 	first,
 } from '../tools';
-import controller from '../spr/flazza';
+import controller, { eDrop, eRecover } from '../spr/flazza';
 import { zFlying } from '../layers';
 import Enemy from '../Enemy';
 import Game from '../Game';
@@ -91,8 +91,8 @@ export default class Flazza implements Enemy {
 				state: sProwling,
 				sprite: new controller(
 					{
-						onDrop: this.onDrop,
-						onRecover: this.onRecover,
+						[eDrop]: this.onDrop.bind(this),
+						[eRecover]: this.onRecover.bind(this),
 					},
 					game.resources[options.img || 'enemy.flazza']
 				),

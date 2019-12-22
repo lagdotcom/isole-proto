@@ -10,14 +10,18 @@ Column 4 - Wake-up: Frame 1 is 150ms, Frames 2-4 are 75ms, Frames 5-9 are 55ms a
 NOTES: the bat can be jumped on unless it is in the spinning animation during wake up, when it goes to punch it can still be jumped on like normal around it's head area, but it's fist will always damage the player. The hitbox for this creature would roughly be the head region and it's hands potentially, wings I don't see being part of it's hitbox for being jumped on or harming the player.
 */
 
-import AnimController, { AnimSpecMap, ListenerMap } from '../AnimController';
-import Bat from '../enemy/bat';
+import AnimController, { AnimSpecMap, ListenerMap, Listener } from '../AnimController';
 
 const aMove = 'move',
 	aPunch = 'punch',
 	aSleep = 'sleep',
 	aWake = 'wake',
 	aFlip = 'flip';
+
+export const ePunchPullback = 'onPunchPullback',
+	ePunchForward = 'onPunchForward',
+	ePunchDone = 'onPunchDone',
+	eWakeDone = 'onWakeDone';
 
 const animations: AnimSpecMap = {
 	[aMove]: {
@@ -35,10 +39,10 @@ const animations: AnimSpecMap = {
 		frames: [
 			{ c: 1, r: 0, t: 40 },
 			{ c: 1, r: 1, t: 40 },
-			{ c: 1, r: 2, t: 75, event: 'onpunchpullback' },
+			{ c: 1, r: 2, t: 75, event: ePunchPullback },
 			{ c: 1, r: 3, t: 75 },
 			{ c: 1, r: 4, t: 75 },
-			{ c: 1, r: 5, t: 50, event: 'onpunchforward' },
+			{ c: 1, r: 5, t: 50, event: ePunchForward },
 			{ c: 1, r: 6, t: 50 },
 			{ c: 1, r: 7, t: 50 },
 			{ c: 1, r: 5, t: 50 },
@@ -50,7 +54,7 @@ const animations: AnimSpecMap = {
 			{ c: 1, r: 5, t: 50 },
 			{ c: 1, r: 6, t: 50 },
 			{ c: 1, r: 7, t: 50 },
-			{ c: 1, r: 8, t: 40, event: 'onpunchdone' },
+			{ c: 1, r: 8, t: 40, event: ePunchDone },
 		],
 	},
 
@@ -78,7 +82,7 @@ const animations: AnimSpecMap = {
 			{ c: 3, r: 7, t: 55 },
 			{ c: 3, r: 8, t: 55 },
 			{ c: 3, r: 9, t: 75, },
-			{ c: 3, r: 9, t: 1000, event: 'onwakedone' },
+			{ c: 3, r: 9, t: 1000, event: eWakeDone },
 		],
 	},
 
@@ -88,10 +92,17 @@ const animations: AnimSpecMap = {
 	},
 };
 
+interface BatListenerMap extends ListenerMap {
+	[ePunchDone]: Listener;
+	[ePunchForward]: Listener;
+	[ePunchPullback]: Listener;
+	[eWakeDone]: Listener;
+}
+
 export default class BatController extends AnimController {
 	parent: ListenerMap;
 
-	constructor(parent: ListenerMap, img: any) {
+	constructor(parent: BatListenerMap, img: any) {
 		super({
 			animations,
 			img,
