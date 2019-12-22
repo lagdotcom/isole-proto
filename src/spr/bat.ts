@@ -77,7 +77,8 @@ const animations: AnimSpecMap = {
 			{ c: 3, r: 6, t: 55 },
 			{ c: 3, r: 7, t: 55 },
 			{ c: 3, r: 8, t: 55 },
-			{ c: 3, r: 9, t: 75 },
+			{ c: 3, r: 9, t: 75, },
+			{ c: 3, r: 9, t: 1000, event: 'onwakedone' },
 		],
 	},
 
@@ -124,7 +125,7 @@ export default class BatController extends AnimController {
 	}
 
 	wake(t: number): void {
-		this.play(aWake);
+		this._play(aWake);
 		this.next(t);
 	}
 
