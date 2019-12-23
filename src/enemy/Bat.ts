@@ -53,6 +53,7 @@ const gAttackFar = 160,
 	gVerticalNear = 50,
 	gVerticalSlowdown = 0.75,
 	gWakeChance = 0.01,
+	gWakeHitboxExtend = 40,
 	gZeroAngleThreshold = 0.01,
 	gZeroRadiusThreshold = 2;
 
@@ -303,7 +304,7 @@ export default class Bat implements Enemy {
 	canAttack(): boolean {
 		const { a } = this.getHitbox();
 		return (
-			this.game.player.alive && collides(a!, this.game.player.getHitbox())
+			a && this.game.player.alive && collides(a!, this.game.player.getHitbox())
 		);
 	}
 
@@ -352,6 +353,12 @@ export default class Bat implements Enemy {
 			if (nd !== this.dir) this.turn();
 		}
 
+		if (this.canAttack()) {
+			this.channel.play('enemy.bat.punch');
+			this.state = sPunching;
+			return this[sPunching + 'Update'](time);
+		}
+
 		const va = this.roostingAngleUpdate(time);
 		const vr = this.roostingRadiusUpdate(time);
 		this.physics(time, va, vr);
@@ -397,7 +404,7 @@ export default class Bat implements Enemy {
 	[sSleeping + 'Update'](time: number): void {
 		this.sleepTimer += time;
 
-		if (this.canWake()) {
+		if (this.canAttack() || this.canWake()) {
 			this.roost = null
 			this.state = sWaking;
 			this.sleepTimer = 0;
@@ -443,21 +450,20 @@ export default class Bat implements Enemy {
 		c.arc(cx, cy, b.r, b.al, b.ar);
 		c.stroke();
 
-		c.strokeStyle = cAI;
-		c.beginPath();
-		c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
-		c.arc(cx, cy, a!.t.r, a!.b.ar, a!.b.al, true);
-		c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
-		c.stroke();
+		if (a) {
+			c.strokeStyle = cAI;
+			c.beginPath();
+			c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
+			c.arc(cx, cy, a!.t.r, a!.b.ar, a!.b.al, true);
+			c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
+			c.stroke();
+		}
 	}
 
 	getHitbox(): Hitbox {
-		const { r, a, va, vr, width, height, tscale, dir } = this;
+		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
-			taw = scalew(width, r + height),
-			naw = scalew(gAttackNear, r),
-			faw = scalew(gAttackFar, r),
-			left = dir === dLeft;
+			taw = scalew(width, r + height);
 		var amod: number,
 			vbr = 0,
 			vtr = 0;
@@ -481,19 +487,66 @@ export default class Bat implements Enemy {
 				al: amod - taw,
 				ar: amod + taw,
 			},
-			a: {
-				b: {
-					r: r + vbr,
-					aw: faw - naw,
-					al: left ? amod - faw : amod + naw,
-					ar: left ? amod - naw : amod + faw,
-				},
-				t: {
-					r: r + height + vbr,
-					aw: faw - naw,
-					al: left ? amod - faw : amod + naw,
-					ar: left ? amod - naw : amod + faw,
-				},
+			a: this.getAttackHitbox(),
+		};
+	}
+
+	getAttackHitbox(): Hitbox | null {
+		if (this.state == sFlying || this.state == sRoosting) return this.getPunchHitbox();
+		if (this.state == sSleeping) return this.getSleepingHitbox();
+		return null;
+	}
+
+	getPunchHitbox(): Hitbox {
+		const { r, a, va, vr, height, tscale, dir } = this;
+		const naw = scalew(gAttackNear, r),
+			faw = scalew(gAttackFar, r),
+			left = dir === dLeft;
+
+		var amod: number,
+			vbr = 0;
+
+		if (tscale) amod = a + (va / r) * tscale * gWalkScale;
+		else amod = a;
+
+		if (vr < 0) vbr = vr;
+
+		return {
+			b: {
+				r: r + vbr,
+				aw: faw - naw,
+				al: left ? amod - faw : amod + naw,
+				ar: left ? amod - naw : amod + faw,
+			},
+			t: {
+				r: r + height + vbr,
+				aw: faw - naw,
+				al: left ? amod - faw : amod + naw,
+				ar: left ? amod - naw : amod + faw,
+			},
+		};
+	}
+
+	getSleepingHitbox(): Hitbox {
+		const { r, a, width, height } = this;
+		const br = r - gWakeHitboxExtend;
+		const tr = r + height + gWakeHitboxExtend;
+		const width2 = width + gWakeHitboxExtend * 2;
+		const baw = scalew(width2, br),
+			taw = scalew(width2, tr);
+
+		return {
+			b: {
+				r: br,
+				aw: baw,
+				al: a - baw,
+				ar: a + baw,
+			},
+			t: {
+				r: tr,
+				aw: taw,
+				al: a - taw,
+				ar: a + taw,
 			},
 		};
 	}
