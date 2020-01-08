@@ -16,12 +16,15 @@ import Enemy from './Enemy';
 import Player from './Player';
 import Controller from './Controller';
 import Material from './Material';
+import Zoomer from './Zoomer';
+import { zBeforeUI } from './layers';
 
 interface GameInit {
 	debugContainer?: HTMLElement;
 	height: number;
+	maxScale?: number;
+	minScale?: number;
 	parent: HTMLElement;
-	scale: number;
 	showDebug?: boolean;
 	showFps?: boolean;
 	showHitboxes?: boolean;
@@ -41,6 +44,19 @@ interface PlatformInit {
 }
 
 type ResourceLoader = (url: string, callback: () => void) => any;
+
+class Unzoomer implements DrawnComponent {
+	game: Game;
+	layer: number;
+	constructor(game: Game) {
+		this.game = game;
+		this.layer = zBeforeUI;
+	}
+
+	draw() {
+		this.game.zoomer.reset();
+	}
+}
 
 /** Isole */
 export default class Game {
@@ -70,16 +86,18 @@ export default class Game {
 	time: number;
 	walls: Wall[];
 	wallsInMotion: boolean;
+	unzoomer: DrawnComponent;
+	zoomer: Zoomer;
 
 	/**
 	 * Create a new Game instance
 	 * @param {GameInit} options options
 	 */
 	constructor(options: GameInit) {
-		const { parent, width, height, scale, smoothing } = options;
+		const { parent, width, height, smoothing } = options;
 
-		this.cx = width / 2 / scale;
-		this.cy = height / 2 / scale;
+		this.cx = width / 2;
+		this.cy = height / 2;
 		this.keys = {};
 		this.loaded = 0;
 		this.loading = 0;
@@ -102,7 +120,12 @@ export default class Game {
 
 		this.context = context;
 		this.context.imageSmoothingEnabled = smoothing || false;
-		this.context.scale(scale, scale);
+		this.zoomer = new Zoomer(
+			this,
+			options.minScale || 0.5,
+			options.maxScale || 1
+		);
+		this.unzoomer = new Unzoomer(this);
 
 		addResources(this);
 	}
@@ -354,7 +377,9 @@ export default class Game {
 			c.fillStyle = 'rgba(0,0,0,0.5)';
 			c.fill();
 
+			this.zoomer.draw(c);
 			this.drawn.forEach(co => co.drawHitbox && co.drawHitbox(c));
+			this.zoomer.reset();
 		}
 
 		if (showFps) {

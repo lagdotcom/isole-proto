@@ -24,7 +24,7 @@ h2 {
 	display: grid;
 	grid-template-areas: 'game editor' 'extras editor';
 	grid-template-rows: 768px 1fr;
-	grid-template-columns: 1024px 1fr;
+	grid-template-columns: 1280px 1fr;
 }
 
 canvas {

@@ -9,7 +9,9 @@ export const zBackground = 0,
 	zDecal = 14,
 	zFlying = 15,
 	zSpark = 16,
-	zUI = 17;
+	zUI = 100,
+	zBeforeUI = zUI - 1,
+	zFirst = -1;
 
 export default {
 	Bg0: zBackground,

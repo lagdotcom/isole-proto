@@ -126,12 +126,14 @@ export default class Editor {
 				{ h: 150, a: 0, w: 360, material: 'bluegrass' },
 				{ h: 300, a: 180, w: 30, motion: 2, material: 'cloud' },
 				{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
+				{ h: 500, a: 190, w: 40, motion: 0, material: 'grass' },
+				{ h: 700, a: 140, w: 30, motion: 0, material: 'grass' },
 			],
 			objects: [],
 			player: {
 				type: 'jacques',
-				a: 270,
-				r: 150,
+				a: 140,
+				r: 1000,
 				item: 'rock',
 				weapon: 'axe',
 			},
@@ -206,6 +208,8 @@ export default class Editor {
 			...game.decals,
 			game.player,
 			game.inventory,
+			game.zoomer,
+			game.unzoomer,
 		];
 		game.wallsInMotion = true; // TODO
 

@@ -37,9 +37,8 @@ window.addEventListener('load', () => {
 
 	G = new Game({
 		parent: layout,
-		width: 1024,
-		height: 768,
-		scale: 1,
+		width: 1280,
+		height: 720,
 		smoothing: true,
 		showDebug: true,
 		debugContainer: debug,
