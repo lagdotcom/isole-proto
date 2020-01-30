@@ -20,7 +20,7 @@ export default class Flat implements DrawnComponent {
 	motion: number;
 	r: number;
 	right: number;
-	scale?: number;
+	scale: number;
 	sprite?: Texture;
 	width: number;
 	wleft?: Wall;
@@ -65,6 +65,7 @@ export default class Flat implements DrawnComponent {
 			game.materials[texture].spawner(this);
 		} else {
 			this.draw = () => {};
+			this.scale = 0;
 		}
 	}
 
@@ -87,16 +88,18 @@ export default class Flat implements DrawnComponent {
 	draw(c: CanvasRenderingContext2D): void {
 		const { left, right, r, game, scale, sprite, width } = this;
 		const { cx, cy } = game;
-		const step = scalew(scale!, r),
-			offset = scalew(scale! / 2, r);
+		const step = scalew(scale, r),
+			offset = scalew(scale / 2, r);
 		var remaining = width * 2,
 			a = left;
 
-		sprite!.reset();
-		sprite!.tile(this.circle ? 'tm' : 'tl');
+		if (!sprite) return;
+
+		sprite.reset();
+		sprite.tile(this.circle ? 'tm' : 'tl');
 		while (remaining > 0) {
 			if (remaining < step) {
-				if (!this.circle) sprite!.tile('tr');
+				if (!this.circle) sprite.tile('tr');
 				a = right - step;
 			}
 
@@ -113,7 +116,7 @@ export default class Flat implements DrawnComponent {
 
 			remaining -= step;
 			a += step;
-			sprite!.tile('tm');
+			sprite.tile('tm');
 		}
 	}
 

@@ -11,11 +11,11 @@ export default class Wall implements DrawnComponent {
 	a: number;
 	b: number;
 	bottom: number;
-	ceiling: Flat;
+	ceiling?: Flat;
 	direction: 1 | -1;
 	ex: number;
 	ey: number;
-	floor: Flat;
+	floor?: Flat;
 	game: Game;
 	isWall: true;
 	layer: number;

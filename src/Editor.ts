@@ -51,6 +51,8 @@ interface EditorPlatform {
 	th: number;
 	motion?: number;
 	material: string;
+	ceiling?: boolean;
+	walls?: boolean;
 }
 
 interface EditorPlayer extends CoordAR {
@@ -154,6 +156,7 @@ export default class Editor {
 		if (game.options.debugContainer)
 			clearChildren(game.options.debugContainer);
 
+		game.platforms = [];
 		game.floors = [];
 		game.ceilings = [];
 		game.walls = [];
@@ -201,6 +204,7 @@ export default class Editor {
 		game.inventory.health = game.player.health;
 
 		game.components = [
+			...game.platforms,
 			...game.floors,
 			...game.ceilings,
 			...game.walls,
@@ -347,6 +351,28 @@ export default class Editor {
 		});
 	}
 
+	makeBoolInput(
+		parent: HTMLElement,
+		object: any,
+		label: string,
+		attribute: string
+	) {
+		const el = mel(
+			mel(parent, 'label', {
+				className: 'input checkbox',
+				innerText: label,
+			}),
+			'input',
+			{ type: 'checkbox' },
+			{
+				change: (e: Event) => {
+					object[attribute] = el.checked;
+					this.game.begin();
+				},
+			}
+		) as HTMLInputElement;
+	}
+
 	makeChoiceInput(
 		parent: HTMLElement,
 		object: any,
@@ -436,10 +462,12 @@ export default class Editor {
 		this.makeDel(e, o, 'platforms');
 		this.makeNumInput(e, o, 'Height', 'h');
 		this.makeAngleInput(e, o, 'Angle', 'a');
-		this.makeAngleInput(e, o, 'Width', 'w');
+		this.makeNumInput(e, o, 'Width', 'w');
 		this.makeNumInput(e, o, 'Thickness', 'th');
 		this.makeNumInput(e, o, 'Motion', 'motion');
 		this.makeChoiceInput(e, o, 'Material', 'material', materials);
+		this.makeBoolInput(e, o, 'Ceiling?', 'ceiling');
+		this.makeBoolInput(e, o, 'Walls?', 'walls');
 	}
 
 	makeWallDom(parent: HTMLElement, o: EditorWall) {

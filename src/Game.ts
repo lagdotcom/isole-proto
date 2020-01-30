@@ -18,6 +18,7 @@ import Controller from './Controller';
 import Material from './Material';
 import Zoomer from './Zoomer';
 import { zBeforeUI } from './layers';
+import Platform, { PlatformInit } from './component/Platform';
 
 interface GameInit {
 	debugContainer?: HTMLElement;
@@ -30,17 +31,6 @@ interface GameInit {
 	showHitboxes?: boolean;
 	smoothing?: boolean;
 	width: number;
-}
-
-interface PlatformInit {
-	h: number;
-	a: number;
-	w: number;
-	th: number;
-	material: string;
-	motion?: number;
-	texX?: number;
-	texY?: number;
 }
 
 type ResourceLoader = (url: string, callback: () => void) => any;
@@ -78,6 +68,7 @@ export default class Game {
 	objects: { [name: string]: Controller };
 	options: GameInit;
 	pads: Gamepad[];
+	platforms: Platform[];
 	player: Player;
 	redraw: boolean;
 	resources: { [name: string]: any };
@@ -148,6 +139,7 @@ export default class Game {
 	 * Prepare the game for starting
 	 */
 	begin(): void {
+		this.platforms = [];
 		this.floors = [];
 		this.ceilings = [];
 		this.walls = [];
@@ -217,30 +209,22 @@ export default class Game {
 		th,
 		motion = 0,
 		material = '',
-		texX = 0,
-		texY = 0,
+		ceiling = false,
+		walls = false,
 	}: PlatformInit) {
-		var floor = new Flat(this, h, a, w, motion, material),
-			ceiling = new Flat(this, h - th, a, w, motion),
-			left = new Wall(this, h, h - th, a - w / 2, 1, motion),
-			right = new Wall(this, h, h - th, a + w / 2, -1, motion);
-
-		floor.wleft = left;
-		floor.wright = right;
-
-		ceiling.wleft = left;
-		ceiling.wright = right;
-
-		left.ceiling = ceiling;
-		left.floor = floor;
-
-		right.ceiling = ceiling;
-		right.floor = floor;
-
-		this.floors.push(floor);
-		this.ceilings.push(ceiling);
-		this.walls.push(left);
-		this.walls.push(right);
+		this.platforms.push(
+			new Platform({
+				game: this,
+				h,
+				a,
+				w,
+				th,
+				motion,
+				material,
+				ceiling,
+				walls,
+			})
+		);
 	}
 
 	/**

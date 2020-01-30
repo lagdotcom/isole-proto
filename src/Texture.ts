@@ -1,5 +1,3 @@
-import DrawnComponent from './DrawnComponent';
-
 export default interface Texture {
 	h: number;
 	w: number;

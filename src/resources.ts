@@ -8,6 +8,7 @@ import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
 import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
 import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
 import grassImg from '../media/gfx/tile/grass.png';
+import greyboxImg from '../media/gfx/tile/greybox.png';
 
 import busterImg from '../media/gfx/mon/buster.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
@@ -31,6 +32,7 @@ import woodyHurtSnd from '../media/sfx/Player_Hurt_Woody.wav';
 
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
+import greyboxMaterials from './material/greybox';
 
 import bluegrassObjects from './object/bluegrass';
 import Game from './Game';
@@ -134,6 +136,7 @@ export default function PreloadResources(game: Game) {
 	game.require('player.woody', image, woodyImg);
 	game.require('tile.grass', image, grassImg);
 	game.require('tile.bluegrass', image, bluegrassImg);
+	game.require('tile.greybox', image, greyboxImg);
 	game.require('ui.icons', image, iconsImg);
 	game.require('tile.rwbgtree', image, rwbgtreeImg);
 	game.require('tile.rwbgrocks', image, rwbgrocksImg);
@@ -151,6 +154,6 @@ export default function PreloadResources(game: Game) {
 
 	game.require('enemy.bat.punch', sound, batPunchSnd);
 
-	addMaterials(game, [grassMaterials, bluegrassMaterials]);
+	addMaterials(game, [grassMaterials, bluegrassMaterials, greyboxMaterials]);
 	addObjects(game, [bluegrassObjects]);
 }
