@@ -65,7 +65,10 @@ export default class Platform implements DrawnComponent {
 		game.materials[material].spawner(this.floor);
 		game.floors.push(this.floor);
 
-		if (ceiling) this.ceiling = new Flat(game, this.bottom, a, w, motion);
+		if (ceiling) {
+			this.ceiling = new Flat(game, this.bottom, a, w, motion);
+			game.ceilings.push(this.ceiling);
+		}
 
 		if (walls && !this.circle) {
 			this.wleft = new Wall(game, h, this.bottom, a - w / 2, 1, motion);
