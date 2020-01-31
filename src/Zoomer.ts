@@ -3,24 +3,21 @@ import DrawnComponent from './DrawnComponent';
 import { zFirst } from './layers';
 import { cart } from './tools';
 
-const gScale = 550,
-	gVerticalMultiplier = 2;
-
 export default class Zoomer implements DrawnComponent {
 	game: Game;
 	layer: number;
 	max: number;
 	min: number;
-	pr: number;
-	pa: number;
-	ps: number;
-	pc: number;
+	px: number;
+	py: number;
+	scale: number;
 
-	constructor(game: Game, min: number, max: number) {
+	constructor(game: Game, min: number, max: number, scale: number) {
 		this.layer = zFirst;
 		this.game = game;
 		this.min = min;
 		this.max = max;
+		this.scale = scale;
 	}
 
 	reset() {
@@ -30,27 +27,24 @@ export default class Zoomer implements DrawnComponent {
 	update(t: number) {
 		const { player } = this.game;
 		if (player.alive) {
-			this.pr = player.r;
-			this.pa = player.a;
-			this.ps = Math.sin(player.a);
-			this.pc = Math.cos(player.a);
+			const xy = cart(player.a, player.r);
+			this.px = xy.x;
+			this.py = xy.y;
 		}
 	}
 
 	draw(context: CanvasRenderingContext2D) {
-		let ss = Math.abs(this.pr * this.ps) * gVerticalMultiplier;
-		let cs = Math.abs(this.pr * this.pc);
+		let ss = Math.abs(this.py);
+		let cs = Math.abs(this.px);
 
-		let s = gScale / Math.max(ss, cs);
+		let s = this.scale / Math.max(ss, cs);
 		if (s < this.min) s = this.min;
 		if (s > this.max) s = this.max;
 
 		const { width, height } = this.game.options;
 		context.setTransform(s, 0, 0, s, 0, 0);
 
-		const player = cart(this.pa, this.pr);
-
-		this.game.cx = width / s / 2 - player.x;
-		this.game.cy = height / s / 2 - player.y;
+		this.game.cx = width / s / 2 - this.px;
+		this.game.cy = height / s / 2 - this.py;
 	}
 }

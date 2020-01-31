@@ -25,6 +25,7 @@ interface GameInit {
 	height: number;
 	maxScale?: number;
 	minScale?: number;
+	zoomScale?: number;
 	parent: HTMLElement;
 	showDebug?: boolean;
 	showFps?: boolean;
@@ -48,7 +49,7 @@ class Unzoomer implements DrawnComponent {
 	}
 }
 
-/** Isole */
+/** Neverseed */
 export default class Game {
 	ceilings: Flat[];
 	components: Component[];
@@ -114,7 +115,8 @@ export default class Game {
 		this.zoomer = new Zoomer(
 			this,
 			options.minScale || 0.5,
-			options.maxScale || 1
+			options.maxScale || 1,
+			options.zoomScale || 550
 		);
 		this.unzoomer = new Unzoomer(this);
 
