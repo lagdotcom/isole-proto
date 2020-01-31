@@ -33,7 +33,7 @@ window.addEventListener('load', () => {
 	const layout = mel(document.body, 'div', { className: 'layout' });
 	const extras = mel(layout, 'div', { className: 'extras' });
 	options = mel(extras, 'div', { className: 'options' });
-	const debug = mel(extras, 'div');
+	const debug = mel(extras, 'div', { className: 'debug-container' });
 
 	G = new Game({
 		parent: layout,

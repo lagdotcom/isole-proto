@@ -304,12 +304,13 @@ export default abstract class AbstractPlayer implements Player {
 
 		if (game.options.showDebug && this.del)
 			this.del.innerHTML = jbr(
+				'<b>Player</b>',
 				`controls: ${controls.join(' ')}`,
 				`flags: ${flags.join(' ')}`,
 				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
 				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
 				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
-				sprite.flip ? 'flip' : 'normal'
+					sprite.flip ? 'flip' : 'normal'
 				}`,
 				debug
 			);

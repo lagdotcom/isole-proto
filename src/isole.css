@@ -16,7 +16,12 @@ h2 {
 	padding: 0;
 }
 
+.debug-container {
+	display: flex;
+}
+
 .debug {
+	flex: 1 0 200px;
 	font-family: monospace;
 }
 

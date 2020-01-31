@@ -19,6 +19,7 @@ import Material from './Material';
 import Zoomer from './Zoomer';
 import { zBeforeUI } from './layers';
 import Platform, { PlatformInit } from './component/Platform';
+import emptyElement from './emptyElement';
 
 interface GameInit {
 	debugContainer?: HTMLElement;
@@ -143,6 +144,9 @@ export default class Game {
 	 * Prepare the game for starting
 	 */
 	begin(): void {
+		if (this.options.debugContainer)
+			emptyElement(this.options.debugContainer);
+
 		this.platforms = [];
 		this.floors = [];
 		this.ceilings = [];

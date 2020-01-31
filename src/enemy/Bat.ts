@@ -27,14 +27,21 @@ import {
 	rnda,
 	rndr,
 	scalew,
+	jbr,
 } from '../tools';
-import controller, { ePunchDone, ePunchForward, ePunchPullback, eWakeDone } from '../spr/bat';
+import controller, {
+	ePunchDone,
+	ePunchForward,
+	ePunchPullback,
+	eWakeDone,
+} from '../spr/bat';
 import { zFlying } from '../layers';
 import Channel from '../Channel';
 import Enemy from '../Enemy';
 import Flat from '../component/Flat';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
+import mel from '../makeElement';
 
 const gAttackFar = 160,
 	gAttackNear = 30,
@@ -88,6 +95,7 @@ export default class Bat implements Enemy {
 	a: number;
 	alive: boolean;
 	channel: Channel;
+	del: HTMLElement;
 	dir: Facing;
 	game: Game;
 	health: number;
@@ -158,6 +166,12 @@ export default class Bat implements Enemy {
 		);
 
 		this.a = deg2rad(this.a);
+
+		if (game.options.showDebug) {
+			this.del = mel(game.options.debugContainer, 'div', {
+				className: 'debug debug-enemy',
+			});
+		}
 	}
 
 	update(time: number): void {
@@ -174,6 +188,19 @@ export default class Bat implements Enemy {
 		if (!this.targetradius) this.targetradius = this.r;
 
 		this[this.state + 'Update'](time);
+
+		if (this.del) {
+			const { va, vr, r, a, sprite, state, substate } = this;
+			this.del.innerHTML = jbr(
+				'<b>Bat</b>',
+				`state: ${state},${substate}`,
+				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
+				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
+				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
+					sprite.flip ? 'flip' : 'normal'
+				}`
+			);
+		}
 	}
 
 	physics(time: number, va: number, vr: number): void {
@@ -304,7 +331,9 @@ export default class Bat implements Enemy {
 	canAttack(): boolean {
 		const { a } = this.getHitbox();
 		return (
-			a && this.game.player.alive && collides(a!, this.game.player.getHitbox())
+			a &&
+			this.game.player.alive &&
+			collides(a!, this.game.player.getHitbox())
 		);
 	}
 
@@ -326,7 +355,8 @@ export default class Bat implements Enemy {
 	}
 
 	canRoost(): boolean {
-		if (this.sleepTimer <= gSleepThreshold || rnd() >= gRoostChance) return false;
+		if (this.sleepTimer <= gSleepThreshold || rnd() >= gRoostChance)
+			return false;
 		this.roost = this.getNearestCeiling();
 		this.roostangle = undefined;
 		return !!this.roost;
@@ -405,17 +435,17 @@ export default class Bat implements Enemy {
 		this.sleepTimer += time;
 
 		if (this.canAttack() || this.canWake()) {
-			this.roost = null
+			this.roost = null;
 			this.state = sWaking;
 			this.sleepTimer = 0;
-			return this.sprite.wake(time)
+			return this.sprite.wake(time);
 		}
 
 		this.sprite.sleep(time);
 	}
 
 	[sWaking + 'Update'](time: number): void {
-		this.sprite.wake(time)
+		this.sprite.wake(time);
 	}
 
 	onwakedone(): void {
@@ -492,7 +522,8 @@ export default class Bat implements Enemy {
 	}
 
 	getAttackHitbox(): Hitbox | null {
-		if (this.state == sFlying || this.state == sRoosting) return this.getPunchHitbox();
+		if (this.state == sFlying || this.state == sRoosting)
+			return this.getPunchHitbox();
 		if (this.state == sSleeping) return this.getSleepingHitbox();
 		return null;
 	}
