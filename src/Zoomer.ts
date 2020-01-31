@@ -1,6 +1,7 @@
 import Game from './Game';
 import DrawnComponent from './DrawnComponent';
 import { zFirst } from './layers';
+import { cart } from './tools';
 
 const gScale = 550,
 	gVerticalMultiplier = 2;
@@ -11,6 +12,7 @@ export default class Zoomer implements DrawnComponent {
 	max: number;
 	min: number;
 	pr: number;
+	pa: number;
 	ps: number;
 	pc: number;
 
@@ -29,6 +31,7 @@ export default class Zoomer implements DrawnComponent {
 		const { player } = this.game;
 		if (player.alive) {
 			this.pr = player.r;
+			this.pa = player.a;
 			this.ps = Math.sin(player.a);
 			this.pc = Math.cos(player.a);
 		}
@@ -45,7 +48,9 @@ export default class Zoomer implements DrawnComponent {
 		const { width, height } = this.game.options;
 		context.setTransform(s, 0, 0, s, 0, 0);
 
-		this.game.cx = width / s / 2;
-		this.game.cy = height / s / 2;
+		const player = cart(this.pa, this.pr);
+
+		this.game.cx = width / s / 2 - player.x;
+		this.game.cy = height / s / 2 - player.y;
 	}
 }
