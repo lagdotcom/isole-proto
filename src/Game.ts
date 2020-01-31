@@ -25,6 +25,7 @@ interface GameInit {
 	height: number;
 	maxScale?: number;
 	minScale?: number;
+	vertScale?: number;
 	zoomScale?: number;
 	parent: HTMLElement;
 	showDebug?: boolean;
@@ -116,7 +117,8 @@ export default class Game {
 			this,
 			options.minScale || 0.5,
 			options.maxScale || 1,
-			options.zoomScale || 550
+			options.zoomScale || 550,
+			options.vertScale || 1.2
 		);
 		this.unzoomer = new Unzoomer(this);
 

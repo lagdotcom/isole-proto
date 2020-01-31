@@ -11,13 +11,21 @@ export default class Zoomer implements DrawnComponent {
 	px: number;
 	py: number;
 	scale: number;
+	vert: number;
 
-	constructor(game: Game, min: number, max: number, scale: number) {
+	constructor(
+		game: Game,
+		min: number,
+		max: number,
+		scale: number,
+		vert: number
+	) {
 		this.layer = zFirst;
 		this.game = game;
 		this.min = min;
 		this.max = max;
 		this.scale = scale;
+		this.vert = vert;
 	}
 
 	reset() {
@@ -34,7 +42,7 @@ export default class Zoomer implements DrawnComponent {
 	}
 
 	draw(context: CanvasRenderingContext2D) {
-		let ss = Math.abs(this.py);
+		let ss = Math.abs(this.py) * this.vert;
 		let cs = Math.abs(this.px);
 
 		let s = this.scale / Math.max(ss, cs);
