@@ -10,6 +10,7 @@ import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
 import grassImg from '../media/gfx/tile/grass.png';
 import greyboxImg from '../media/gfx/tile/greybox.png';
 
+import boosterImg from '../media/gfx/mon/booster.png';
 import busterImg from '../media/gfx/mon/buster.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
@@ -126,6 +127,7 @@ function sound(fn: string, onload: (e: Event) => void): HTMLAudioElement {
  */
 export default function PreloadResources(game: Game) {
 	game.require('enemy.bat', image, batImg);
+	game.require('enemy.booster', image, boosterImg);
 	game.require('enemy.buster', image, busterImg);
 	game.require('enemy.flazza', image, flazzaImg);
 	game.require('enemy.krillna', image, krillnaImg);

@@ -27,8 +27,10 @@ import Game from '../Game';
 import { Quad } from '../Hitbox';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
+import mel from '../makeElement';
+import Player from '../Player';
 
-const gJumpDelay = 150,
+const gJumpFatigue = 150,
 	gJumpSide = 0.4,
 	gJumpStartup = 15,
 	gJumpStrength = 4,
@@ -42,13 +44,25 @@ const sIdle = 'idle',
 	sWaiting = 'waiting';
 type BusterState = 'idle' | 'prejump' | 'jumping' | 'waiting';
 
+interface BusterController {
+	draw(c: CanvasRenderingContext2D): void;
+	fall(t: number): void;
+	idle(t: number): void;
+	jump(t: number): void;
+	near(t: number): void;
+	rise(t: number): void;
+}
+
 interface BusterInit {
 	img?: string;
+	jumpfatigue?: number;
+	sprite?: BusterController;
 }
 
 export default class Buster implements Enemy {
 	a: number;
 	alive: boolean;
+	del: HTMLElement;
 	fatigue: number;
 	game: Game;
 	grounded: boolean;
@@ -57,9 +71,10 @@ export default class Buster implements Enemy {
 	isEnemy: true;
 	layer: number;
 	jumpdelay: number;
-	name: 'Buster';
+	jumpfatigue: number;
+	name: string;
 	r: number;
-	sprite: controller;
+	sprite: BusterController;
 	state: BusterState;
 	tscale: number;
 	va: number;
@@ -84,10 +99,14 @@ export default class Buster implements Enemy {
 				vfa: 0,
 				vfr: 0,
 				fatigue: 0,
+				jumpdelay: 0,
+				jumpfatigue: gJumpFatigue,
 				state: sIdle,
-				sprite: new controller(
-					game.resources[options.img || 'enemy.buster']
-				),
+				sprite:
+					options.sprite ||
+					new controller(
+						game.resources[options.img || 'enemy.buster']
+					),
 				alive: true,
 				health: 3,
 				damage: 1,
@@ -96,6 +115,12 @@ export default class Buster implements Enemy {
 		);
 
 		this.a = deg2rad(this.a);
+
+		if (game.options.showDebug) {
+			this.del = mel(game.options.debugContainer, 'div', {
+				className: 'debug debug-enemy',
+			});
+		}
 	}
 
 	update(time: number): void {
@@ -104,7 +129,6 @@ export default class Buster implements Enemy {
 			tscale = time / gTimeScale;
 		const { b, t } = this.getHitbox();
 		const playerDist = unscalew(angledist(a, player.a), r),
-			attackable = player.alive && playerDist - player.w <= gAttackWidth,
 			near = player.alive && playerDist - player.w <= gNearWidth;
 
 		var floor: Flat | null = null;
@@ -153,15 +177,13 @@ export default class Buster implements Enemy {
 			va *= gGroundFriction;
 			vfa = floor.motion * time;
 
-			if (attackable) {
+			if (this.canAttack(player, playerDist)) {
 				switch (state) {
 					case sPreJump:
 						this.jumpdelay -= tscale;
 						if (this.jumpdelay <= 0) {
-							if (anglewrap(a - player.a) > pi) va = gJumpSide;
-							else va = -gJumpSide;
-
-							this.fatigue = gJumpDelay;
+							va = this.getJumpSide() * gJumpSide;
+							this.fatigue = this.jumpfatigue;
 							vr = gJumpStrength;
 							state = sJumping;
 						}
@@ -231,6 +253,25 @@ export default class Buster implements Enemy {
 		} else {
 			sprite.idle(time);
 		}
+
+		if (this.del) {
+			const { jumpdelay, fatigue } = this;
+			this.del.innerHTML = jbr(
+				`<b>${this.name}</b>`,
+				`state: ${state}`,
+				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
+				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
+				`${jumpdelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`
+			);
+		}
+	}
+
+	canAttack(player: Player, playerDist: number) {
+		return player.alive && playerDist - player.w <= gAttackWidth;
+	}
+
+	getJumpSide() {
+		return anglewrap(this.a - this.game.player.a) > pi ? 1 : -1;
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
