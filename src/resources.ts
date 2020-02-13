@@ -12,6 +12,7 @@ import greyboxImg from '../media/gfx/tile/greybox.png';
 
 import boosterImg from '../media/gfx/mon/booster.png';
 import busterImg from '../media/gfx/mon/buster.png';
+import chompChampImg from '../media/gfx/mon/chompchamp.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
 import batImg from '../media/gfx/mon/bat.png';
@@ -129,6 +130,7 @@ export default function PreloadResources(game: Game) {
 	game.require('enemy.bat', image, batImg);
 	game.require('enemy.booster', image, boosterImg);
 	game.require('enemy.buster', image, busterImg);
+	game.require('enemy.chompchamp', image, chompChampImg);
 	game.require('enemy.flazza', image, flazzaImg);
 	game.require('enemy.krillna', image, krillnaImg);
 	game.require('item.bomb', image, bombImg);

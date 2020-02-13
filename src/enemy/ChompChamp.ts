@@ -1,0 +1,338 @@
+import Enemy from '../Enemy';
+import { deg2rad, piHalf, cart, scalew, collides, jbr } from '../tools';
+import Game from '../Game';
+import { zFlying } from '../layers';
+import Hitbox from '../Hitbox';
+import AnimController, { ListenerMap, Listener } from '../AnimController';
+import { cAI, cHurt } from '../colours';
+import mel from '../makeElement';
+import { eAnimationEnded } from '../events';
+
+const aIdle = 'idle',
+	aClose = 'close',
+	aOpen = 'open',
+	aStruggle = 'struggle';
+
+export const eCatch = 'catch',
+	eRelease = 'release';
+
+interface ChompChampSprite {
+	a: string;
+	at: number;
+	idle(t: number): void;
+	close(t: number): void;
+	open(t: number): void;
+	struggle(t: number): void;
+	draw(c: CanvasRenderingContext2D): void;
+}
+
+interface ChompChampInit {
+	a: number;
+	img: string;
+	r: number;
+	sprite: ChompChampSprite;
+}
+
+interface ChompChampListenerMap extends ListenerMap {
+	[eCatch]: Listener;
+	[eRelease]: Listener;
+}
+
+/*
+IDLE (column 1): currently infinite, no idle animation
+
+CLOSE (column 2): first two frames are 30 ms, frames three and four are 50 ms, final frame lasts for 300 ms before playing the animation in reverse IF the player ISN'T caught
+
+THUMP N SPIT: if the player IS caught, disappear player sprite and take away control til this animation's sixth frame, frames one through five are 75 ms, frame six is 150 ms (launch player from top of sprite and do damage to player), frame seven is 200 ms, frame eight and nine are 50 ms, and frame ten and eleven are 30 ms
+*/
+const animations = {
+	[aIdle]: {
+		loop: true,
+		frames: [{ c: 0, r: 0, t: 1000 }],
+	},
+	[aClose]: {
+		frames: [
+			{ c: 1, r: 0, t: 30 },
+			{ c: 1, r: 1, t: 30 },
+			{ c: 1, r: 2, t: 50 },
+			{ c: 1, r: 3, t: 50 },
+			{ c: 1, r: 4, t: 300, event: eCatch },
+		],
+	},
+	[aOpen]: {
+		frames: [
+			{ c: 1, r: 4, t: 300 },
+			{ c: 1, r: 3, t: 50 },
+			{ c: 1, r: 2, t: 50 },
+			{ c: 1, r: 1, t: 30 },
+			{ c: 1, r: 0, t: 30 },
+		],
+	},
+	[aStruggle]: {
+		frames: [
+			{ c: 2, r: 0, t: 75 },
+			{ c: 2, r: 1, t: 75 },
+			{ c: 2, r: 2, t: 75 },
+			{ c: 2, r: 3, t: 75 },
+			{ c: 2, r: 4, t: 75 },
+			{ c: 2, r: 5, t: 150, event: eRelease },
+			{ c: 2, r: 6, t: 200 },
+			{ c: 2, r: 7, t: 50 },
+			{ c: 2, r: 8, t: 50 },
+			{ c: 2, r: 9, t: 30 },
+			{ c: 2, r: 10, t: 30 },
+		],
+	},
+};
+
+class ChompChampController extends AnimController implements ChompChampSprite {
+	parent: ListenerMap;
+
+	constructor(parent: ChompChampListenerMap, img: CanvasImageSource) {
+		super({
+			animations,
+			img,
+			w: 192,
+			h: 192,
+			xo: -96,
+			yo: -90,
+		});
+
+		this.parent = parent;
+	}
+
+	_play(anim: string, force: boolean = false): void {
+		return this.play(anim, force, this.parent);
+	}
+
+	idle(t: number) {
+		this.play(aIdle);
+		this.next(t);
+	}
+
+	close(t: number) {
+		this._play(aClose);
+		this.next(t);
+	}
+
+	open(t: number) {
+		this._play(aOpen);
+		this.next(t);
+	}
+
+	struggle(t: number) {
+		this._play(aStruggle);
+		this.next(t);
+	}
+}
+
+export default class ChompChamp implements Enemy {
+	a: number;
+	alive: true;
+	attackWidth: number;
+	del: HTMLElement;
+	game: Game;
+	health: number;
+	height: number;
+	isEnemy: true;
+	layer: number;
+	name: string;
+	r: number;
+	sprite: ChompChampSprite;
+	state: string;
+	va: number;
+	width: number;
+
+	constructor(game: Game, init: Partial<ChompChampInit> = {}) {
+		this.isEnemy = true;
+		this.name = 'Chomp Champ';
+		this.game = game;
+		this.alive = true;
+		this.health = 100;
+		this.layer = zFlying;
+		this.width = 100;
+		this.attackWidth = 140;
+		this.height = 80;
+		this.a = deg2rad(init.a || 0);
+		this.r = init.r || 0;
+		this.sprite =
+			init.sprite ||
+			new ChompChampController(
+				{
+					[eAnimationEnded]: this.onNext.bind(this),
+					[eCatch]: this.onCatch.bind(this),
+					[eRelease]: this.onRelease.bind(this),
+				},
+				game.resources[init.img || 'enemy.chompchamp']
+			);
+		this.state = aIdle;
+		this.va = 0;
+
+		if (game.options.showDebug) {
+			this.del = mel(game.options.debugContainer, 'div', {
+				className: 'debug debug-enemy',
+			});
+		}
+	}
+
+	update(time: number) {
+		switch (this.state) {
+			case aIdle:
+				const a = this.getAttackHitbox();
+				if (collides(a, this.game.player.getHitbox())) {
+					this.state = aClose;
+				}
+
+				this.sprite.idle(time);
+				break;
+
+			case aClose:
+				this.sprite.close(time);
+				break;
+
+			case aOpen:
+				this.sprite.open(time);
+				break;
+
+			case aStruggle:
+				this.sprite.struggle(time);
+				break;
+		}
+
+		if (this.del) {
+			const { r, a, sprite, state } = this;
+			this.del.innerHTML = jbr(
+				'<b>Chomp Champ</b>',
+				`state: ${state}`,
+				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
+				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms`
+			);
+		}
+	}
+
+	draw(c: CanvasRenderingContext2D) {
+		const { a, r, game, sprite } = this;
+		const { cx, cy } = game;
+		const normal = a + piHalf;
+
+		const { x, y } = cart(a, r);
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { game, state } = this;
+		const { cx, cy } = game;
+
+		switch (state) {
+			case aIdle:
+				const a = this.getAttackHitbox();
+
+				c.strokeStyle = cAI;
+				c.beginPath();
+				c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
+				c.arc(cx, cy, a.t.r, a.b.ar, a.b.al, true);
+				c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
+				c.stroke();
+				break;
+
+			case aClose:
+				const g = this.getCatchHitbox();
+
+				c.strokeStyle = cHurt;
+				c.beginPath();
+				c.arc(cx, cy, g.b.r, g.b.al, g.b.ar);
+				c.arc(cx, cy, g.t.r, g.b.ar, g.b.al, true);
+				c.arc(cx, cy, g.b.r, g.b.al, g.b.ar);
+				c.stroke();
+				break;
+		}
+	}
+
+	getHitbox(): Hitbox {
+		// this doesn't have a hitbox as such
+		return {
+			b: { r: 0, aw: 0, al: 0, ar: 0 },
+			t: { r: 0, aw: 0, al: 0, ar: 0 },
+		};
+	}
+
+	getAttackHitbox(): Hitbox {
+		const { r, a, attackWidth, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(attackWidth, br),
+			taw = scalew(attackWidth, tr);
+
+		return {
+			b: {
+				r: br,
+				aw: baw,
+				al: a - baw,
+				ar: a + baw,
+			},
+			t: {
+				r: tr,
+				aw: taw,
+				al: a - taw,
+				ar: a + taw,
+			},
+		};
+	}
+
+	getCatchHitbox(): Hitbox {
+		const { r, a, width, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(width, br),
+			taw = scalew(width, tr);
+
+		return {
+			b: {
+				r: br,
+				aw: baw,
+				al: a - baw,
+				ar: a + baw,
+			},
+			t: {
+				r: tr,
+				aw: taw,
+				al: a - taw,
+				ar: a + taw,
+			},
+		};
+	}
+
+	onCatch() {
+		const g = this.getCatchHitbox();
+		if (collides(g, this.game.player.getHitbox())) {
+			this.state = aStruggle;
+
+			// TODO: hide player, remove control
+		}
+	}
+
+	onRelease() {
+		console.log('ChompChamp.release');
+
+		// TODO: show player, damage, restore control, push into air
+	}
+
+	onNext() {
+		switch (this.state) {
+			case aClose:
+				this.state = aOpen;
+				break;
+
+			default:
+				this.state = aIdle;
+				break;
+		}
+	}
+}

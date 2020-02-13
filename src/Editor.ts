@@ -2,6 +2,7 @@ import Axe from './weapon/axe';
 import Bat from './enemy/bat';
 import Booster from './enemy/Booster';
 import Buster from './enemy/Buster';
+import ChompChamp from './enemy/ChompChamp';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
@@ -81,6 +82,7 @@ const enemyTypes = {
 	bat: Bat,
 	booster: Booster,
 	buster: Buster,
+	chompChamp: ChompChamp,
 	krillna: Krillna,
 	flazza: Flazza,
 };
