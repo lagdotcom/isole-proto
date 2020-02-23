@@ -4,6 +4,7 @@ import Booster from './enemy/Booster';
 import Buster from './enemy/Buster';
 import ChompChamp from './enemy/ChompChamp';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
+import Delaunay from 'delaunay-fast';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
 import Jacques from './player/Jacques';
@@ -20,6 +21,8 @@ import CoordAR from './CoordAR';
 import Woody from './player/Woody';
 import Bomb from './item/Bomb';
 import Platform from './component/Platform';
+import { rndr } from './tools';
+import MapNode from './MapNode';
 
 interface EditorData {
 	platforms: EditorPlatform[];
@@ -157,24 +160,51 @@ export default class Editor {
 	}
 
 	refresh() {
-		this.game.mode = this.mode;
-
 		if (this.mode == LevelMode) this.game.enter(this);
+		if (this.mode == MapMode) this.game.show(this);
+	}
+
+	makeMap(game: Game) {
+		const nodes: MapNode[] = [];
+		const stages = 10;
+		const offsets = [[0], [-60, 60], [-100, 0, 100]];
+		const maxwiggle = 20;
+		const wiggle = () => rndr(-maxwiggle, maxwiggle);
+
+		for (var stage = 0; stage < stages; stage++) {
+			const size = stage == 0 ? 1 : stage == stages - 1 ? 1 : rndr(2, 4);
+			const yo = offsets[size - 1];
+
+			for (var i = 0; i < size; i++) {
+				nodes.push({
+					id: nodes.length,
+					connections: [],
+					locked: rndr(0, 10) == 0,
+					stage,
+					x: wiggle() + stage * 120,
+					y: wiggle() + yo[i],
+				});
+			}
+		}
+
+		const tris = Delaunay.triangulate(nodes.map(n => [n.x, n.y]));
+		for (var i = 0; i < tris.length; i += 3) {
+			const indices = [tris[i], tris[i + 1], tris[i + 2]];
+			const set = indices.map(x => nodes[x]);
+
+			set.forEach(n => {
+				set.forEach(o => {
+					if (n.stage == o.stage - 1) n.connections.push(o.id);
+				});
+			});
+		}
+
+		game.nodes = nodes;
 	}
 
 	makeLevel(game: Game) {
 		const { data } = this;
 		const { platforms, walls, floors, objects, player, enemies } = data;
-
-		if (game.options.debugContainer)
-			clearChildren(game.options.debugContainer);
-
-		game.platforms = [];
-		game.floors = [];
-		game.ceilings = [];
-		game.walls = [];
-		game.enemies = [];
-		game.decals = [];
 
 		platforms.forEach(p => {
 			game.platforms.push(new Platform({ game, ...p }));
@@ -215,20 +245,6 @@ export default class Editor {
 		if (player.weapon)
 			game.inventory.weapon = new weaponTypes[player.weapon](game);
 		game.inventory.health = game.player.health;
-
-		game.components = [
-			...game.platforms,
-			...game.floors,
-			...game.ceilings,
-			...game.walls,
-			...game.enemies,
-			...game.decals,
-			game.player,
-			game.inventory,
-			game.zoomer,
-			game.unzoomer,
-		];
-		game.wallsInMotion = true; // TODO
 
 		this.dump.value = JSON.stringify(data);
 	}

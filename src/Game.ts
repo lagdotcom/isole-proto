@@ -1,7 +1,7 @@
 import Flat from './component/Flat';
 import Inventory from './component/Inventory';
 import Wall from './component/Wall';
-import { eGameBegin, eGameReady } from './events';
+import { eGameEnter, eGameReady, eGameMap } from './events';
 import { kLeft, kRight, kJump, kThrow, kSwing } from './keys';
 import { any, min } from './tools';
 import { gMaxTimeStep, gPadAxisThreshold } from './nums';
@@ -19,6 +19,9 @@ import Material from './Material';
 import Zoomer from './Zoomer';
 import { zBeforeUI } from './layers';
 import Platform from './component/Platform';
+import emptyElement from './emptyElement';
+import MapNode from './MapNode';
+import MapView from './component/MapView';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
@@ -27,6 +30,10 @@ export type GameMode = 'level' | 'loading' | 'map';
 
 export interface LevelGenerator {
 	makeLevel: (game: Game) => void;
+}
+
+export interface MapGenerator {
+	makeMap: (game: Game) => void;
 }
 
 interface GameInit {
@@ -75,8 +82,10 @@ export default class Game {
 	keys: { [name: string]: boolean };
 	loaded: number;
 	loading: number;
+	mapView: MapView;
 	materials: { [name: string]: Material };
 	mode: GameMode;
+	nodes: MapNode[];
 	objects: { [name: string]: Controller };
 	options: GameInit;
 	pads: Gamepad[];
@@ -164,6 +173,8 @@ export default class Game {
 	 */
 	ready() {
 		this.inventory = new Inventory(this);
+		this.mapView = new MapView(this);
+
 		this.fire(eGameReady);
 	}
 
@@ -171,10 +182,14 @@ export default class Game {
 	 * Clear all active game components
 	 */
 	clear() {
+		if (this.options.debugContainer)
+			emptyElement(this.options.debugContainer);
+
 		this.ceilings = [];
 		this.decals = [];
 		this.enemies = [];
 		this.floors = [];
+		this.nodes = [];
 		this.platforms = [];
 		this.walls = [];
 		this.components = [];
@@ -182,7 +197,21 @@ export default class Game {
 	}
 
 	/**
-	 * Prepare the game for starting
+	 * Show the game map
+	 * @param {MapGenerator} gen map generator
+	 */
+	show(gen: MapGenerator): void {
+		this.clear();
+
+		gen.makeMap(this);
+		this.components = [this.inventory, this.mapView];
+		this.mode = MapMode;
+		this.fire(eGameMap);
+	}
+
+	/**
+	 * Enter a game level!
+	 * @param {LevelGenerator} gen level generator
 	 */
 	enter(gen: LevelGenerator): void {
 		this.clear();
@@ -203,7 +232,7 @@ export default class Game {
 		this.wallsInMotion = true; // TODO
 
 		this.mode = LevelMode;
-		this.fire(eGameBegin);
+		this.fire(eGameEnter);
 		this.addAttachments();
 	}
 
@@ -365,7 +394,8 @@ export default class Game {
 				break;
 
 			case LevelMode:
-				this.showLevelScreen(step);
+			case MapMode:
+				this.showGameScreen(step);
 				break;
 		}
 
@@ -376,7 +406,7 @@ export default class Game {
 	 * Render the next frame, in Level mode
 	 * @param {number} step time to process
 	 */
-	showLevelScreen(step: number) {
+	showGameScreen(step: number) {
 		const { width, height, showFps, showHitboxes } = this.options;
 		var c = this.context;
 

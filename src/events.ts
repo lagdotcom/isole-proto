@@ -1,5 +1,6 @@
 export const eAnimationEnded = 'onanimend',
-	eGameBegin = 'begin.isole',
+	eGameEnter = 'enter.level.isole',
+	eGameMap = 'show.map.isole',
 	eGameReady = 'ready.isole',
 	ePlayerDied = 'died.player.isole',
 	ePlayerDying = 'dying.player.isole',

@@ -47,16 +47,17 @@ export default class Inventory implements DrawnComponent {
 
 	update(t: number): void {
 		const { game, weapon } = this;
+		const ok = game.mode === 'level';
 
 		if (weapon && weapon.update) weapon.update(t);
 
-		if (game.keys[kSwing]) {
+		if (ok && game.keys[kSwing]) {
 			if (weapon && weapon.canUse()) {
 				weapon.use();
 			}
 		}
 
-		if (game.keys[kThrow]) {
+		if (ok && game.keys[kThrow]) {
 			if (this.canThrow()) {
 				this.throw();
 			}
@@ -67,7 +68,7 @@ export default class Inventory implements DrawnComponent {
 			// }
 		}
 
-		if (game.keys[kCycle]) {
+		if (ok && game.keys[kCycle]) {
 			if (!this.cycling) {
 				this.cycle();
 				this.cycling = true;

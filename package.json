@@ -22,5 +22,8 @@
 		"webpack": "^4.41.2",
 		"webpack-cli": "^3.3.9",
 		"webpack-dev-server": "3.7.2"
+	},
+	"dependencies": {
+		"delaunay-fast": "^1.0.1"
 	}
 }

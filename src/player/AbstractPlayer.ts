@@ -214,8 +214,9 @@ export default abstract class AbstractPlayer implements Player {
 			vfa = 0;
 		}
 
+		const ok = game.mode === 'level';
 		var controls: string[] = [];
-		if (!sprite.flags.noControl) {
+		if (ok && !sprite.flags.noControl) {
 			var strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys[kLeft]) {
 				va -= strength;
