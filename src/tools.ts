@@ -131,6 +131,7 @@ export function first<T>(
  */
 export function collides(a: Hitbox, b: Hitbox): boolean {
 	// TODO: should this also check .t.al?
+	// TODO: this is wrong when angle is wrapped
 	return (
 		a.b.r <= b.t.r && a.t.r >= b.b.r && a.b.ar >= b.b.al && a.b.al <= b.b.ar
 	);

@@ -18,8 +18,16 @@ import Controller from './Controller';
 import Material from './Material';
 import Zoomer from './Zoomer';
 import { zBeforeUI } from './layers';
-import Platform, { PlatformInit } from './component/Platform';
-import emptyElement from './emptyElement';
+import Platform from './component/Platform';
+
+export const LevelMode = 'level';
+export const LoadingMode = 'loading';
+export const MapMode = 'map';
+export type GameMode = 'level' | 'loading' | 'map';
+
+export interface LevelGenerator {
+	makeLevel: (game: Game) => void;
+}
 
 interface GameInit {
 	debugContainer?: HTMLElement;
@@ -68,6 +76,7 @@ export default class Game {
 	loaded: number;
 	loading: number;
 	materials: { [name: string]: Material };
+	mode: GameMode;
 	objects: { [name: string]: Controller };
 	options: GameInit;
 	pads: Gamepad[];
@@ -76,6 +85,7 @@ export default class Game {
 	redraw: boolean;
 	resources: { [name: string]: any };
 	running: boolean;
+	runningRaf: number;
 	textures: { [name: string]: Texture };
 	time: number;
 	walls: Wall[];
@@ -123,6 +133,7 @@ export default class Game {
 		);
 		this.unzoomer = new Unzoomer(this);
 
+		this.mode = LoadingMode;
 		addResources(this);
 	}
 
@@ -133,29 +144,67 @@ export default class Game {
 	 * @param {string} src source URL
 	 */
 	require(key: string, typ: ResourceLoader, src: string): void {
-		const me = this;
 		this.loading++;
-		this.resources[key] = typ(src, () => {
-			me.loaded++;
-		});
+		this.resources[key] = typ(src, () => this.resourceLoaded());
+	}
+
+	/**
+	 * Mark a resource as loaded
+	 */
+	resourceLoaded() {
+		this.loaded++;
+
+		if (this.loaded == this.loading) {
+			this.ready();
+		}
+	}
+
+	/**
+	 * Mark game instance as ready to begin
+	 */
+	ready() {
+		this.inventory = new Inventory(this);
+		this.fire(eGameReady);
+	}
+
+	/**
+	 * Clear all active game components
+	 */
+	clear() {
+		this.ceilings = [];
+		this.decals = [];
+		this.enemies = [];
+		this.floors = [];
+		this.platforms = [];
+		this.walls = [];
+		this.components = [];
+		this.redraw = true;
 	}
 
 	/**
 	 * Prepare the game for starting
 	 */
-	begin(): void {
-		if (this.options.debugContainer)
-			emptyElement(this.options.debugContainer);
+	enter(gen: LevelGenerator): void {
+		this.clear();
 
-		this.platforms = [];
-		this.floors = [];
-		this.ceilings = [];
-		this.walls = [];
-		this.enemies = [];
-		this.redraw = true;
+		gen.makeLevel(this);
+		this.components = [
+			...this.platforms,
+			...this.floors,
+			...this.ceilings,
+			...this.walls,
+			...this.enemies,
+			...this.decals,
+			this.player,
+			this.inventory,
+			this.zoomer,
+			this.unzoomer,
+		];
+		this.wallsInMotion = true; // TODO
+
+		this.mode = LevelMode;
 		this.fire(eGameBegin);
-		this.fire(eGameReady);
-		this.ready();
+		this.addAttachments();
 	}
 
 	/**
@@ -188,7 +237,7 @@ export default class Game {
 	/**
 	 * Add attachments into the component list
 	 */
-	ready(): void {
+	addAttachments(): void {
 		this.components.forEach(co => {
 			co.attachments &&
 				co.attachments.forEach(a => {
@@ -204,35 +253,6 @@ export default class Game {
 	makeCanvas(parent: HTMLElement | undefined): HTMLCanvasElement {
 		const { width, height } = this.options;
 		return mel(parent, 'canvas', { width, height }) as HTMLCanvasElement;
-	}
-
-	/**
-	 * Add a platform
-	 * @param {PlatformInit} options options
-	 */
-	addPlatform({
-		h,
-		a,
-		w,
-		th,
-		motion = 0,
-		material = '',
-		ceiling = false,
-		walls = false,
-	}: PlatformInit) {
-		this.platforms.push(
-			new Platform({
-				game: this,
-				h,
-				a,
-				w,
-				th,
-				motion,
-				material,
-				ceiling,
-				walls,
-			})
-		);
 	}
 
 	/**
@@ -327,17 +347,8 @@ export default class Game {
 	 * Start the game
 	 */
 	start(): void {
-		if (this.loaded < this.loading) {
-			this.showLoadScreen();
-			requestAnimationFrame(this.start);
-			return;
-		}
-
-		this.inventory = new Inventory(this);
-		if (!this.player) this.begin();
-
 		this.running = true;
-		requestAnimationFrame(this.next);
+		this.runningRaf = requestAnimationFrame(this.next);
 	}
 
 	/**
@@ -345,8 +356,28 @@ export default class Game {
 	 * @param {number} t time
 	 */
 	next(t: number): void {
-		const { width, height, showFps, showHitboxes } = this.options;
 		const step = min(t - this.time, gMaxTimeStep);
+		this.time = t;
+
+		switch (this.mode) {
+			case LoadingMode:
+				this.showLoadScreen();
+				break;
+
+			case LevelMode:
+				this.showLevelScreen(step);
+				break;
+		}
+
+		if (this.running) this.runningRaf = requestAnimationFrame(this.next);
+	}
+
+	/**
+	 * Render the next frame, in Level mode
+	 * @param {number} step time to process
+	 */
+	showLevelScreen(step: number) {
+		const { width, height, showFps, showHitboxes } = this.options;
 		var c = this.context;
 
 		c.fillStyle = '#000000';
@@ -379,9 +410,6 @@ export default class Game {
 			c.font = '12px monospace';
 			c.fillText(Math.floor(1000 / step) + 'fps', width - 40, 10);
 		}
-
-		this.time = t;
-		if (this.running) requestAnimationFrame(this.next);
 	}
 
 	getDrawnComponents(): DrawnComponent[] {

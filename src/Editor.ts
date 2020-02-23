@@ -12,13 +12,14 @@ import Rock from './item/Rock';
 import Wall from './component/Wall';
 import mel from './makeElement';
 import clearChildren from './clearChildren';
-import { eGameBegin } from './events';
+import { eGameReady } from './events';
 import layers, { zBackground } from './layers';
 import { dLeft, dRight, Facing } from './dirs';
-import Game from './Game';
+import Game, { GameMode, LevelMode, MapMode } from './Game';
 import CoordAR from './CoordAR';
 import Woody from './player/Woody';
 import Bomb from './item/Bomb';
+import Platform from './component/Platform';
 
 interface EditorData {
 	platforms: EditorPlatform[];
@@ -107,15 +108,17 @@ export default class Editor {
 	data: EditorData;
 	dump: HTMLTextAreaElement;
 	game: Game;
+	mode: GameMode;
 
 	constructor(options: EditorInit) {
 		const { data, game, parent } = options;
 
 		materials = Object.keys(game.materials);
 		objects = Object.keys(game.objects);
-		game.on(eGameBegin, () => this.onGameBegin());
+		game.on(eGameReady, () => this.refresh());
 
 		this.game = game;
+		this.mode = LevelMode;
 		this.data = data || {
 			platforms: [
 				{
@@ -153,8 +156,14 @@ export default class Editor {
 		this.makeDom(parent);
 	}
 
-	onGameBegin() {
-		const { data, game } = this;
+	refresh() {
+		this.game.mode = this.mode;
+
+		if (this.mode == LevelMode) this.game.enter(this);
+	}
+
+	makeLevel(game: Game) {
+		const { data } = this;
 		const { platforms, walls, floors, objects, player, enemies } = data;
 
 		if (game.options.debugContainer)
@@ -168,7 +177,7 @@ export default class Editor {
 		game.decals = [];
 
 		platforms.forEach(p => {
-			game.addPlatform(p);
+			game.platforms.push(new Platform({ game, ...p }));
 		});
 
 		walls.forEach(w => {
@@ -242,7 +251,29 @@ export default class Editor {
 			c = this.container = mel(parent, 'div', { className: 'editor' });
 		}
 
-		mel(c, 'h1', { innerText: 'Editor' });
+		const h1 = mel(c, 'h1', { innerText: 'Editor' });
+		mel(
+			c,
+			'button',
+			{ innerText: 'Level' },
+			{
+				click: () => {
+					this.mode = LevelMode;
+					this.refresh();
+				},
+			}
+		);
+		mel(
+			c,
+			'button',
+			{ innerText: 'Map' },
+			{
+				click: () => {
+					this.mode = MapMode;
+					this.refresh();
+				},
+			}
+		);
 
 		const yc = mel(c, 'div', { className: 'section section-player' });
 		mel(yc, 'h2', { innerText: 'Player' });
@@ -301,7 +332,7 @@ export default class Editor {
 						this.data = newData;
 						this.makeDom();
 
-						this.game.begin();
+						this.refresh();
 					} catch (e) {
 						alert(e);
 						return;
@@ -337,7 +368,7 @@ export default class Editor {
 				change: e => {
 					var f = filter(el.valueAsNumber);
 					object[attribute] = f;
-					this.game.begin();
+					this.refresh();
 
 					if (el.valueAsNumber != f) el.value = f;
 				},
@@ -369,9 +400,9 @@ export default class Editor {
 			'input',
 			{ type: 'checkbox' },
 			{
-				change: (e: Event) => {
+				change: () => {
 					object[attribute] = el.checked;
-					this.game.begin();
+					this.refresh();
 				},
 			}
 		) as HTMLInputElement;
@@ -393,9 +424,9 @@ export default class Editor {
 			'select',
 			{},
 			{
-				change: (e: Event) => {
+				change: () => {
 					object[attribute] = parser(el.value);
-					this.game.begin();
+					this.refresh();
 				},
 			}
 		) as HTMLSelectElement;
@@ -430,7 +461,7 @@ export default class Editor {
 				click: () => {
 					parent.remove();
 					this.data[list] = this.data[list].filter(i => i !== o);
-					this.game.begin();
+					this.refresh();
 				},
 			}
 		);
@@ -446,7 +477,7 @@ export default class Editor {
 					const o = Object.assign({}, example);
 					this.data[list].push(o);
 					this[maker](this[list], o);
-					this.game.begin();
+					this.refresh();
 				},
 			}
 		);
