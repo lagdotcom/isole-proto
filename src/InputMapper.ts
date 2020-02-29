@@ -8,6 +8,7 @@ import {
 	jButton1,
 	jButton2,
 	jButton3,
+	jButton4,
 	kLeft,
 	kUp,
 	kRight,
@@ -70,7 +71,7 @@ export class GamepadInput implements InputDevice {
 	}
 
 	add(pad: Gamepad) {
-		if (pad.buttons.length < 3) {
+		if (pad.buttons.length < 4) {
 			console.log(`Cannot use pad ${pad.id} - not enough buttons.`);
 			return;
 		}
@@ -102,6 +103,7 @@ export class GamepadInput implements InputDevice {
 			if (buttons[0].pressed) mapper.press(jButton1);
 			if (buttons[1].pressed) mapper.press(jButton2);
 			if (buttons[2].pressed) mapper.press(jButton3);
+			if (buttons[3].pressed) mapper.press(jButton4);
 		});
 	}
 }
@@ -135,6 +137,7 @@ export default class InputMapper {
 		this.map(jButton1, InputButton.Jump);
 		this.map(jButton2, InputButton.Throw);
 		this.map(jButton3, InputButton.Swing);
+		this.map(jButton4, InputButton.Cycle);
 	}
 
 	load(key: string = 'InputMapping') {

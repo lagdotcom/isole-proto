@@ -15,3 +15,4 @@ export const jDown = 'JoypadDown';
 export const jButton1 = 'Joypad1';
 export const jButton2 = 'Joypad2';
 export const jButton3 = 'Joypad3';
+export const jButton4 = 'Joypad4';
