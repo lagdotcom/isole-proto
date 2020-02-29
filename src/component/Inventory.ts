@@ -1,9 +1,9 @@
-import { kCycle, kThrow, kSwing } from '../keys';
 import { zUI } from '../layers';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
 import Weapon from '../Weapon';
 import Item from '../Item';
+import { InputButton } from '../InputMapper';
 
 export default class Inventory implements DrawnComponent {
 	cycling: boolean;
@@ -51,13 +51,13 @@ export default class Inventory implements DrawnComponent {
 
 		if (weapon && weapon.update) weapon.update(t);
 
-		if (ok && game.keys[kSwing]) {
+		if (ok && game.keys.has(InputButton.Swing)) {
 			if (weapon && weapon.canUse()) {
 				weapon.use();
 			}
 		}
 
-		if (ok && game.keys[kThrow]) {
+		if (ok && game.keys.has(InputButton.Throw)) {
 			if (this.canThrow()) {
 				this.throw();
 			}
@@ -68,7 +68,7 @@ export default class Inventory implements DrawnComponent {
 			// }
 		}
 
-		if (ok && game.keys[kCycle]) {
+		if (ok && game.keys.has(InputButton.Cycle)) {
 			if (!this.cycling) {
 				this.cycle();
 				this.cycling = true;

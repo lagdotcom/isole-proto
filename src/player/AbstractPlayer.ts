@@ -1,7 +1,6 @@
 import { cHurt, cStep, cHotspot } from '../colours';
 import { dLeft, dRight, Facing } from '../dirs';
 import { ePlayerDying, ePlayerHurt, ePlayerDied } from '../events';
-import { kLeft, kRight, kJump, kThrow, kSwing } from '../keys';
 import {
 	gAirWalk,
 	gGravityStrength,
@@ -39,6 +38,7 @@ import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
 import Player, { PlayerInit } from '../Player';
 import PlayerController from '../spr/PlayerController';
+import { InputButton } from '../InputMapper';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
@@ -218,7 +218,7 @@ export default abstract class AbstractPlayer implements Player {
 		var controls: string[] = [];
 		if (ok && !sprite.flags.noControl) {
 			var strength = this.grounded ? gGroundWalk : gAirWalk;
-			if (keys[kLeft]) {
+			if (keys.has(InputButton.Left)) {
 				va -= strength;
 				controls.push('left');
 
@@ -226,7 +226,7 @@ export default abstract class AbstractPlayer implements Player {
 					sprite.face(-1, this.grounded);
 					this.facing = dLeft;
 				}
-			} else if (keys[kRight]) {
+			} else if (keys.has(InputButton.Right)) {
 				va += strength;
 				controls.push('right');
 
@@ -236,7 +236,7 @@ export default abstract class AbstractPlayer implements Player {
 				}
 			}
 
-			if (keys[kJump]) {
+			if (keys.has(InputButton.Jump)) {
 				if (floor) {
 					vr += gJumpStrength;
 					this.jumpt = gJumpTimer;
@@ -258,8 +258,8 @@ export default abstract class AbstractPlayer implements Player {
 				this.jumplg = true;
 			}
 
-			if (keys[kSwing]) controls.push('swing');
-			if (keys[kThrow]) controls.push('throw');
+			if (keys.has(InputButton.Swing)) controls.push('swing');
+			if (keys.has(InputButton.Throw)) controls.push('throw');
 		} else controls.push('nocontrol');
 
 		if (wall && !ceiling) {

@@ -63,19 +63,3 @@ window.addEventListener('load', () => {
 
 	G.start();
 });
-
-window.addEventListener('keydown', e => {
-	if (G) G.press(e.code);
-});
-
-window.addEventListener('keyup', e => {
-	if (G) G.release(e.code);
-});
-
-window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
-	G.addPad(e.gamepad);
-});
-
-window.addEventListener('gamepaddisconnected', (e: GamepadEvent) => {
-	G.removePad(e.gamepad);
-});

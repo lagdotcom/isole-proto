@@ -194,11 +194,16 @@ export default class Editor {
 
 			set.forEach(n => {
 				set.forEach(o => {
-					if (n.stage == o.stage - 1) n.connections.push(o.id);
+					if (n.stage == o.stage - 1 && !n.connections.includes(o.id))
+						n.connections.push(o.id);
 				});
+
+				n.connections.sort();
 			});
 		}
 
+		game.mapView.current = 0;
+		game.mapView.selected = nodes[0].connections[0];
 		game.nodes = nodes;
 	}
 

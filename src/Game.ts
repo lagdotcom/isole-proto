@@ -2,9 +2,8 @@ import Flat from './component/Flat';
 import Inventory from './component/Inventory';
 import Wall from './component/Wall';
 import { eGameEnter, eGameReady, eGameMap } from './events';
-import { kLeft, kRight, kJump, kThrow, kSwing } from './keys';
-import { any, min } from './tools';
-import { gMaxTimeStep, gPadAxisThreshold } from './nums';
+import { min } from './tools';
+import { gMaxTimeStep } from './nums';
 import mel from './makeElement';
 import dispatch from './dispatchEvent';
 import addResources from './resources';
@@ -22,6 +21,7 @@ import Platform from './component/Platform';
 import emptyElement from './emptyElement';
 import MapNode from './MapNode';
 import MapView from './component/MapView';
+import InputMapper, { InputButton } from './InputMapper';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
@@ -78,8 +78,9 @@ export default class Game {
 	element: HTMLCanvasElement;
 	enemies: Enemy[];
 	floors: Flat[];
+	input: InputMapper;
 	inventory: Inventory;
-	keys: { [name: string]: boolean };
+	keys: Set<InputButton>;
 	loaded: number;
 	loading: number;
 	mapView: MapView;
@@ -88,7 +89,6 @@ export default class Game {
 	nodes: MapNode[];
 	objects: { [name: string]: Controller };
 	options: GameInit;
-	pads: Gamepad[];
 	platforms: Platform[];
 	player: Player;
 	redraw: boolean;
@@ -111,18 +111,18 @@ export default class Game {
 
 		this.cx = width / 2;
 		this.cy = height / 2;
-		this.keys = {};
+		this.input = new InputMapper();
 		this.loaded = 0;
 		this.loading = 0;
 		this.materials = {};
 		this.objects = {};
 		this.options = options;
-		this.pads = [];
 		this.resources = [];
 		this.running = false;
 		this.textures = {};
 		this.time = 0;
 
+		this.input.load();
 		this.next = this.next.bind(this);
 		this.start = this.start.bind(this);
 
@@ -301,67 +301,6 @@ export default class Game {
 	}
 
 	/**
-	 * Add a Gamepad to the list
-	 * @param {Gamepad} pad pad
-	 */
-	addPad(pad: Gamepad): void {
-		if (pad.buttons.length < 3) {
-			console.log(`Cannot use pad ${pad.id} - not enough buttons.`);
-			return;
-		}
-		console.log(`Added pad ${pad.id}.`);
-		this.pads.push(pad);
-	}
-
-	/**
-	 * Remove a Gamepad from the list
-	 * @param {Gamepad} pad pad
-	 */
-	removePad(pad: Gamepad): void {
-		if (any(this.pads, p => p.id === pad.id)) {
-			console.log(`No longer listening to pad ${pad.id}.`);
-			this.pads = this.pads.filter(p => p.id !== pad.id);
-		}
-	}
-
-	/**
-	 * Read from attached Gamepads
-	 */
-	readGamepads(): void {
-		const pads = navigator.getGamepads();
-		this.pads.forEach(p => {
-			const pad = pads[p.index];
-			if (!pad) return;
-
-			const buttons = pad.buttons;
-			const axes = pad.axes;
-
-			// TODO: configuration
-			this.keys[kLeft] = axes[0] < -gPadAxisThreshold;
-			this.keys[kRight] = axes[0] > gPadAxisThreshold;
-			this.keys[kJump] = buttons[0].pressed;
-			this.keys[kThrow] = buttons[1].pressed;
-			this.keys[kSwing] = buttons[2].pressed;
-		});
-	}
-
-	/**
-	 * Mark a key as pressed
-	 * @param {string} key name
-	 */
-	press(key: string): void {
-		this.keys[key] = true;
-	}
-
-	/**
-	 * Mark a key as unpressed
-	 * @param {string} key name
-	 */
-	release(key: string): void {
-		this.keys[key] = false;
-	}
-
-	/**
 	 * Remove a component from the list
 	 * @param {Component} component component
 	 */
@@ -413,8 +352,7 @@ export default class Game {
 		c.fillStyle = '#000000';
 		c.fillRect(0, 0, width, height);
 
-		if (this.pads.length) this.readGamepads();
-
+		this.keys = this.input.poll();
 		this.components.forEach(co => co.update && co.update(step));
 
 		if (this.redraw) {
