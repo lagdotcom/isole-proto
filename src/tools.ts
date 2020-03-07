@@ -3,6 +3,7 @@ import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
 import Hitbox from './Hitbox';
 import Damageable from './Damageable';
+import { eEnemyDied } from './events';
 
 export const pi = Math.PI,
 	pi2 = pi * 2,
@@ -158,6 +159,8 @@ export function damage(
 		target.alive = false;
 		if (target.die) target.die();
 		else game.remove(target);
+
+		if (target.isEnemy) game.fire(eEnemyDied, { attacker, target });
 	} else {
 		if (target.hurt) target.hurt(attacker, n);
 		if (attacker.hit) attacker.hit(target);

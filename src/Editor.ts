@@ -13,10 +13,16 @@ import Rock from './item/Rock';
 import Wall from './component/Wall';
 import mel from './makeElement';
 import clearChildren from './clearChildren';
-import { eGameReady } from './events';
+import { eGameReady, eLevelEnter, eMapEnter } from './events';
 import layers, { zBackground } from './layers';
 import { dLeft, dRight, Facing } from './dirs';
-import Game, { GameMode, LevelMode, MapMode } from './Game';
+import Game, {
+	GameMode,
+	LevelMode,
+	MapMode,
+	LevelGenerator,
+	MapGenerator,
+} from './Game';
 import CoordAR from './CoordAR';
 import Woody from './player/Woody';
 import Bomb from './item/Bomb';
@@ -106,19 +112,26 @@ var objects: string[];
 const wallDirections = [1, -1];
 const objectPositions = [normalPosition, staticPosition];
 
-export default class Editor {
+export default class Editor implements LevelGenerator, MapGenerator {
 	container: HTMLElement;
 	data: EditorData;
 	dump: HTMLTextAreaElement;
 	game: Game;
 	mode: GameMode;
+	nodes: MapNode[];
 
 	constructor(options: EditorInit) {
 		const { data, game, parent } = options;
 
+		this.nodes = [];
 		materials = Object.keys(game.materials);
 		objects = Object.keys(game.objects);
 		game.on(eGameReady, () => this.refresh());
+		game.on(eLevelEnter, () => this.game.enter(this));
+		game.on(eMapEnter, () => {
+			this.mode = MapMode;
+			this.game.show(this);
+		});
 
 		this.game = game;
 		this.mode = LevelMode;
@@ -165,6 +178,12 @@ export default class Editor {
 	}
 
 	makeMap(game: Game) {
+		if (!this.nodes.length) this.generateMap(game);
+
+		game.mapView.selected = this.nodes[game.mapView.current].connections[0];
+	}
+
+	generateMap(game: Game) {
 		const nodes: MapNode[] = [];
 		const stages = 10;
 		const offsets = [[0], [-60, 60], [-100, 0, 100]];
@@ -202,8 +221,9 @@ export default class Editor {
 			});
 		}
 
+		this.nodes = nodes;
+		nodes[0].visited = true;
 		game.mapView.current = 0;
-		game.mapView.selected = nodes[0].connections[0];
 		game.nodes = nodes;
 	}
 
@@ -279,6 +299,7 @@ export default class Editor {
 			{ innerText: 'Level' },
 			{
 				click: () => {
+					this.nodes = [];
 					this.mode = LevelMode;
 					this.refresh();
 				},

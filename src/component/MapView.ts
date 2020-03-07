@@ -2,12 +2,13 @@ import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
 import { zUI } from '../layers';
 import { pi2 } from '../tools';
-import { kUp, kDown } from '../keys';
 import { InputButton } from '../InputMapper';
+import { eLevelEnter } from '../events';
 
 const mapNode = '#888888',
 	currentNode = '#00ff00',
 	selectedNode = '#ffffff',
+	visitedNode = '#228822',
 	connection = '#444444';
 
 export default class MapView implements DrawnComponent {
@@ -27,10 +28,21 @@ export default class MapView implements DrawnComponent {
 	}
 
 	update(t: number) {
-		const key = this.debounce(InputButton.Up, InputButton.Down);
+		const { game, selected } = this;
+
+		const key = this.debounce(
+			InputButton.Up,
+			InputButton.Down,
+			InputButton.Swing
+		);
 
 		if (key === InputButton.Up) this.cycle(-1);
 		else if (key === InputButton.Down) this.cycle(1);
+		else if (key === InputButton.Swing) {
+			game.fire(eLevelEnter, { id: selected });
+			this.current = selected;
+			game.nodes[selected].visited = true;
+		}
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
@@ -52,6 +64,8 @@ export default class MapView implements DrawnComponent {
 					? currentNode
 					: n.id === selected
 					? selectedNode
+					: n.visited
+					? visitedNode
 					: mapNode;
 			ctx.beginPath();
 			ctx.arc(x + n.x, y + n.y, 10, 0, pi2);

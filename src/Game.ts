@@ -1,7 +1,7 @@
 import Flat from './component/Flat';
 import Inventory from './component/Inventory';
 import Wall from './component/Wall';
-import { eGameEnter, eGameReady, eGameMap } from './events';
+import { eLevelEntered, eGameReady, eMapEntered } from './events';
 import { min } from './tools';
 import { gMaxTimeStep } from './nums';
 import mel from './makeElement';
@@ -22,6 +22,7 @@ import emptyElement from './emptyElement';
 import MapNode from './MapNode';
 import MapView from './component/MapView';
 import InputMapper, { InputButton } from './InputMapper';
+import LeaveTimer from './Component/LeaveTimer';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
@@ -81,6 +82,7 @@ export default class Game {
 	input: InputMapper;
 	inventory: Inventory;
 	keys: Set<InputButton>;
+	leaver: LeaveTimer;
 	loaded: number;
 	loading: number;
 	mapView: MapView;
@@ -115,6 +117,7 @@ export default class Game {
 		this.loaded = 0;
 		this.loading = 0;
 		this.materials = {};
+		this.nodes = [];
 		this.objects = {};
 		this.options = options;
 		this.resources = [];
@@ -141,6 +144,7 @@ export default class Game {
 			options.vertScale || 1.2
 		);
 		this.unzoomer = new Unzoomer(this);
+		this.leaver = new LeaveTimer(this);
 
 		this.mode = LoadingMode;
 		addResources(this);
@@ -189,7 +193,6 @@ export default class Game {
 		this.decals = [];
 		this.enemies = [];
 		this.floors = [];
-		this.nodes = [];
 		this.platforms = [];
 		this.walls = [];
 		this.components = [];
@@ -206,7 +209,7 @@ export default class Game {
 		gen.makeMap(this);
 		this.components = [this.inventory, this.mapView];
 		this.mode = MapMode;
-		this.fire(eGameMap);
+		this.fire(eMapEntered);
 	}
 
 	/**
@@ -228,12 +231,13 @@ export default class Game {
 			this.inventory,
 			this.zoomer,
 			this.unzoomer,
+			this.leaver,
 		];
 		this.wallsInMotion = true; // TODO
 
 		this.mode = LevelMode;
-		this.fire(eGameEnter);
 		this.addAttachments();
+		this.fire(eLevelEntered);
 	}
 
 	/**
