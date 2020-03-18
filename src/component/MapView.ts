@@ -86,6 +86,9 @@ export default class MapView implements DrawnComponent {
 			ctx.globalAlpha = selected === n.id ? 1 : 0.5;
 			icon.draw(ctx, x + n.x, y + n.y);
 		});
+
+		// be nice to everyone else
+		ctx.globalAlpha = 1;
 	}
 
 	debounce(...buttons: InputButton[]) {
