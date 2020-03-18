@@ -1,20 +1,19 @@
+import Controller from '../Controller';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
 import { zUI } from '../layers';
-import { pi2 } from '../tools';
 import { InputButton } from '../InputMapper';
 import { eLevelEnter } from '../events';
+import { NodeType } from '../MapNode';
 
-const mapNode = '#888888',
-	currentNode = '#00ff00',
-	selectedNode = '#ffffff',
-	visitedNode = '#228822',
-	connection = '#444444';
+const connection = '#444444';
 
 export default class MapView implements DrawnComponent {
+	bossicon: Controller;
 	current: number;
 	debounced: InputButton;
 	game: Game;
+	icon: Controller;
 	layer: number;
 	selected: number;
 	x: number;
@@ -25,6 +24,21 @@ export default class MapView implements DrawnComponent {
 		this.layer = zUI;
 		this.x = 100;
 		this.y = game.options.height / 2;
+
+		this.icon = new Controller({
+			img: game.resources['ui.mapicons'],
+			w: 48,
+			h: 48,
+			xo: -24,
+			yo: -24,
+		});
+		this.bossicon = new Controller({
+			img: game.resources['ui.mapboss'],
+			w: 96,
+			h: 96,
+			xo: -48,
+			yo: -48,
+		});
 	}
 
 	update(t: number) {
@@ -46,9 +60,10 @@ export default class MapView implements DrawnComponent {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { current, game, selected, x, y } = this;
+		const { game, selected, x, y } = this;
 
 		game.nodes.forEach(n => {
+			ctx.globalAlpha = 1;
 			ctx.strokeStyle = connection;
 			n.connections.forEach(i => {
 				const o = game.nodes[i];
@@ -59,17 +74,17 @@ export default class MapView implements DrawnComponent {
 				ctx.stroke();
 			});
 
-			ctx.strokeStyle =
-				n.id === current
-					? currentNode
-					: n.id === selected
-					? selectedNode
-					: n.visited
-					? visitedNode
-					: mapNode;
-			ctx.beginPath();
-			ctx.arc(x + n.x, y + n.y, 10, 0, pi2);
-			ctx.stroke();
+			let icon: Controller;
+			if (n.type === NodeType.Boss) {
+				icon = this.bossicon;
+			} else {
+				icon = this.icon;
+				const type = n.hidden && !n.visited ? NodeType.Unknown : n.type;
+				icon.show('type' + type, type, 0);
+			}
+
+			ctx.globalAlpha = selected === n.id ? 1 : 0.5;
+			icon.draw(ctx, x + n.x, y + n.y);
 		});
 	}
 

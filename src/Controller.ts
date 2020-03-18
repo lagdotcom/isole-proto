@@ -80,14 +80,20 @@ export default class Controller {
 	/**
 	 * Draw the image
 	 * @param {CanvasRenderingContext2D} ctx image context
+	 * @param {number} xadd x offset
+	 * @param {number} yadd y offset
 	 */
-	draw(ctx: CanvasRenderingContext2D): void {
+	draw(
+		ctx: CanvasRenderingContext2D,
+		xadd: number = 0,
+		yadd: number = 0
+	): void {
 		const { w, c, h, r, flip, img, xo, yo } = this,
 			sx = w * c,
 			sy = h * r;
 
 		if (flip) ctx.scale(-1, 1);
-		ctx.drawImage(img, sx, sy, w, h, xo, yo, w, h);
+		ctx.drawImage(img, sx, sy, w, h, xo + xadd, yo + yadd, w, h);
 		if (flip) ctx.scale(-1, 1);
 	}
 }

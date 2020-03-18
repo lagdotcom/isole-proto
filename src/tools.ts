@@ -262,3 +262,10 @@ export function rndr(
 export function rnda(min: number, max: number): number {
 	return anglewrap(rndr(min, max, n => n));
 }
+
+/**
+ * Return a percentage chance checker
+ * @param {number} percentage chance for event to occur
+ * @returns {() => boolean}
+ */
+export const chance = (percentage: number) => () => rndr(0, 100) < percentage;

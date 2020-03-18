@@ -4,7 +4,6 @@ import Booster from './enemy/Booster';
 import Buster from './enemy/Buster';
 import ChompChamp from './enemy/ChompChamp';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
-import Delaunay from 'delaunay-fast';
 import Flat from './component/Flat';
 import Flazza from './enemy/Flazza';
 import Jacques from './player/Jacques';
@@ -27,8 +26,8 @@ import CoordAR from './CoordAR';
 import Woody from './player/Woody';
 import Bomb from './item/Bomb';
 import Platform from './component/Platform';
-import { rndr } from './tools';
 import MapNode from './MapNode';
+import Cartographer from './Cartographer';
 
 interface EditorData {
 	platforms: EditorPlatform[];
@@ -184,42 +183,8 @@ export default class Editor implements LevelGenerator, MapGenerator {
 	}
 
 	generateMap(game: Game) {
-		const nodes: MapNode[] = [];
-		const stages = 10;
-		const offsets = [[0], [-60, 60], [-100, 0, 100]];
-		const maxwiggle = 20;
-		const wiggle = () => rndr(-maxwiggle, maxwiggle);
-
-		for (var stage = 0; stage < stages; stage++) {
-			const size = stage == 0 ? 1 : stage == stages - 1 ? 1 : rndr(2, 4);
-			const yo = offsets[size - 1];
-
-			for (var i = 0; i < size; i++) {
-				nodes.push({
-					id: nodes.length,
-					connections: [],
-					locked: rndr(0, 10) == 0,
-					stage,
-					x: wiggle() + stage * 120,
-					y: wiggle() + yo[i],
-				});
-			}
-		}
-
-		const tris = Delaunay.triangulate(nodes.map(n => [n.x, n.y]));
-		for (var i = 0; i < tris.length; i += 3) {
-			const indices = [tris[i], tris[i + 1], tris[i + 2]];
-			const set = indices.map(x => nodes[x]);
-
-			set.forEach(n => {
-				set.forEach(o => {
-					if (n.stage == o.stage - 1 && !n.connections.includes(o.id))
-						n.connections.push(o.id);
-				});
-
-				n.connections.sort();
-			});
-		}
+		const cart = new Cartographer();
+		const nodes = cart.gen({ floor: 0 });
 
 		this.nodes = nodes;
 		nodes[0].visited = true;

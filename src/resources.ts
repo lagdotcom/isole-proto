@@ -1,4 +1,6 @@
 import iconsImg from '../media/gfx/icons.png';
+import mapIconsImg from '../media/gfx/mapicons.png';
+import mapBossImg from '../media/gfx/mapboss.png';
 import jacquesImg from '../media/gfx/jacques.png';
 import woodyImg from '../media/gfx/woody.png';
 
@@ -142,6 +144,8 @@ export default function PreloadResources(game: Game) {
 	game.require('tile.bluegrass', image, bluegrassImg);
 	game.require('tile.greybox', image, greyboxImg);
 	game.require('ui.icons', image, iconsImg);
+	game.require('ui.mapicons', image, mapIconsImg);
+	game.require('ui.mapboss', image, mapBossImg);
 	game.require('tile.rwbgtree', image, rwbgtreeImg);
 	game.require('tile.rwbgrocks', image, rwbgrocksImg);
 	game.require('tile.rwfartrees', image, rwfartreesImg);
