@@ -1,10 +1,9 @@
 import { Mutator, GameState } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
-import { rndr, chance } from '../tools';
+import { rndr, chance, rndweight } from '../tools';
 import { sever } from './tools';
 
-const MoreTreasureChance = 5,
-	isHiddenTreasure = chance(20);
+const MoreTreasureChance = 5;
 
 export default class LockedTreasure implements Mutator {
 	applies(gs: GameState) {
@@ -17,13 +16,20 @@ export default class LockedTreasure implements Mutator {
 	}
 
 	locktype(gs: GameState) {
-		// TODO
-		return NodeType.SilverLock;
+		return rndweight(
+			[NodeType.SilverLock, 12],
+			[NodeType.GoldLock, 3 + gs.floor],
+			[NodeType.SilverHeartLock, 1 + gs.floor],
+			[NodeType.GoldHeartLock, 0 + gs.floor]
+		);
 	}
 
 	treasuretype(gs: GameState, t: NodeType) {
-		// TODO
-		return NodeType.SilverChest;
+		return rndweight(
+			[NodeType.SilverChest, 12],
+			[NodeType.GoldChest, 4],
+			[NodeType.HornedSkull, 2]
+		);
 	}
 
 	run(nodes: MapNode[], stages: number, gs: GameState) {
@@ -43,8 +49,9 @@ export default class LockedTreasure implements Mutator {
 		lock.type = this.locktype(gs);
 
 		const trea = nodes[lock.connections[0]];
+		// TODO: remove when not testing
+		//trea.hidden = true;
 		trea.type = this.treasuretype(gs, lock.type);
-		trea.hidden = isHiddenTreasure();
 
 		sever(nodes, trea.id, lock.id);
 

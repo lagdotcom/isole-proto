@@ -269,3 +269,34 @@ export function rnda(min: number, max: number): number {
  * @returns {() => boolean}
  */
 export const chance = (percentage: number) => () => rndr(0, 100) < percentage;
+
+/**
+ * Add up a list of numbers.
+ * @param {number[]} items list of numbers
+ * @param {number} start number to start from
+ * @returns {number}
+ */
+export function sum(items: number[], start: number = 0): number {
+	items.forEach(i => {
+		start += i;
+	});
+	return start;
+}
+
+/**
+ * Randomly picks from a weighted list.
+ * @param {[T, number][]} weightings list of weightings
+ * @returns {T}
+ */
+export function rndweight<T>(...weightings: [T, number][]): T {
+	const total = sum(weightings.map(([_, weight]) => weight));
+	const roll = rndr(0, total);
+	let accumulator = 0;
+	for (let i = 0; i < weightings.length; i++) {
+		const [choice, weight] = weightings[i];
+		if (roll < accumulator + weight) return choice;
+		accumulator += weight;
+	}
+
+	throw new Error('Try passing some arguments next time');
+}
