@@ -6,7 +6,8 @@ import { InputButton } from '../InputMapper';
 import { eLevelEnter } from '../events';
 import { NodeType } from '../MapNode';
 
-const connection = '#444444';
+const connection = '#444444',
+	highlighted = '#ff4444';
 
 export default class MapView implements DrawnComponent {
 	bossicon: Controller;
@@ -60,14 +61,16 @@ export default class MapView implements DrawnComponent {
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		const { game, selected, x, y } = this;
+		const { current, game, selected, x, y } = this;
 
+		const wd = ctx.lineWidth;
+		ctx.lineWidth = 4;
 		game.nodes.forEach(n => {
-			ctx.globalAlpha = 1;
-			ctx.strokeStyle = connection;
 			n.connections.forEach(i => {
 				const o = game.nodes[i];
 
+				ctx.strokeStyle =
+					current == n.id && selected == i ? highlighted : connection;
 				ctx.beginPath();
 				ctx.moveTo(x + n.x, y + n.y);
 				ctx.lineTo(x + o.x, y + o.y);
@@ -83,12 +86,9 @@ export default class MapView implements DrawnComponent {
 				icon.show('type' + type, type, 0);
 			}
 
-			ctx.globalAlpha = selected === n.id ? 1 : 0.5;
 			icon.draw(ctx, x + n.x, y + n.y);
 		});
-
-		// be nice to everyone else
-		ctx.globalAlpha = 1;
+		ctx.lineWidth = wd;
 	}
 
 	debounce(...buttons: InputButton[]) {
