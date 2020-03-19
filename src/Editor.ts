@@ -28,64 +28,16 @@ import Bomb from './item/Bomb';
 import Platform from './component/Platform';
 import MapNode from './MapNode';
 import Cartographer from './Cartographer';
-
-interface EditorData {
-	platforms: EditorPlatform[];
-	walls: EditorWall[];
-	floors: EditorFloor[];
-	objects: EditorObject[];
-	player: EditorPlayer;
-	enemies: EditorEnemy[];
-}
-
-interface EditorEnemy extends CoordAR {
-	dir: Facing;
-	type: string;
-}
-
-interface EditorFloor {
-	a: number;
-	h: number;
-	material: string;
-	motion?: number;
-	w: number;
-}
-
-interface EditorObject extends CoordAR {
-	object: string;
-}
-
-interface EditorPlatform {
-	h: number;
-	w: number;
-	a: number;
-	th: number;
-	motion?: number;
-	material: string;
-	ceiling?: boolean;
-	walls?: boolean;
-}
-
-interface EditorPlayer extends CoordAR {
-	type: string;
-	item?: string;
-	weapon?: string;
-}
-
-interface EditorWall {
-	top: number;
-	bottom: number;
-	a: number;
-	motion?: number;
-	dir: 1 | -1;
-	material: string;
-}
-
-interface EditorInit {
-	data?: EditorData;
-	game: Game;
-	parent: HTMLElement;
-}
+import { choose } from './tools';
+import { roundwoods } from './worlds';
+import EditorData, {
+	EditorEnemy,
+	EditorPlayer,
+	EditorPlatform,
+	EditorWall,
+	EditorFloor,
+	EditorObject,
+} from './EditorData';
 
 const enemyTypes = {
 	bat: Bat,
@@ -111,11 +63,18 @@ var objects: string[];
 const wallDirections = [1, -1];
 const objectPositions = [normalPosition, staticPosition];
 
+interface EditorInit {
+	data?: EditorData;
+	game: Game;
+	parent: HTMLElement;
+}
+
 export default class Editor implements LevelGenerator, MapGenerator {
 	container: HTMLElement;
 	data: EditorData;
 	dump: HTMLTextAreaElement;
 	game: Game;
+	me: boolean;
 	mode: GameMode;
 	nodes: MapNode[];
 
@@ -193,7 +152,7 @@ export default class Editor implements LevelGenerator, MapGenerator {
 	}
 
 	makeLevel(game: Game) {
-		const { data } = this;
+		const data = this.me ? this.data : choose(roundwoods);
 		const { platforms, walls, floors, objects, player, enemies } = data;
 
 		platforms.forEach(p => {
@@ -257,25 +216,28 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			c = this.container = mel(parent, 'div', { className: 'editor' });
 		}
 
-		const h1 = mel(c, 'h1', { innerText: 'Editor' });
+		mel(c, 'h1', { innerText: 'Editor' });
 		mel(
 			c,
 			'button',
-			{ innerText: 'Level' },
+			{ innerText: 'Edit Mode' },
 			{
 				click: () => {
 					this.nodes = [];
+					this.me = true;
 					this.mode = LevelMode;
 					this.refresh();
+					this.me = false;
 				},
 			}
 		);
 		mel(
 			c,
 			'button',
-			{ innerText: 'Map' },
+			{ innerText: 'Game Mode' },
 			{
 				click: () => {
+					this.me = false;
 					this.mode = MapMode;
 					this.refresh();
 				},

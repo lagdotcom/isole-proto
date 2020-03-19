@@ -17,9 +17,11 @@ import {
 	angledist,
 	anglewrap,
 	cart,
+	choose,
 	collides,
 	deg2rad,
 	fittest,
+	lerp,
 	min,
 	pi,
 	piHalf,
@@ -76,14 +78,6 @@ const ssNormal = 'Normal',
 	ssFast = 'Fast',
 	ssTurn = 'Turn';
 type BatSubstate = 'Normal' | 'Slow' | 'Fast' | 'Turn';
-
-function lerp(a: number, b: number, f: number = 0.03): number {
-	return a * (1 - f) + b * f;
-}
-
-function choose<T>(a: T[]): T {
-	return a[rndr(0, a.length)];
-}
 
 interface BatInit {
 	a?: number;

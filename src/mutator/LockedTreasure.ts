@@ -1,6 +1,6 @@
 import { Mutator, GameState } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
-import { rndr, chance, rndweight } from '../tools';
+import { chance, rndweight, choose } from '../tools';
 import { sever } from './tools';
 
 const MoreTreasureChance = 5;
@@ -45,7 +45,7 @@ export default class LockedTreasure implements Mutator {
 		);
 		if (!candidates.length) return false;
 
-		const lock = candidates[rndr(0, candidates.length)];
+		const lock = choose(candidates);
 		lock.type = this.locktype(gs);
 
 		const trea = nodes[lock.connections[0]];

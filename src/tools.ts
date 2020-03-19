@@ -300,3 +300,23 @@ export function rndweight<T>(...weightings: [T, number][]): T {
 
 	throw new Error('Try passing some arguments next time');
 }
+
+/**
+ * Linear interpolation.
+ * @param {number} a start value
+ * @param {number} b end value
+ * @param {number} f fraction
+ * @returns {number}
+ */
+export function lerp(a: number, b: number, f: number = 0.03): number {
+	return a * (1 - f) + b * f;
+}
+
+/**
+ * Randomly choose from a list.
+ * @param {T[]} a choice list
+ * @returns {T}
+ */
+export function choose<T>(a: T[]): T {
+	return a[rndr(0, a.length)];
+}
