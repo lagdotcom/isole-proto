@@ -22,7 +22,6 @@ import Game, {
 	LevelGenerator,
 	MapGenerator,
 } from './Game';
-import CoordAR from './CoordAR';
 import Woody from './player/Woody';
 import Bomb from './item/Bomb';
 import Platform from './component/Platform';
@@ -38,6 +37,7 @@ import EditorData, {
 	EditorFloor,
 	EditorObject,
 } from './EditorData';
+import Minatoad from './enemy/Minatoad';
 
 const enemyTypes = {
 	bat: Bat,
@@ -46,6 +46,7 @@ const enemyTypes = {
 	chompChamp: ChompChamp,
 	krillna: Krillna,
 	flazza: Flazza,
+	minatoad: Minatoad,
 };
 const enemies = Object.keys(enemyTypes);
 

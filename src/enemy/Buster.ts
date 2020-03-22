@@ -54,9 +54,13 @@ interface BusterController {
 }
 
 interface BusterInit {
+	damage?: number;
+	health?: number;
+	height?: number;
 	img?: string;
 	jumpfatigue?: number;
 	sprite?: BusterController;
+	width?: number;
 }
 
 export default class Buster implements Enemy {
@@ -90,8 +94,8 @@ export default class Buster implements Enemy {
 				layer: zEnemy,
 				game,
 				name: 'Buster',
-				width: 35,
-				height: 35,
+				width: options.width || 35,
+				height: options.height || 35,
 				a: 0,
 				r: 250,
 				va: 0,
@@ -108,8 +112,8 @@ export default class Buster implements Enemy {
 						game.resources[options.img || 'enemy.buster']
 					),
 				alive: true,
-				health: 3,
-				damage: 1,
+				health: options.health || 3,
+				damage: options.damage || 1,
 			},
 			options
 		);
