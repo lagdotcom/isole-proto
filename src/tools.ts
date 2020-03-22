@@ -156,11 +156,13 @@ export function damage(
 	target.health -= n;
 
 	if (target.health <= 0) {
-		target.alive = false;
-		if (target.die) target.die();
-		else game.remove(target);
+		if (target.alive) {
+			target.alive = false;
+			if (target.die) target.die(attacker);
+			else game.remove(target);
 
-		if (target.isEnemy) game.fire(eEnemyDied, { attacker, target });
+			if (target.isEnemy) game.fire(eEnemyDied, { attacker, target });
+		}
 	} else {
 		if (target.hurt) target.hurt(attacker, n);
 		if (attacker.hit) attacker.hit(target);

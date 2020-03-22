@@ -1,4 +1,3 @@
-import Controller from '../Controller';
 import { aThrow } from '../anims';
 import { cHit } from '../colours';
 import { dLeft } from '../dirs';
@@ -17,7 +16,6 @@ import {
 	pi,
 	piHalf,
 	scalew,
-	damage,
 	first,
 } from '../tools';
 import { zFlying } from '../layers';
@@ -28,7 +26,7 @@ import Flat from '../component/Flat';
 import Player from '../Player';
 import Wall from '../component/Wall';
 import Hitbox from '../Hitbox';
-import AnimController, { ListenerMap } from '../AnimController';
+import AnimController from '../AnimController';
 
 const gBombTimer = 3000,
 	gBombWarning = 1000,

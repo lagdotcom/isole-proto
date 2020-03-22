@@ -421,8 +421,8 @@ export default abstract class AbstractPlayer implements Player {
 		if (this.invtimer <= 0) this.invincible = false;
 	}
 
-	die(): void {
-		this.game.fire(ePlayerDying);
+	die(by: Damageable): void {
+		this.game.fire(ePlayerDying, { by });
 		this.voice.play(this.deadSound);
 		this.sprite.die();
 	}
