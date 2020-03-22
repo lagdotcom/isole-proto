@@ -18,11 +18,20 @@ h2 {
 
 .debug-container {
 	display: flex;
+	flex-wrap: wrap;
 }
 
 .debug {
 	flex: 1 0 200px;
 	font-family: monospace;
+	margin-bottom: 1em;
+}
+
+.debug-player {
+	order: 1;
+}
+.debug-enemy {
+	order: 2;
 }
 
 .layout {

@@ -29,6 +29,7 @@ import Flat from '../component/Flat';
 import Wall from '../component/Wall';
 import mel from '../makeElement';
 import Player from '../Player';
+import AbstractEnemy from './AbstractEnemy';
 
 const gJumpFatigue = 150,
 	gJumpSide = 0.4,
@@ -54,80 +55,60 @@ interface BusterController {
 }
 
 interface BusterInit {
+	a?: number;
 	damage?: number;
 	health?: number;
 	height?: number;
 	img?: string;
 	jumpfatigue?: number;
+	r?: number;
 	sprite?: BusterController;
 	width?: number;
 }
 
-export default class Buster implements Enemy {
-	a: number;
-	alive: boolean;
-	del: HTMLElement;
+export default class Buster extends AbstractEnemy {
 	fatigue: number;
-	game: Game;
 	grounded: boolean;
-	health: number;
 	height: number;
-	isEnemy: true;
-	layer: number;
 	jumpdelay: number;
 	jumpfatigue: number;
-	name: string;
-	r: number;
 	sprite: BusterController;
 	state: BusterState;
 	tscale: number;
-	va: number;
 	vfa: number;
 	vr: number;
 	width: number;
 
 	constructor(game: Game, options: BusterInit = {}) {
-		Object.assign(
-			this,
-			{
-				isEnemy: true,
-				layer: zEnemy,
-				game,
-				name: 'Buster',
-				width: options.width || 35,
-				height: options.height || 35,
-				a: 0,
-				r: 250,
-				va: 0,
-				vr: 0,
-				vfa: 0,
-				vfr: 0,
-				fatigue: 0,
-				jumpdelay: 0,
-				jumpfatigue: gJumpFatigue,
-				state: sIdle,
-				sprite:
-					options.sprite ||
-					new controller(
-						game.resources[options.img || 'enemy.buster']
-					),
-				alive: true,
-				health: options.health || 3,
-				damage: options.damage || 1,
-			},
-			options
-		);
-
-		this.a = deg2rad(this.a);
-
-		if (game.options.showDebug) {
-			this.del = mel(game.options.debugContainer, 'div', {
-				className: 'debug debug-enemy',
-			});
-		}
+		super({
+			isEnemy: true,
+			layer: zEnemy,
+			game,
+			name: 'Buster',
+			width: options.width || 35,
+			height: options.height || 35,
+			a: options.a || 0,
+			r: options.r || 250,
+			va: 0,
+			vr: 0,
+			vfa: 0,
+			vfr: 0,
+			fatigue: 0,
+			jumpdelay: 0,
+			jumpfatigue: options.jumpfatigue || gJumpFatigue,
+			state: sIdle,
+			sprite:
+				options.sprite ||
+				new controller(game.resources[options.img || 'enemy.buster']),
+			alive: true,
+			health: options.health || 3,
+			damage: options.damage || 1,
+		});
 	}
 
 	update(time: number): void {
+		if (!(time = this.dostun(time))) return;
+
 		var { a, r, va, vr, vfa, game, sprite, state } = this;
 		const { player, walls, ceilings, floors } = game,
 			tscale = time / gTimeScale;
@@ -260,13 +241,12 @@ export default class Buster implements Enemy {
 
 		if (this.del) {
 			const { jumpdelay, fatigue } = this;
-			this.del.innerHTML = jbr(
-				`<b>${this.name}</b>`,
-				`state: ${state}`,
-				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
-				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
-				`${jumpdelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`
-			);
+			this.debug({
+				state,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				jump: `${jumpdelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`,
+			});
 		}
 	}
 

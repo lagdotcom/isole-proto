@@ -64,9 +64,9 @@ interface FlazzaListenerMap extends ListenerMap {
 }
 
 export default class FlazzaController extends AnimController {
-	parent: ListenerMap;
+	map: FlazzaListenerMap;
 
-	constructor(parent: FlazzaListenerMap, img: CanvasImageSource) {
+	constructor(img: CanvasImageSource) {
 		super({
 			animations,
 			img,
@@ -76,12 +76,10 @@ export default class FlazzaController extends AnimController {
 			yo: -90,
 			leftflip: false,
 		});
-
-		this.parent = parent;
 	}
 
 	_play(anim: string, force: boolean = false): void {
-		return this.play(anim, force, this.parent);
+		return this.play(anim, force, this.map);
 	}
 
 	fly(t: number): void {

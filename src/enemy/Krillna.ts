@@ -23,6 +23,7 @@ import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
+import AbstractEnemy from './AbstractEnemy';
 
 const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
 	gKrillnaSpeed = 0.16,
@@ -35,62 +36,49 @@ interface KrillnaInit {
 	speed?: number;
 }
 
-export default class Krillna implements Enemy {
-	a: number;
-	alive: boolean;
+export default class Krillna extends AbstractEnemy {
 	dir: 'L' | 'R' | 'U' | 'D';
-	game: Game;
-	health: number;
 	height: number;
-	isEnemy: true;
 	last: { ceiling?: Flat | null; floor?: Flat | null; wall?: Wall | null };
-	layer: number;
 	movefn: (frame: number, n: number) => number;
-	name: 'Krillna';
-	r: number;
 	speed: number;
 	sprite: controller;
 	tscale: number;
-	va: number;
 	vfa: number;
 	vr: number;
 	width: number;
 
 	constructor(game: Game, options: KrillnaInit = {}) {
-		Object.assign(
-			this,
-			{
-				isEnemy: true,
-				layer: zEnemy,
-				game,
-				name: 'Krillna',
-				dir: dRight,
-				speed: gKrillnaSpeed,
-				last: {},
-				width: 30,
-				height: 30,
-				a: piHalf,
-				r: 200,
-				va: 0,
-				vr: 0,
-				vfa: 0,
-				vfr: 0,
-				tscale: 0,
-				movefn: (fr, n) => gFrameMotion[fr] * n,
-				sprite: new controller(
-					game.resources[options.img || 'enemy.krillna']
-				),
-				alive: true,
-				health: 5,
-				damage: 1,
-			},
-			options
-		);
-
-		this.a = deg2rad(this.a);
+		super({
+			isEnemy: true,
+			layer: zEnemy,
+			game,
+			name: 'Krillna',
+			dir: dRight,
+			speed: options.speed || gKrillnaSpeed,
+			last: {},
+			width: 30,
+			height: 30,
+			a: options.a || piHalf,
+			r: options.r || 200,
+			va: 0,
+			vr: 0,
+			vfa: 0,
+			vfr: 0,
+			tscale: 0,
+			movefn: (fr, n) => gFrameMotion[fr] * n,
+			sprite: new controller(
+				game.resources[options.img || 'enemy.krillna']
+			),
+			alive: true,
+			health: 5,
+			damage: 1,
+		});
 	}
 
 	update(time: number): void {
+		if (!(time = this.dostun(time))) return;
+
 		var {
 			a,
 			r,
@@ -284,6 +272,11 @@ export default class Krillna implements Enemy {
 		} else {
 			sprite.walk(tscale, dir);
 		}
+
+		this.debug({
+			vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+			pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+		});
 	}
 
 	draw(c) {

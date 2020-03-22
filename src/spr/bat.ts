@@ -10,7 +10,11 @@ Column 4 - Wake-up: Frame 1 is 150ms, Frames 2-4 are 75ms, Frames 5-9 are 55ms a
 NOTES: the bat can be jumped on unless it is in the spinning animation during wake up, when it goes to punch it can still be jumped on like normal around it's head area, but it's fist will always damage the player. The hitbox for this creature would roughly be the head region and it's hands potentially, wings I don't see being part of it's hitbox for being jumped on or harming the player.
 */
 
-import AnimController, { AnimSpecMap, ListenerMap, Listener } from '../AnimController';
+import AnimController, {
+	AnimSpecMap,
+	ListenerMap,
+	Listener,
+} from '../AnimController';
 
 const aMove = 'move',
 	aPunch = 'punch',
@@ -81,7 +85,7 @@ const animations: AnimSpecMap = {
 			{ c: 3, r: 6, t: 55 },
 			{ c: 3, r: 7, t: 55 },
 			{ c: 3, r: 8, t: 55 },
-			{ c: 3, r: 9, t: 75, },
+			{ c: 3, r: 9, t: 75 },
 			{ c: 3, r: 9, t: 1000, event: eWakeDone },
 		],
 	},
@@ -100,9 +104,9 @@ interface BatListenerMap extends ListenerMap {
 }
 
 export default class BatController extends AnimController {
-	parent: ListenerMap;
+	map: BatListenerMap;
 
-	constructor(parent: BatListenerMap, img: any) {
+	constructor(img: any) {
 		super({
 			animations,
 			img,
@@ -112,12 +116,10 @@ export default class BatController extends AnimController {
 			yo: -140,
 			leftflip: false,
 		});
-
-		this.parent = parent;
 	}
 
 	_play(anim: string, force = false): void {
-		return this.play(anim, force, this.parent);
+		return this.play(anim, force, this.map);
 	}
 
 	move(t: number): void {

@@ -44,6 +44,7 @@ import Flat from '../component/Flat';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import mel from '../makeElement';
+import AbstractEnemy from './AbstractEnemy';
 
 const gAttackFar = 160,
 	gAttackNear = 30,
@@ -85,21 +86,12 @@ interface BatInit {
 	r?: number;
 }
 
-export default class Bat implements Enemy {
-	a: number;
-	alive: boolean;
+export default class Bat extends AbstractEnemy {
 	channel: Channel;
-	del: HTMLElement;
 	dir: Facing;
-	game: Game;
-	health: number;
 	height: number;
-	isEnemy: true;
-	layer: number;
 	maxradius: number;
 	minradius: number;
-	name: 'Bat';
-	r: number;
 	roost: Flat | null;
 	roostangle?: number;
 	roostradius?: number;
@@ -110,7 +102,6 @@ export default class Bat implements Enemy {
 	substateTimer: number;
 	targetradius: number;
 	tscale: number;
-	va: number;
 	verticalTimer: number;
 	vr: number;
 	width: number;
@@ -122,53 +113,42 @@ export default class Bat implements Enemy {
 	 * @param {BatInit} options options
 	 */
 	constructor(game: Game, options: BatInit = {}) {
-		Object.assign(
-			this,
-			{
-				channel: new Channel(game, 'Bat'),
-				isEnemy: true,
-				layer: zFlying,
-				game,
-				name: 'Bat',
-				width: 50,
-				height: 50,
-				a: 0,
-				r: 250,
-				rtop: options.r || 250,
-				dir: dLeft,
-				va: 0,
-				vr: 0,
-				sleepTimer: 0,
-				state: sFlying,
-				substate: ssNormal,
-				substateTimer: gSubstateChange,
-				verticalTimer: gVerticalChange,
-				sprite: new controller(
-					{
-						[ePunchDone]: this.onpunchdone.bind(this),
-						[ePunchForward]: this.onpunchforward.bind(this),
-						[ePunchPullback]: this.onpunchpullback.bind(this),
-						[eWakeDone]: this.onwakedone.bind(this),
-					},
-					game.resources[options.img || 'enemy.bat']
-				),
-				alive: true,
-				health: 2,
-				damage: 1,
-			},
-			options
-		);
+		super({
+			channel: new Channel(game, 'Bat'),
+			isEnemy: true,
+			layer: zFlying,
+			game,
+			name: 'Bat',
+			width: 50,
+			height: 50,
+			a: options.a || 0,
+			r: options.r || 250,
+			rtop: options.r || 250,
+			dir: dLeft,
+			va: 0,
+			vr: 0,
+			sleepTimer: 0,
+			state: sFlying,
+			substate: ssNormal,
+			substateTimer: gSubstateChange,
+			verticalTimer: gVerticalChange,
+			sprite: new controller(game.resources[options.img || 'enemy.bat']),
+			alive: true,
+			health: 2,
+			damage: 1,
+		});
 
-		this.a = deg2rad(this.a);
-
-		if (game.options.showDebug) {
-			this.del = mel(game.options.debugContainer, 'div', {
-				className: 'debug debug-enemy',
-			});
-		}
+		this.sprite.map = {
+			[ePunchDone]: this.onpunchdone.bind(this),
+			[ePunchForward]: this.onpunchforward.bind(this),
+			[ePunchPullback]: this.onpunchpullback.bind(this),
+			[eWakeDone]: this.onwakedone.bind(this),
+		};
 	}
 
 	update(time: number): void {
+		if (!(time = this.dostun(time))) return;
+
 		if (!this.minradius) {
 			const lowest = fittest(this.game.floors, fl => -fl.r);
 			this.minradius = lowest ? lowest.r : 100;
@@ -185,15 +165,14 @@ export default class Bat implements Enemy {
 
 		if (this.del) {
 			const { va, vr, r, a, sprite, state, substate } = this;
-			this.del.innerHTML = jbr(
-				'<b>Bat</b>',
-				`state: ${state},${substate}`,
-				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
-				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
-				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
+			this.debug({
+				state: `${state},${substate}`,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				anim: `${sprite.a}+${sprite.at.toFixed(0)}ms, ${
 					sprite.flip ? 'flip' : 'normal'
-				}`
-			);
+				}`,
+			});
 		}
 	}
 

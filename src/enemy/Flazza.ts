@@ -28,6 +28,7 @@ import Enemy from '../Enemy';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Flat from '../component/Flat';
+import AbstractEnemy from './AbstractEnemy';
 
 const gAttackWidth = 120,
 	gSpeed = 0.2,
@@ -47,66 +48,54 @@ interface FlazzaInit {
 	r?: number;
 }
 
-export default class Flazza implements Enemy {
-	a: number;
-	alive: boolean;
+export default class Flazza extends AbstractEnemy {
 	dir: Facing;
 	dropSpeed: number;
-	game: Game;
-	health: number;
 	height: number;
-	isEnemy: true;
-	layer: number;
-	name: 'Flazza';
-	r: number;
 	recoverSpeed: number;
 	rtop: number;
 	speed: number;
 	sprite: controller;
 	state: FlazzaState;
 	tscale: number;
-	va: number;
 	vr: number;
 	width: number;
 
 	constructor(game: Game, options: FlazzaInit = {}) {
-		Object.assign(
-			this,
-			{
-				isEnemy: true,
-				layer: zFlying,
-				game,
-				name: 'Flazza',
-				width: 45,
-				height: 45,
-				a: 0,
-				r: 250,
-				rtop: options.r || 250,
-				dir: dLeft,
-				speed: gSpeed,
-				dropSpeed: gDropSpeed,
-				recoverSpeed: gRecoverSpeed,
-				va: 0,
-				vr: 0,
-				state: sProwling,
-				sprite: new controller(
-					{
-						[eDrop]: this.onDrop.bind(this),
-						[eRecover]: this.onRecover.bind(this),
-					},
-					game.resources[options.img || 'enemy.flazza']
-				),
-				alive: true,
-				health: 2,
-				damage: 1,
-			},
-			options
-		);
+		super({
+			isEnemy: true,
+			layer: zFlying,
+			game,
+			name: 'Flazza',
+			width: 45,
+			height: 45,
+			a: 0,
+			r: options.r || 250,
+			rtop: options.r || 250,
+			dir: dLeft,
+			speed: gSpeed,
+			dropSpeed: gDropSpeed,
+			recoverSpeed: gRecoverSpeed,
+			va: 0,
+			vr: 0,
+			state: sProwling,
+			sprite: new controller(
+				game.resources[options.img || 'enemy.flazza']
+			),
+			alive: true,
+			health: 2,
+			damage: 1,
+		});
 
-		this.a = deg2rad(this.a);
+		this.sprite.map = {
+			[eDrop]: this.onDrop.bind(this),
+			[eRecover]: this.onRecover.bind(this),
+		};
 	}
 
 	update(time: number): void {
+		if (!(time = this.dostun(time))) return;
+
 		var {
 			a,
 			r,
@@ -195,6 +184,14 @@ export default class Flazza implements Enemy {
 			case sSlam:
 				sprite.slam(time);
 				break;
+		}
+
+		if (this.del) {
+			this.debug({
+				state,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+			});
 		}
 	}
 
