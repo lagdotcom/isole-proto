@@ -1,4 +1,4 @@
-import { cAI, cHurt } from '../colours';
+import { cAI, cAIDark, cHurt } from '../colours';
 import {
 	gGravityStrength,
 	gGroundFriction,
@@ -19,12 +19,14 @@ import {
 	scalew,
 	unscalew,
 	first,
+	drawWedge,
+	drawArc,
 } from '../tools';
 import controller from '../spr/buster';
 import { zEnemy } from '../layers';
 import Enemy from '../Enemy';
 import Game from '../Game';
-import { Quad } from '../Hitbox';
+import { Hitsize } from '../Hitbox';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
 import mel from '../makeElement';
@@ -109,7 +111,7 @@ export default class Buster extends AbstractEnemy {
 		var { a, r, va, vr, vfa, game, sprite, state } = this;
 		const { player, walls, ceilings, floors } = game,
 			tscale = time / gTimeScale;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 		const playerDist = unscalew(angledist(a, player.a), r),
 			near = player.alive && playerDist - player.w <= gNearWidth;
 
@@ -118,7 +120,7 @@ export default class Buster extends AbstractEnemy {
 			floor = first(floors, f => {
 				var da = angledist(a, f.a);
 
-				return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
+				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
@@ -127,7 +129,7 @@ export default class Buster extends AbstractEnemy {
 			ceiling = first(ceilings, f => {
 				var da = angledist(a, f.a);
 
-				return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
+				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 			if (ceiling) {
 				vr = 0;
@@ -141,10 +143,10 @@ export default class Buster extends AbstractEnemy {
 				if (vas != w.direction && !w.motion) return false;
 
 				return (
-					b.al <= w.a &&
-					b.ar >= w.a &&
-					t.r >= w.bottom &&
-					b.r <= w.top
+					bot.a - bot.width <= w.a &&
+					bot.a + bot.width >= w.a &&
+					top.r >= w.bottom &&
+					bot.r <= w.top
 				);
 			});
 		}
@@ -201,10 +203,10 @@ export default class Buster extends AbstractEnemy {
 		if (wall && !ceiling) {
 			const bounce = wall.direction * gWallBounce;
 			if (wall.direction == 1) {
-				a = wall.a - b.aw;
+				a = wall.a - bot.width;
 				if (va > bounce) va = bounce;
 			} else {
-				a = wall.a + b.aw;
+				a = wall.a + bot.width;
 				if (va < -bounce) va = -bounce;
 			}
 		} else if (va > gMaxVA) va = gMaxVA;
@@ -274,37 +276,21 @@ export default class Buster extends AbstractEnemy {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t, a, n } = this.getHitbox();
+		const { bot, top, a, n } = this.getHitbox();
 
-		c.strokeStyle = cHurt;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHurt, cx, cy, bot, top);
 
-		c.strokeStyle = cAI;
-		c.beginPath();
-		c.arc(cx, cy, a!.r, a!.al, a!.ar);
-		c.arc(cx, cy, t.r, a!.ar, a!.al, true);
-		c.arc(cx, cy, a!.r, a!.al, a!.ar);
-		c.stroke();
-
-		c.strokeStyle = cAI;
-		c.beginPath();
-		c.arc(cx, cy, n.r, n.al, n.ar);
-		c.arc(cx, cy, t.r, n.ar, n.al, true);
-		c.arc(cx, cy, n.r, n.al, n.ar);
-		c.stroke();
+		drawArc(c, cAI, cx, cy, a.r, a.a, a.width);
+		drawArc(c, cAIDark, cx, cy, n.r, n.a, n.width);
 	}
 
-	getHitbox(): { t: Quad; b: Quad; a: Quad; n: Quad } {
+	getHitbox(): { top: Hitsize; bot: Hitsize; a: Hitsize; n: Hitsize } {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height),
 			aaw = scalew(gAttackWidth, r),
 			naw = scalew(gNearWidth, r);
-		var amod,
+		var amod: number,
 			vbr = 0,
 			vtr = 0;
 
@@ -315,29 +301,25 @@ export default class Buster extends AbstractEnemy {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + height + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
 			a: {
-				r: r + vbr,
-				aw: aaw,
-				al: amod - aaw,
-				ar: amod + aaw,
+				r: r + height / 2 + vbr,
+				a: amod,
+				width: aaw,
 			},
 			n: {
-				r: r + vbr,
-				aw: naw,
-				al: amod - naw,
-				ar: amod + naw,
+				r: r + height / 2 + vbr,
+				a: amod,
+				width: naw,
 			},
 		};
 	}

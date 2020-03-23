@@ -1,6 +1,6 @@
 import AnimController from '../AnimController';
 import { zSpark } from '../layers';
-import { piHalf, cart, displace, scalew, collides } from '../tools';
+import { piHalf, cart, displace, scalew, collides, drawWedge } from '../tools';
 import { aAxe } from '../anims';
 import { eAnimationEnded, ePlayerHurt } from '../events';
 import { cHit } from '../colours';
@@ -52,10 +52,10 @@ class Swing implements DrawnComponent {
 		this.sprite.next(ti);
 
 		if (this.hasHitbox()) {
-			const { b, t } = this.getHitbox();
+			const { bot, top } = this.getHitbox();
 			var enemy = null;
 			this.game.enemies.forEach(e => {
-				if (collides({ b, t }, e.getHitbox())) {
+				if (collides({ bot, top }, e.getHitbox())) {
 					me.hit(e);
 				}
 			});
@@ -121,16 +121,11 @@ class Swing implements DrawnComponent {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		if (!this.hasHitbox()) return;
 
-		const { game, sprite } = this;
+		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 
-		c.strokeStyle = cHit;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHit, cx, cy, bot, top);
 	}
 
 	getHitbox(): Hitbox {
@@ -139,17 +134,15 @@ class Swing implements DrawnComponent {
 			taw = scalew(w, r + h);
 
 		return {
-			b: {
+			bot: {
 				r: r,
-				aw: baw,
-				al: a - baw,
-				ar: a + baw,
+				a,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + h,
-				aw: taw,
-				al: a - taw,
-				ar: a + taw,
+				a,
+				width: taw,
 			},
 		};
 	}

@@ -1,7 +1,7 @@
 import { gHitboxScale } from './nums';
 import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
-import Hitbox from './Hitbox';
+import Hitbox, { Hitsize } from './Hitbox';
 import Damageable from './Damageable';
 import { eEnemyDied } from './events';
 
@@ -125,16 +125,25 @@ export function first<T>(
 }
 
 /**
+ * Check if two hitsizes overlap angle-wise
+ * @param a first hitsize
+ * @param b second hitsize
+ */
+export function anglecollides(a: Hitsize, b: Hitsize): boolean {
+	const ad = angledist(a.a, b.a);
+	return ad < a.width + b.width;
+}
+
+/**
  * Check if two hitboxes overlap
  * @param {Hitbox} a first hitbox
  * @param {Hitbox} b second hitbox
  * @returns {boolean} overlap found
  */
 export function collides(a: Hitbox, b: Hitbox): boolean {
-	// TODO: should this also check .t.al?
-	// TODO: this is wrong when angle is wrapped
+	// TODO: should this also check .t.a?
 	return (
-		a.b.r <= b.t.r && a.t.r >= b.b.r && a.b.ar >= b.b.al && a.b.al <= b.b.ar
+		a.bot.r <= b.top.r && a.top.r >= b.bot.r && anglecollides(a.bot, b.bot)
 	);
 }
 
@@ -321,4 +330,54 @@ export function lerp(a: number, b: number, f: number = 0.03): number {
  */
 export function choose<T>(a: T[]): T {
 	return a[rndr(0, a.length)];
+}
+
+/**
+ * Draw a ...wedge?
+ * @param {CanvasRenderingContext2D} c canvas context
+ * @param {string | CanvasGradient | CanvasPattern} style line style
+ * @param {number} x center x
+ * @param {number} y center y
+ * @param {Hitsize} b bottom hitsize
+ * @param {Hitsize} t top hitsize
+ */
+export function drawWedge(
+	c: CanvasRenderingContext2D,
+	style: string | CanvasGradient | CanvasPattern,
+	x: number,
+	y: number,
+	b: Hitsize,
+	t: Hitsize
+) {
+	c.strokeStyle = style;
+	c.beginPath();
+	c.arc(x, y, b.r, b.a - b.width, b.a + b.width);
+	c.arc(x, y, t.r, t.a + t.width, t.a - t.width, true);
+	c.arc(x, y, b.r, b.a - b.width, b.a + b.width);
+	c.stroke();
+}
+
+/**
+ * Draw an arc
+ * @param {CanvasRenderingContext2D} c canvas context
+ * @param {string | CanvasGradient | CanvasPattern} style line style
+ * @param {number} x center x
+ * @param {number} y center y
+ * @param {number} r radius
+ * @param {number} a angle
+ * @param {number} width width
+ */
+export function drawArc(
+	c: CanvasRenderingContext2D,
+	style: string | CanvasGradient | CanvasPattern,
+	x: number,
+	y: number,
+	r: number,
+	a: number,
+	width: number
+) {
+	c.strokeStyle = style;
+	c.beginPath();
+	c.arc(x, y, r, a - width, a + width);
+	c.stroke();
 }

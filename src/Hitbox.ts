@@ -1,14 +1,21 @@
 export default interface Hitbox {
-	b: Quad;
-	t: Quad;
+	// Bottom
+	bot: Hitsize;
+
+	// Top
+	top: Hitsize;
 
 	// allow arbitrary extension
 	[field: string]: any;
 }
 
-export interface Quad {
+export interface Hitsize {
+	// Radius
 	r: number;
-	aw: number;
-	al: number;
-	ar: number;
+
+	// Angle (middle)
+	a: number;
+
+	// Width (either side of middle)
+	width: number;
 }

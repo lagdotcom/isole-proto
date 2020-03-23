@@ -1,5 +1,14 @@
 import Enemy from '../Enemy';
-import { deg2rad, piHalf, cart, scalew, collides, jbr, damage } from '../tools';
+import {
+	deg2rad,
+	piHalf,
+	cart,
+	scalew,
+	collides,
+	jbr,
+	damage,
+	drawWedge,
+} from '../tools';
 import Game from '../Game';
 import { zFlying } from '../layers';
 import Hitbox from '../Hitbox';
@@ -236,24 +245,12 @@ export default class ChompChamp implements Enemy {
 		switch (state) {
 			case aIdle:
 				const a = this.getAttackHitbox();
-
-				c.strokeStyle = cAI;
-				c.beginPath();
-				c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
-				c.arc(cx, cy, a.t.r, a.b.ar, a.b.al, true);
-				c.arc(cx, cy, a.b.r, a.b.al, a.b.ar);
-				c.stroke();
+				drawWedge(c, cAI, cx, cy, a.bot, a.top);
 				break;
 
 			case aClose:
 				const g = this.getCatchHitbox();
-
-				c.strokeStyle = cHurt;
-				c.beginPath();
-				c.arc(cx, cy, g.b.r, g.b.al, g.b.ar);
-				c.arc(cx, cy, g.t.r, g.b.ar, g.b.al, true);
-				c.arc(cx, cy, g.b.r, g.b.al, g.b.ar);
-				c.stroke();
+				drawWedge(c, cHurt, cx, cy, g.bot, g.top);
 				break;
 		}
 	}
@@ -261,8 +258,8 @@ export default class ChompChamp implements Enemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			b: { r: 0, aw: 0, al: 0, ar: 0 },
-			t: { r: 0, aw: 0, al: 0, ar: 0 },
+			bot: { r: 0, a: 0, width: 0 },
+			top: { r: 0, a: 0, width: 0 },
 		};
 	}
 
@@ -274,17 +271,15 @@ export default class ChompChamp implements Enemy {
 			taw = scalew(attackWidth, tr);
 
 		return {
-			b: {
+			bot: {
 				r: br,
-				aw: baw,
-				al: a - baw,
-				ar: a + baw,
+				a,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: tr,
-				aw: taw,
-				al: a - taw,
-				ar: a + taw,
+				a,
+				width: taw,
 			},
 		};
 	}
@@ -297,17 +292,15 @@ export default class ChompChamp implements Enemy {
 			taw = scalew(width, tr);
 
 		return {
-			b: {
+			bot: {
 				r: br,
-				aw: baw,
-				al: a - baw,
-				ar: a + baw,
+				a,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: tr,
-				aw: taw,
-				al: a - taw,
-				ar: a + taw,
+				a,
+				width: taw,
 			},
 		};
 	}

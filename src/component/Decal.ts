@@ -1,7 +1,7 @@
 import Controller from '../Controller';
 import { cIgnore } from '../colours';
 import { gTimeScale } from '../nums';
-import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
+import { anglewrap, cart, deg2rad, piHalf, scalew, drawWedge } from '../tools';
 import { zBackground } from '../layers';
 import Game from '../Game';
 import PointAR from '../CoordAR';
@@ -103,14 +103,9 @@ export default class Decal implements Component {
 	drawHitbox?(c: CanvasRenderingContext2D): void {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 
-		c.strokeStyle = cIgnore;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cIgnore, cx, cy, bot, top);
 	}
 
 	getHitbox(): Hitbox {
@@ -119,17 +114,15 @@ export default class Decal implements Component {
 			taw = scalew(width, r + height);
 
 		return {
-			b: {
+			bot: {
 				r: r,
-				aw: baw,
-				al: a - baw,
-				ar: a + baw,
+				a,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + height,
-				aw: taw,
-				al: a - taw,
-				ar: a + taw,
+				a,
+				width: taw,
 			},
 		};
 	}

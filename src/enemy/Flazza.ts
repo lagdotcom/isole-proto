@@ -21,6 +21,8 @@ import {
 	scalew,
 	unscalew,
 	first,
+	drawWedge,
+	anglecollides,
 } from '../tools';
 import controller, { eDrop, eRecover } from '../spr/flazza';
 import { zFlying } from '../layers';
@@ -211,21 +213,10 @@ export default class Flazza extends AbstractEnemy {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t, a } = this.getHitbox();
+		const { bot, top, a } = this.getHitbox();
 
-		c.strokeStyle = cHurt;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
-
-		c.strokeStyle = cAI;
-		c.beginPath();
-		c.arc(cx, cy, a.r, a.al, a.ar);
-		c.arc(cx, cy, t.r, a.ar, a.al, true);
-		c.arc(cx, cy, a.r, a.al, a.ar);
-		c.stroke();
+		drawWedge(c, cHurt, cx, cy, bot, top);
+		drawWedge(c, cAI, cx, cy, a, top);
 	}
 
 	getHitbox(): Hitbox {
@@ -244,36 +235,32 @@ export default class Flazza extends AbstractEnemy {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + height + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
 			a: {
 				r: r + vbr,
-				aw: aaw,
-				al: amod - aaw,
-				ar: amod + aaw,
+				a: amod,
+				w: aaw,
 			},
 		};
 	}
 
 	getFloor(): Flat | null {
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 		const { a, game } = this;
 
-		return first(game.floors, (f, i) => {
-			var da = angledist(a, f.a);
-
-			return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
-		});
+		return first(
+			game.floors,
+			(f, i) => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+		);
 	}
 
 	shouldAttack(target) {

@@ -14,6 +14,8 @@ import {
 	scalew,
 	damage,
 	first,
+	drawWedge,
+	anglecollides,
 } from '../tools';
 import { zFlying } from '../layers';
 import Item from '../Item';
@@ -70,8 +72,8 @@ class Rock implements DrawnComponent {
 			{ enemies, floors, walls } = game,
 			tscale = time / gTimeScale;
 
-		const { b, t } = this.getHitbox();
-		var enemy = first(enemies, e => collides({ b, t }, e.getHitbox()));
+		const { bot, top } = this.getHitbox();
+		var enemy = first(enemies, e => collides({ bot, top }, e.getHitbox()));
 
 		if (enemy) {
 			// TODO: bounce etc
@@ -88,16 +90,15 @@ class Rock implements DrawnComponent {
 
 		var floor: Flat | null = null;
 		if (vr < 0) {
-			floors.forEach(f => {
+			floor = first(floors, f => {
 				var da = angledist(a, f.a);
-				if (b.r <= f.r && t.r >= f.r && da < f.width + t.aw) floor = f;
+				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
 		var wall: Wall | null = null;
-		walls.forEach(w => {
-			if (b.al <= w.a && b.ar >= w.a && t.r >= w.bottom && b.r <= w.top)
-				wall = w;
+		wall = first(walls, w => {
+			return top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w);
 		});
 
 		if (floor || wall) {
@@ -141,14 +142,9 @@ class Rock implements DrawnComponent {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 
-		c.strokeStyle = cHit;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHit, cx, cy, bot, top);
 	}
 
 	getHitbox(): Hitbox {
@@ -166,17 +162,15 @@ class Rock implements DrawnComponent {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + h + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
 		};
 	}

@@ -26,6 +26,8 @@ import {
 	dirv,
 	displace,
 	first,
+	drawWedge,
+	anglecollides,
 } from '../tools';
 import mel from '../makeElement';
 import { zPlayer } from '../layers';
@@ -119,32 +121,27 @@ export default abstract class AbstractPlayer implements Player {
 		const { walls, ceilings, floors, keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
-		const { b, t, s } = this.getHitbox();
+		const { bot, top, step } = this.getHitbox();
 		var debug = '',
 			flags: string[] = [];
 
 		var floor: Flat | null = null;
 		if (vr <= 0) {
 			flags.push('down');
-			floor = first(floors, (f, i) => {
-				var da = angledist(a, f.a);
-
-				debug += `f${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}r<br>`;
-
-				return b.r <= f.r && s.r >= f.r && da < f.width + s.aw;
-			});
+			floor = first(
+				floors,
+				(f, i) =>
+					bot.r <= f.r && step.r >= f.r && anglecollides(step, f)
+			);
 		}
 
 		var ceiling: Flat | null = null;
 		if (vr > 0) {
 			flags.push('up');
-			ceiling = first(ceilings, (f, i) => {
-				var da = angledist(a, f.a);
-
-				debug += `c${i}: r=${f.r.toFixed(2)}, da=${da.toFixed(2)}r<br>`;
-
-				return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
-			});
+			ceiling = first(
+				ceilings,
+				(f, i) => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+			);
 			if (ceiling) {
 				flags.push('ceiling');
 				if (vr > 0) this.body.play('player.bonk');
@@ -160,10 +157,7 @@ export default abstract class AbstractPlayer implements Player {
 				if (vas != w.direction && !w.motion) return false;
 
 				return (
-					b.al <= w.a &&
-					b.ar >= w.a &&
-					t.r >= w.bottom &&
-					b.r <= w.top
+					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
 				);
 			});
 		}
@@ -171,7 +165,7 @@ export default abstract class AbstractPlayer implements Player {
 		var hurtenemy: Enemy | null = null;
 		if (vr < 0) {
 			hurtenemy = first(enemies, (e, i) => {
-				if (collides({ b, t: s }, e.getHitbox())) {
+				if (collides({ bot, top: step }, e.getHitbox())) {
 					debug += `jumped on e${i}: ${e.name}<br>`;
 					return true;
 				}
@@ -181,7 +175,7 @@ export default abstract class AbstractPlayer implements Player {
 		}
 
 		var hitenemy = first(enemies, (e, i) => {
-			if (e !== hurtenemy && collides({ b, t }, e.getHitbox())) {
+			if (e !== hurtenemy && collides({ bot, top }, e.getHitbox())) {
 				debug += `hit by e${i}: ${e.name}<br>`;
 				return true;
 			}
@@ -267,10 +261,10 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('wall');
 			const bounce = wall.direction * gWallBounce;
 			if (wall.direction == 1) {
-				a = wall.a - b.aw;
+				a = wall.a - bot.width;
 				if (va > bounce) va = bounce;
 			} else {
-				a = wall.a + b.aw;
+				a = wall.a + bot.width;
 				if (va < -bounce) va = -bounce;
 			}
 		} else if (va > gMaxVA) va = gMaxVA;
@@ -339,21 +333,10 @@ export default abstract class AbstractPlayer implements Player {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		const { game, sprite } = this;
 		const { cx, cy } = game;
-		const { b, t, s } = this.getHitbox();
+		const { bot, top, step } = this.getHitbox();
 
-		c.strokeStyle = cHurt;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
-
-		c.strokeStyle = cStep;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, s.r, s.ar, s.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHurt, cx, cy, bot, top);
+		drawWedge(c, cStep, cx, cy, bot, step);
 
 		const p = cart(this.a, this.r);
 		const { a, r } = displace(this, [sprite.hotspot], sprite.flip);
@@ -382,23 +365,20 @@ export default abstract class AbstractPlayer implements Player {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + h + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
-			s: {
+			step: {
 				r: r + steph + vtr,
-				aw: saw,
-				al: amod - saw,
-				ar: amod + saw,
+				a: amod,
+				width: saw,
 			},
 		};
 	}

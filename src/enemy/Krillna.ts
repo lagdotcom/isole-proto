@@ -15,6 +15,8 @@ import {
 	piHalf,
 	scalew,
 	first,
+	drawWedge,
+	anglecollides,
 } from '../tools';
 import controller from '../spr/krillna';
 import { zEnemy } from '../layers';
@@ -94,14 +96,14 @@ export default class Krillna extends AbstractEnemy {
 		const { walls, ceilings, floors } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 
 		var floor: Flat | null = null;
 		if (vr <= 0 || last.floor) {
 			floor = first(floors, f => {
 				var da = angledist(a, f.a);
 
-				return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
+				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
@@ -110,7 +112,7 @@ export default class Krillna extends AbstractEnemy {
 			ceiling = first(ceilings, f => {
 				var da = angledist(a, f.a);
 
-				return b.r <= f.r && t.r >= f.r && da < f.width + t.aw;
+				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 			if (ceiling) {
 				vr = 0;
@@ -125,10 +127,7 @@ export default class Krillna extends AbstractEnemy {
 				if (vas != w.direction && !w.motion) return false;
 
 				return (
-					b.al <= w.a &&
-					b.ar >= w.a &&
-					t.r >= w.bottom &&
-					b.r <= w.top
+					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
 				);
 			});
 		}
@@ -228,7 +227,7 @@ export default class Krillna extends AbstractEnemy {
 		if (wall) {
 			applywall(wall);
 		} else if (last.wall) {
-			if (b.r <= last.wall.top && t.r >= last.wall.bottom) {
+			if (bot.r <= last.wall.top && top.r >= last.wall.bottom) {
 				applywall(last.wall);
 			} else if (dir == dDown && last.wall.ceiling) {
 				if (last.wall.direction == 1) dir = dRight;
@@ -295,14 +294,9 @@ export default class Krillna extends AbstractEnemy {
 	drawHitbox(c) {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t } = this.getHitbox();
+		const { bot, top } = this.getHitbox();
 
-		c.strokeStyle = cHurt;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHurt, cx, cy, bot, top);
 	}
 
 	getHitbox(): Hitbox {
@@ -320,17 +314,15 @@ export default class Krillna extends AbstractEnemy {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + height + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
 		};
 	}

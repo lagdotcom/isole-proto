@@ -24,8 +24,10 @@ export default class Wall implements DrawnComponent {
 	sprite?: Texture;
 	sx: number;
 	sy: number;
+	r: number; // used for anglecollides()
 	t: number;
 	top: number;
+	width: number; // used for anglecollides()
 
 	draw: (c: CanvasRenderingContext2D) => void;
 
@@ -53,6 +55,8 @@ export default class Wall implements DrawnComponent {
 			a,
 			direction,
 			motion: deg2rad(motion / 100 || 0),
+			r: b,
+			width: 0,
 		});
 
 		if (texture) {

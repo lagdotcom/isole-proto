@@ -30,6 +30,7 @@ import {
 	rndr,
 	scalew,
 	jbr,
+	drawWedge,
 } from '../tools';
 import controller, {
 	ePunchDone,
@@ -441,23 +442,11 @@ export default class Bat extends AbstractEnemy {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		const { game } = this;
 		const { cx, cy } = game;
-		const { b, t, a } = this.getHitbox();
+		const { bot, top, a } = this.getHitbox();
 
-		c.strokeStyle = cHurt;
-		c.beginPath();
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.arc(cx, cy, t.r, t.ar, t.al, true);
-		c.arc(cx, cy, b.r, b.al, b.ar);
-		c.stroke();
+		drawWedge(c, cHurt, cx, cy, bot, top);
 
-		if (a) {
-			c.strokeStyle = cAI;
-			c.beginPath();
-			c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
-			c.arc(cx, cy, a!.t.r, a!.b.ar, a!.b.al, true);
-			c.arc(cx, cy, a!.b.r, a!.b.al, a!.b.ar);
-			c.stroke();
-		}
+		if (a) drawWedge(c, cAI, cx, cy, a.bot, a.top);
 	}
 
 	getHitbox(): Hitbox {
@@ -475,17 +464,15 @@ export default class Bat extends AbstractEnemy {
 		else if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: baw,
-				al: amod - baw,
-				ar: amod + baw,
+				a: amod,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: r + height + vtr,
-				aw: taw,
-				al: amod - taw,
-				ar: amod + taw,
+				a: amod,
+				width: taw,
 			},
 			a: this.getAttackHitbox(),
 		};
@@ -500,9 +487,9 @@ export default class Bat extends AbstractEnemy {
 
 	getPunchHitbox(): Hitbox {
 		const { r, a, va, vr, height, tscale, dir } = this;
-		const naw = scalew(gAttackNear, r),
-			faw = scalew(gAttackFar, r),
-			left = dir === dLeft;
+		const attackWidth = scalew((gAttackFar - gAttackNear) / 2, r);
+		const left = dir === dLeft;
+		const aoffset = left ? -attackWidth : attackWidth;
 
 		var amod: number,
 			vbr = 0;
@@ -513,17 +500,15 @@ export default class Bat extends AbstractEnemy {
 		if (vr < 0) vbr = vr;
 
 		return {
-			b: {
+			bot: {
 				r: r + vbr,
-				aw: faw - naw,
-				al: left ? amod - faw : amod + naw,
-				ar: left ? amod - naw : amod + faw,
+				a: amod + aoffset,
+				width: attackWidth,
 			},
-			t: {
+			top: {
 				r: r + height + vbr,
-				aw: faw - naw,
-				al: left ? amod - faw : amod + naw,
-				ar: left ? amod - naw : amod + faw,
+				a: amod + aoffset,
+				width: attackWidth,
 			},
 		};
 	}
@@ -537,17 +522,15 @@ export default class Bat extends AbstractEnemy {
 			taw = scalew(width2, tr);
 
 		return {
-			b: {
+			bot: {
 				r: br,
-				aw: baw,
-				al: a - baw,
-				ar: a + baw,
+				a,
+				width: baw,
 			},
-			t: {
+			top: {
 				r: tr,
-				aw: taw,
-				al: a - taw,
-				ar: a + taw,
+				a,
+				width: taw,
 			},
 		};
 	}
