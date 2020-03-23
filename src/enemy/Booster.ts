@@ -50,12 +50,12 @@ class BoosterController extends Controller {
 }
 
 interface BoosterOptions {
-	facing?: Facing;
+	dir?: Facing;
 	img?: string;
 }
 
 export default class Booster extends Buster {
-	facing: Facing;
+	dir: Facing;
 
 	constructor(game: Game, options: BoosterOptions = {}) {
 		super(game, {
@@ -67,7 +67,7 @@ export default class Booster extends Buster {
 		});
 
 		this.name = 'Booster';
-		this.facing = options.facing || 'L';
+		this.dir = options.dir || 'L';
 	}
 
 	canAttack(player: Player, playerDist: number) {
@@ -75,6 +75,6 @@ export default class Booster extends Buster {
 	}
 
 	getJumpSide() {
-		return this.facing == 'R' ? 1 : -1;
+		return this.dir == 'R' ? 1 : -1;
 	}
 }

@@ -14,7 +14,7 @@ import mel from './makeElement';
 import clearChildren from './clearChildren';
 import { eGameReady, eLevelEnter, eMapEnter } from './events';
 import layers, { zBackground } from './layers';
-import { dLeft, dRight, Facing } from './dirs';
+import { dLeft, dRight } from './dirs';
 import Game, {
 	GameMode,
 	LevelMode,
