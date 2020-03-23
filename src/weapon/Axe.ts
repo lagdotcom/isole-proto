@@ -48,11 +48,6 @@ export default class AxeWeapon extends GenericMelee {
 			gCooldown,
 			aAxe,
 			(enemy: Enemy) => {
-				// TODO: this doesn't seem to be working
-				const dv = dirv(this.swing!.owner, enemy);
-				enemy.va += Math.sign(dv.a) * 2; // knock back a bit
-				enemy.last = {}; // unstick krillna
-
 				// TODO: always 2?
 				damage(enemy, this.swing!.owner, 2);
 			}

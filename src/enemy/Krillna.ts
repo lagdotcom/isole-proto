@@ -38,15 +38,12 @@ interface KrillnaInit {
 
 export default class Krillna extends AbstractEnemy {
 	dir: 'L' | 'R' | 'U' | 'D';
-	height: number;
 	last: { ceiling?: Flat | null; floor?: Flat | null; wall?: Wall | null };
 	movefn: (frame: number, n: number) => number;
 	speed: number;
 	sprite: controller;
 	tscale: number;
 	vfa: number;
-	vr: number;
-	width: number;
 
 	constructor(game: Game, options: KrillnaInit = {}) {
 		super({

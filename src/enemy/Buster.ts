@@ -69,15 +69,12 @@ interface BusterInit {
 export default class Buster extends AbstractEnemy {
 	fatigue: number;
 	grounded: boolean;
-	height: number;
 	jumpdelay: number;
 	jumpfatigue: number;
 	sprite: BusterController;
 	state: BusterState;
 	tscale: number;
 	vfa: number;
-	vr: number;
-	width: number;
 
 	constructor(game: Game, options: BusterInit = {}) {
 		super({

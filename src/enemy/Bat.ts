@@ -89,7 +89,6 @@ interface BatInit {
 export default class Bat extends AbstractEnemy {
 	channel: Channel;
 	dir: Facing;
-	height: number;
 	maxradius: number;
 	minradius: number;
 	roost: Flat | null;
@@ -103,8 +102,6 @@ export default class Bat extends AbstractEnemy {
 	targetradius: number;
 	tscale: number;
 	verticalTimer: number;
-	vr: number;
-	width: number;
 
 	/**
 	 * Create a new Bat

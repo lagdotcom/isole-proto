@@ -76,8 +76,6 @@ class Rock implements DrawnComponent {
 		if (enemy) {
 			// TODO: bounce etc
 			game.remove(this);
-			enemy.va += va * 0.2; // knock back a bit
-			enemy.last = {}; // unstick krillna
 			damage(enemy, this.owner, 1);
 			return;
 		}

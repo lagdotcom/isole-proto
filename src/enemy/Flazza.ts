@@ -51,15 +51,12 @@ interface FlazzaInit {
 export default class Flazza extends AbstractEnemy {
 	dir: Facing;
 	dropSpeed: number;
-	height: number;
 	recoverSpeed: number;
 	rtop: number;
 	speed: number;
 	sprite: controller;
 	state: FlazzaState;
 	tscale: number;
-	vr: number;
-	width: number;
 
 	constructor(game: Game, options: FlazzaInit = {}) {
 		super({

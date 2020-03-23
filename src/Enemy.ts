@@ -6,9 +6,7 @@ import Hitbox from './Hitbox';
 export default interface Enemy extends CoordAR, DrawnComponent, Damageable {
 	damage?: number;
 	isEnemy: true;
-	last?: any; //TODO
 	name: string;
-	va: number; // TODO
 
 	getHitbox(): Hitbox;
 }

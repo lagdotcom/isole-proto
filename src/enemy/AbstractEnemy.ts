@@ -5,27 +5,34 @@ import { deg2rad, jbr } from '../tools';
 import mel from '../makeElement';
 import Damageable from '../Damageable';
 
+const gStunMultiplier = 200;
+
 export default abstract class AbstractEnemy implements Enemy {
 	a: number;
 	alive: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
+	height: number;
 	isEnemy: true;
 	layer: number;
 	name: string;
 	r: number;
+	stunmultiplier: number;
 	stuntimer: number;
 	va: number;
+	vr: number;
+	width: number;
 
 	abstract draw(ctx: CanvasRenderingContext2D): void;
 	abstract getHitbox(): Hitbox;
 
 	constructor(options: any) {
-		Object.assign(this, options);
-
-		this.a = deg2rad(this.a);
+		this.stunmultiplier = gStunMultiplier;
 		this.stuntimer = 0;
+
+		Object.assign(this, options);
+		this.a = deg2rad(this.a);
 
 		if (this.game.options.showDebug) {
 			this.del = mel(this.game.options.debugContainer, 'div', {
@@ -43,7 +50,7 @@ export default abstract class AbstractEnemy implements Enemy {
 	}
 
 	hurt(by: Damageable, amount: number) {
-		this.stuntimer = amount * 200;
+		this.stuntimer = amount * this.stunmultiplier;
 	}
 
 	dostun(t: number) {
