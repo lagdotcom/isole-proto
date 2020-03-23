@@ -185,7 +185,9 @@ export default class Editor implements LevelGenerator, MapGenerator {
 		});
 
 		enemies.forEach(e => {
-			game.enemies.push(this.makeEnemy(e));
+			// feels weird
+			if (e.type === 'chompChamp') game.decals.push(this.makeEnemy(e));
+			else game.enemies.push(this.makeEnemy(e));
 		});
 
 		game.player = this.makePlayer(player);
