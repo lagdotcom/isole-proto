@@ -10,7 +10,7 @@ export default class Jacques extends AbstractPlayer {
 			body: new Channel(game, 'Jacques Body'),
 			voice: new Channel(game, 'Jacques Voice'),
 			name: 'Jacques',
-			w: 30,
+			w: 38,
 			h: 50,
 			sprite: controller(
 				this,

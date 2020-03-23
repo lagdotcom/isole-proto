@@ -159,9 +159,9 @@ export default class ChompChamp implements Enemy {
 		this.alive = true;
 		this.health = 100;
 		this.layer = zFlying;
-		this.width = 100;
-		this.attackWidth = 140;
-		this.height = 80;
+		this.width = 80;
+		this.attackWidth = 80;
+		this.height = 40;
 		this.a = deg2rad(init.a || 0);
 		this.r = init.r || 0;
 		this.sprite =
@@ -312,6 +312,7 @@ export default class ChompChamp implements Enemy {
 		if (collides(g, player.getHitbox()) && !player.invincible) {
 			this.state = aStruggle;
 
+			player.a = this.a; player.r = this.r; player.va = 0; player.vr = 0;
 			player.hidden = true;
 			player.invincible = true;
 			player.removecontrol = true;
@@ -321,6 +322,7 @@ export default class ChompChamp implements Enemy {
 	onRelease() {
 		const player = this.game.player;
 
+		player.a = this.a; player.r = this.r;
 		player.hidden = false;
 		player.invincible = false;
 		player.removecontrol = false;
