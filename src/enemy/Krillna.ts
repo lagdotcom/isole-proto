@@ -10,7 +10,6 @@ import {
 	angledist,
 	anglewrap,
 	cart,
-	deg2rad,
 	pi,
 	piHalf,
 	scalew,
@@ -21,7 +20,6 @@ import {
 import controller from '../spr/krillna';
 import { zEnemy } from '../layers';
 import Game from '../Game';
-import Enemy from '../Enemy';
 import Hitbox from '../Hitbox';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';

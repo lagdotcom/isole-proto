@@ -19,7 +19,6 @@ import {
 	cart,
 	choose,
 	collides,
-	deg2rad,
 	fittest,
 	lerp,
 	min,
@@ -29,7 +28,6 @@ import {
 	rnda,
 	rndr,
 	scalew,
-	jbr,
 	drawWedge,
 } from '../tools';
 import controller, {
@@ -40,11 +38,9 @@ import controller, {
 } from '../spr/bat';
 import { zFlying } from '../layers';
 import Channel from '../Channel';
-import Enemy from '../Enemy';
 import Flat from '../component/Flat';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
-import mel from '../makeElement';
 import AbstractEnemy from './AbstractEnemy';
 
 const gAttackFar = 160,
@@ -233,7 +229,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	[sFlying + ssTurn + 'Update'](time: number): number {
-		var { dir, va } = this;
+		var { va } = this;
 
 		va = lerp(va, 0);
 		if (Math.abs(va) < gZeroAngleThreshold) {
@@ -360,7 +356,7 @@ export default class Bat extends AbstractEnemy {
 			return this[sPunching + 'Update'](time);
 		}
 
-		const va = this.roostingAngleUpdate(time);
+		const va = this.roostingAngleUpdate();
 		const vr = this.roostingRadiusUpdate(time);
 		this.physics(time, va, vr);
 
@@ -372,7 +368,7 @@ export default class Bat extends AbstractEnemy {
 		this.sprite.move(time);
 	}
 
-	roostingAngleUpdate(time: number): number {
+	roostingAngleUpdate(): number {
 		var { dir, roostangle, va } = this;
 
 		const adiff = angledist(this.a, roostangle!);

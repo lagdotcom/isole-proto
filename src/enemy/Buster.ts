@@ -12,8 +12,6 @@ import {
 	angledist,
 	anglewrap,
 	cart,
-	deg2rad,
-	jbr,
 	pi,
 	piHalf,
 	scalew,
@@ -24,12 +22,10 @@ import {
 } from '../tools';
 import controller from '../spr/buster';
 import { zEnemy } from '../layers';
-import Enemy from '../Enemy';
 import Game from '../Game';
 import { Hitsize } from '../Hitbox';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
-import mel from '../makeElement';
 import Player from '../Player';
 import AbstractEnemy from './AbstractEnemy';
 
@@ -38,8 +34,7 @@ const gJumpFatigue = 150,
 	gJumpStartup = 15,
 	gJumpStrength = 4,
 	gAttackWidth = 250,
-	gNearWidth = 500,
-	gRadiusMult = 6;
+	gNearWidth = 500;
 
 const sIdle = 'idle',
 	sPreJump = 'prejump',

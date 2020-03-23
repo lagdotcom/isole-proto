@@ -15,7 +15,6 @@ import {
 	angledist,
 	anglewrap,
 	cart,
-	deg2rad,
 	pi,
 	piHalf,
 	scalew,
@@ -26,7 +25,6 @@ import {
 } from '../tools';
 import controller, { eDrop, eRecover } from '../spr/flazza';
 import { zFlying } from '../layers';
-import Enemy from '../Enemy';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Flat from '../component/Flat';
@@ -255,11 +253,11 @@ export default class Flazza extends AbstractEnemy {
 
 	getFloor(): Flat | null {
 		const { bot, top } = this.getHitbox();
-		const { a, game } = this;
+		const { game } = this;
 
 		return first(
 			game.floors,
-			(f, i) => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+			f => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
 		);
 	}
 

@@ -13,7 +13,6 @@ import {
 	gWallBounce,
 } from '../nums';
 import {
-	angledist,
 	anglewrap,
 	cart,
 	deg2rad,
@@ -130,8 +129,7 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('down');
 			floor = first(
 				floors,
-				(f, i) =>
-					bot.r <= f.r && step.r >= f.r && anglecollides(step, f)
+				f => bot.r <= f.r && step.r >= f.r && anglecollides(step, f)
 			);
 		}
 
@@ -140,7 +138,7 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('up');
 			ceiling = first(
 				ceilings,
-				(f, i) => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+				f => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
 			);
 			if (ceiling) {
 				flags.push('ceiling');

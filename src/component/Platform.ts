@@ -1,4 +1,3 @@
-import { cWall } from '../colours';
 import { gHitboxScale } from '../nums';
 import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
 import { zStructure } from '../layers';
