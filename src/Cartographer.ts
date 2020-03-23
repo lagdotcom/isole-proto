@@ -1,0 +1,79 @@
+import Delaunay from 'delaunay-fast';
+import MapNode, { NodeType } from './MapNode';
+import { rndr } from './tools';
+import IfInDoubtFight from './mutator/IfInDoubtFight';
+import LockedTreasure from './mutator/LockedTreasure';
+import NeedAShop from './mutator/NeedAShop';
+
+const stageCount = [10, 12, 14];
+const stageGap = [120, 100, 85];
+const offsets = [[0], [-60, 60], [-100, 0, 100]];
+
+const maxwiggle = 20;
+const wiggle = () => rndr(-maxwiggle, maxwiggle);
+
+export interface GameState {
+	floor: number;
+}
+
+export interface Mutator {
+	applies(gs: GameState): boolean;
+	run(nodes: MapNode[], stages: number, gs: GameState): boolean;
+}
+
+export default class Cartographer {
+	mutators: Mutator[];
+
+	constructor() {
+		this.mutators = [
+			new NeedAShop(),
+			new LockedTreasure(),
+			new IfInDoubtFight(),
+		];
+	}
+
+	gen(gs: GameState) {
+		const nodes: MapNode[] = [];
+		const stages = stageCount[gs.floor];
+		const gap = stageGap[gs.floor];
+
+		for (var stage = 0; stage < stages; stage++) {
+			const first = stage == 0;
+			const last = stage == stages - 1;
+			const size = first ? 1 : last ? 1 : rndr(2, 4);
+			const yo = offsets[size - 1];
+
+			for (var i = 0; i < size; i++) {
+				nodes.push({
+					id: nodes.length,
+					connections: [],
+					stage,
+					type: last ? NodeType.Boss : NodeType.Indeterminate,
+					x: wiggle() + stage * gap,
+					y: wiggle() + yo[i],
+				});
+			}
+		}
+
+		const tris = Delaunay.triangulate(nodes.map(n => [n.x, n.y]));
+		for (var i = 0; i < tris.length; i += 3) {
+			const indices = [tris[i], tris[i + 1], tris[i + 2]];
+			const set = indices.map(x => nodes[x]);
+
+			set.forEach(n => {
+				set.forEach(o => {
+					if (n.stage == o.stage - 1 && !n.connections.includes(o.id))
+						n.connections.push(o.id);
+				});
+
+				n.connections.sort();
+			});
+		}
+
+		this.mutators.forEach(m => {
+			if (m.applies(gs)) m.run(nodes, stages, gs);
+		});
+
+		return nodes;
+	}
+}

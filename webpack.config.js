@@ -1,18 +1,28 @@
 const path = require('path');
 
 module.exports = {
-	entry: './src/main.js',
-	devServer: {
-		contentBase: path.join(__dirname, 'dist'),
-		open: true,
+	entry: './src/main',
+	plugins: [],
+	output: {
+		path: __dirname + '/dist',
+		filename: 'main.js',
+	},
+	devtool: 'source-map',
+	resolve: {
+		extensions: ['.ts', '.tsx', '.js'],
 	},
 	module: {
 		rules: [
-			{ test: /\.png$/, use: 'file-loader' },
 			{
-				test: /.css$/,
-				use: ['style-loader', 'css-loader'],
+				test: /\.(png|wav)$/,
+				loader: 'file-loader',
+				options: { name: '[name].[ext]' },
 			},
+			{
+				test: /\.css$/,
+				loader: ['style-loader', 'css-loader'],
+			},
+			{ test: /\.tsx?$/, loader: 'ts-loader' },
 		],
 	},
 };
