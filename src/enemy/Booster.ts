@@ -60,7 +60,7 @@ export default class Booster extends Buster {
 	constructor(game: Game, options: BoosterOptions = {}) {
 		super(game, {
 			...options,
-			jumpfatigue: 0,
+			jumpfatigue: 1,
 			sprite: new BoosterController(
 				game.resources[options.img || 'enemy.booster']
 			),
