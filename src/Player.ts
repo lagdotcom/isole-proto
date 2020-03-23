@@ -11,6 +11,7 @@ export default interface Player extends DrawnComponent, Damageable {
 
 	body: Channel;
 	facing: Facing;
+	removecontrol: boolean;
 	sprite: PlayerController;
 	va: number;
 	vfa: number;

@@ -1,5 +1,5 @@
 import Enemy from '../Enemy';
-import { deg2rad, piHalf, cart, scalew, collides, jbr } from '../tools';
+import { deg2rad, piHalf, cart, scalew, collides, jbr, damage } from '../tools';
 import Game from '../Game';
 import { zFlying } from '../layers';
 import Hitbox from '../Hitbox';
@@ -179,7 +179,10 @@ export default class ChompChamp implements Enemy {
 		switch (this.state) {
 			case aIdle:
 				const a = this.getAttackHitbox();
-				if (collides(a, this.game.player.getHitbox())) {
+				if (
+					collides(a, this.game.player.getHitbox()) &&
+					this.game.player.alive
+				) {
 					this.state = aClose;
 				}
 
@@ -310,18 +313,27 @@ export default class ChompChamp implements Enemy {
 	}
 
 	onCatch() {
+		const player = this.game.player;
 		const g = this.getCatchHitbox();
-		if (collides(g, this.game.player.getHitbox())) {
+
+		if (collides(g, player.getHitbox()) && !player.invincible) {
 			this.state = aStruggle;
 
-			// TODO: hide player, remove control
+			player.hidden = true;
+			player.invincible = true;
+			player.removecontrol = true;
 		}
 	}
 
 	onRelease() {
-		console.log('ChompChamp.release');
+		const player = this.game.player;
 
-		// TODO: show player, damage, restore control, push into air
+		player.hidden = false;
+		player.invincible = false;
+		player.removecontrol = false;
+		damage(player, this, 1);
+		player.va = 0;
+		player.vr = 8;
 	}
 
 	onNext() {

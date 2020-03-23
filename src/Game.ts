@@ -364,7 +364,7 @@ export default class Game {
 			this.drawn = this.getDrawnComponents();
 		}
 
-		this.drawn.forEach(co => co.draw(c));
+		this.drawn.forEach(co => !co.hidden && co.draw(c));
 
 		if (showHitboxes) {
 			c.beginPath();

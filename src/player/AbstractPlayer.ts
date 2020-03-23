@@ -67,6 +67,7 @@ export default abstract class AbstractPlayer implements Player {
 	layer: number;
 	name: string;
 	r: number;
+	removecontrol: boolean;
 	sprite: PlayerController;
 	steph: number;
 	tscale: number;
@@ -216,7 +217,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		var controls: string[] = [];
-		if (ok && !sprite.flags.noControl) {
+		if (ok && !sprite.flags.noControl && !this.removecontrol) {
 			var strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				va -= strength;
