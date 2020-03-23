@@ -3,6 +3,7 @@ import MapNode, { NodeType } from './MapNode';
 import { rndr } from './tools';
 import IfInDoubtFight from './mutator/IfInDoubtFight';
 import LockedTreasure from './mutator/LockedTreasure';
+import NeedAShop from './mutator/NeedAShop';
 
 const stageCount = [10, 12, 14];
 const stageGap = [120, 100, 85];
@@ -24,7 +25,11 @@ export default class Cartographer {
 	mutators: Mutator[];
 
 	constructor() {
-		this.mutators = [new LockedTreasure(), new IfInDoubtFight()];
+		this.mutators = [
+			new NeedAShop(),
+			new LockedTreasure(),
+			new IfInDoubtFight(),
+		];
 	}
 
 	gen(gs: GameState) {
