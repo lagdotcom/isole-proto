@@ -14,7 +14,7 @@ export default class Inventory implements DrawnComponent {
 	keys: number;
 	layer: number;
 	money: number;
-	weapon: Weapon;
+	weapon?: Weapon;
 
 	constructor(game: Game, size: number = 3) {
 		Object.assign(this, {
@@ -34,15 +34,33 @@ export default class Inventory implements DrawnComponent {
 
 	clear(): void {
 		this.items.fill(undefined);
+		this.weapon = undefined;
 	}
 
-	add(cls): void {
+	swap(weapon: Weapon): Weapon | undefined {
+		const old = this.weapon;
+		this.weapon = weapon;
+		return old;
+	}
+
+	add(cls: new (game: Game) => Item): boolean {
 		const i = this.items.indexOf(undefined);
-		if (i > -1) this.items[i] = new cls(this.game);
+		if (i > -1) {
+			this.items[i] = new cls(this.game);
+			return true;
+		}
+
+		return false;
 	}
 
-	remove(item: Item): void {
-		this.items = this.items.filter(i => i != item);
+	remove(item: Item): boolean {
+		const i = this.items.indexOf(item);
+		if (i > -1) {
+			this.items[i] = undefined;
+			return true;
+		}
+
+		return false;
 	}
 
 	update(t: number): void {

@@ -67,6 +67,7 @@ export default abstract class AbstractPlayer implements Player {
 	hurtSound: string;
 	layer: number;
 	name: string;
+	pickupdebounce: boolean;
 	r: number;
 	removecontrol: boolean;
 	sprite: PlayerController;
@@ -99,6 +100,7 @@ export default abstract class AbstractPlayer implements Player {
 				tscale: 0,
 				alive: true,
 				health: 5,
+				pickupdebounce: false,
 			},
 			this.getDefaultInit(game, options),
 			options
@@ -253,6 +255,23 @@ export default abstract class AbstractPlayer implements Player {
 
 			if (keys.has(InputButton.Swing)) controls.push('swing');
 			if (keys.has(InputButton.Throw)) controls.push('throw');
+
+			if (keys.has(InputButton.Pickup)) {
+				controls.push('pickup');
+
+				if (!this.pickupdebounce) {
+					const item = game.pickups.find(p =>
+						collides({ bot, top }, p.getHitbox())
+					);
+
+					if (item) {
+						this.pickupdebounce = true;
+						item.take();
+					}
+				}
+			} else {
+				this.pickupdebounce = false;
+			}
 		} else controls.push('nocontrol');
 
 		if (wall && !ceiling) {

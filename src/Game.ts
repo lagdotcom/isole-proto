@@ -23,6 +23,7 @@ import MapNode from './MapNode';
 import MapView from './component/MapView';
 import InputMapper, { InputButton } from './InputMapper';
 import LeaveTimer from './Component/LeaveTimer';
+import { Pickup } from './Pickup';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
@@ -91,6 +92,7 @@ export default class Game {
 	nodes: MapNode[];
 	objects: { [name: string]: Controller };
 	options: GameInit;
+	pickups: Pickup[];
 	platforms: Platform[];
 	player: Player;
 	redraw: boolean;
@@ -195,6 +197,7 @@ export default class Game {
 		this.floors = [];
 		this.platforms = [];
 		this.walls = [];
+		this.pickups = [];
 		this.components = [];
 		this.redraw = true;
 	}
@@ -227,6 +230,7 @@ export default class Game {
 			...this.walls,
 			...this.enemies,
 			...this.decals,
+			...this.pickups,
 			this.player,
 			this.inventory,
 			this.zoomer,

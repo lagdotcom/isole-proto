@@ -81,9 +81,7 @@ const rw3: EditorData = {
 			walls: true,
 		},
 	],
-	walls: [],
 	floors: [{ h: 320, a: 0, w: 360, material: 'gsolid' }],
-	objects: [],
 	player: {
 		type: 'jacques',
 		a: 180,

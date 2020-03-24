@@ -29,6 +29,7 @@ export enum InputButton {
 	Throw,
 	Swing,
 	Cycle,
+	Pickup,
 }
 
 interface InputDevice {
@@ -129,6 +130,7 @@ export default class InputMapper {
 		this.map(kSwing, InputButton.Swing);
 		this.map(kThrow, InputButton.Throw);
 		this.map(kCycle, InputButton.Cycle);
+		this.map(kDown, InputButton.Pickup);
 
 		this.map(jLeft, InputButton.Left);
 		this.map(jUp, InputButton.Up);
@@ -138,6 +140,7 @@ export default class InputMapper {
 		this.map(jButton2, InputButton.Throw);
 		this.map(jButton3, InputButton.Swing);
 		this.map(jButton4, InputButton.Cycle);
+		this.map(jDown, InputButton.Pickup);
 	}
 
 	load(key: string = 'InputMapping') {

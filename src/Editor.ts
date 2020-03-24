@@ -1,14 +1,5 @@
-import Axe from './weapon/axe';
-import Bat from './enemy/bat';
-import Booster from './enemy/Booster';
-import Buster from './enemy/Buster';
-import ChompChamp from './enemy/ChompChamp';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
-import Flazza from './enemy/Flazza';
-import Jacques from './player/Jacques';
-import Krillna from './enemy/Krillna';
-import Rock from './item/Rock';
 import Wall from './component/Wall';
 import mel from './makeElement';
 import clearChildren from './clearChildren';
@@ -22,8 +13,6 @@ import Game, {
 	LevelGenerator,
 	MapGenerator,
 } from './Game';
-import Woody from './player/Woody';
-import Bomb from './item/Bomb';
 import Platform from './component/Platform';
 import MapNode from './MapNode';
 import Cartographer from './Cartographer';
@@ -36,28 +25,19 @@ import EditorData, {
 	EditorWall,
 	EditorFloor,
 	EditorObject,
+	EditorWeapon,
 } from './EditorData';
-import Minatoad from './enemy/Minatoad';
-
-const enemyTypes = {
-	bat: Bat,
-	booster: Booster,
-	buster: Buster,
-	chompChamp: ChompChamp,
-	krillna: Krillna,
-	flazza: Flazza,
-	minatoad: Minatoad,
-};
-const enemies = Object.keys(enemyTypes);
-
-const itemTypes = { bomb: Bomb, rock: Rock };
-const items = ['', ...Object.keys(itemTypes)];
-
-const playerTypes = { jacques: Jacques, woody: Woody };
-const players = Object.keys(playerTypes);
-
-const weaponTypes = { axe: Axe };
-const weapons = ['', ...Object.keys(weaponTypes)];
+import {
+	enemyNames,
+	enemyTypes,
+	itemNames,
+	itemTypes,
+	playerNames,
+	playerTypes,
+	weaponNames,
+	weaponTypes,
+} from './corpus';
+import WeaponObject from './weapon/WeaponObject';
 
 var materials: string[];
 var objects: string[];
@@ -126,6 +106,7 @@ export default class Editor implements LevelGenerator, MapGenerator {
 				{ type: 'buster', a: 0, r: 150, dir: 'L' },
 				{ type: 'krillna', a: 150, r: 150, dir: 'R' },
 			],
+			weapons: [],
 		};
 
 		this.makeDom(parent);
@@ -154,41 +135,66 @@ export default class Editor implements LevelGenerator, MapGenerator {
 
 	makeLevel(game: Game) {
 		const data = this.me ? this.data : choose(roundwoods);
-		const { platforms, walls, floors, objects, player, enemies } = data;
+		const {
+			platforms,
+			walls,
+			floors,
+			objects,
+			player,
+			enemies,
+			weapons,
+		} = data;
 
-		platforms.forEach(p => {
-			game.platforms.push(new Platform({ game, ...p }));
-		});
+		platforms &&
+			platforms.forEach(p => {
+				game.platforms.push(new Platform({ game, ...p }));
+			});
 
-		walls.forEach(w => {
-			game.walls.push(
-				new Wall(
-					game,
-					w.top,
-					w.bottom,
-					w.a,
-					w.dir,
-					w.motion,
-					w.material
-				)
-			);
-		});
+		walls &&
+			walls.forEach(w => {
+				game.walls.push(
+					new Wall(
+						game,
+						w.top,
+						w.bottom,
+						w.a,
+						w.dir,
+						w.motion,
+						w.material
+					)
+				);
+			});
 
-		floors.forEach(f => {
-			game.floors.push(
-				new Flat(game, f.h, f.a, f.w, f.motion, f.material)
-			);
-		});
+		floors &&
+			floors.forEach(f => {
+				game.floors.push(
+					new Flat(game, f.h, f.a, f.w, f.motion, f.material)
+				);
+			});
 
-		objects.forEach(o => {
-			game.decals.push(new Decal(game, o));
-		});
+		objects &&
+			objects.forEach(o => {
+				game.decals.push(new Decal(game, o));
+			});
 
-		enemies.forEach(e => {
-			// feels weird
-			if (e.type === 'chompChamp') game.decals.push(this.makeEnemy(e));
-			else game.enemies.push(this.makeEnemy(e));
-		});
+		enemies &&
+			enemies.forEach(e => {
+				// feels weird
+				if (e.type === 'chompChamp')
+					game.decals.push(this.makeEnemy(e));
+				else game.enemies.push(this.makeEnemy(e));
+			});
+
+		weapons &&
+			weapons.forEach(w => {
+				game.pickups.push(
+					new WeaponObject(game, {
+						a: w.a,
+						r: w.r,
+						weapon: weaponTypes[w.weapon],
+					})
+				);
+			});
 
 		game.player = this.makePlayer(player);
 
@@ -288,6 +294,11 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			r: 300,
 			dir: dLeft,
 		});
+		this.makeSection(c, 'weapons', 'Weapons', 'makeWeaponDom', {
+			weapon: weaponNames[1],
+			a: 0,
+			r: 300,
+		});
 
 		const dc = mel(c, 'div', { className: 'section section-dump' });
 		mel(dc, 'h2', { innerText: 'Dump' });
@@ -337,7 +348,7 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			'input',
 			{ type: 'number', value: object[attribute] || 0 },
 			{
-				change: e => {
+				change: () => {
 					var f = filter(el.valueAsNumber);
 					object[attribute] = f;
 					this.refresh();
@@ -457,11 +468,11 @@ export default class Editor implements LevelGenerator, MapGenerator {
 
 	makePlayerDom(parent: HTMLElement, o: EditorPlayer) {
 		const e = mel(parent, 'div', { className: 'entry' });
-		this.makeChoiceInput(e, o, 'Character', 'type', players);
+		this.makeChoiceInput(e, o, 'Character', 'type', playerNames);
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
-		this.makeChoiceInput(e, o, 'Item', 'item', items);
-		this.makeChoiceInput(e, o, 'Weapon', 'weapon', weapons);
+		this.makeChoiceInput(e, o, 'Item', 'item', itemNames);
+		this.makeChoiceInput(e, o, 'Weapon', 'weapon', weaponNames);
 	}
 
 	makePlatformDom(parent: HTMLElement, o: EditorPlatform) {
@@ -515,9 +526,23 @@ export default class Editor implements LevelGenerator, MapGenerator {
 	makeEnemyDom(parent: HTMLElement, o: EditorEnemy) {
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'enemies');
-		this.makeChoiceInput(e, o, 'Type', 'type', enemies);
+		this.makeChoiceInput(e, o, 'Type', 'type', enemyNames);
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeChoiceInput(e, o, 'Direction', 'dir', [dLeft, dRight]);
+	}
+
+	makeWeaponDom(parent: HTMLElement, o: EditorWeapon) {
+		const e = mel(parent, 'div', { className: 'entry' });
+		this.makeDel(e, o, 'weapons');
+		this.makeChoiceInput(
+			e,
+			o,
+			'Weapon',
+			'weapon',
+			weaponNames.filter(x => x)
+		);
+		this.makeNumInput(e, o, 'Height', 'r');
+		this.makeAngleInput(e, o, 'Angle', 'a');
 	}
 }

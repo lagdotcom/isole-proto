@@ -33,9 +33,7 @@ const rw5: EditorData = {
 			ceiling: true,
 		},
 	],
-	walls: [],
 	floors: [{ h: 120, a: 0, w: 360, material: 'gsolid' }],
-	objects: [],
 	player: {
 		type: 'jacques',
 		a: 270,

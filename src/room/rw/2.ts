@@ -35,9 +35,7 @@ const rw2: EditorData = {
 			material: 'gthin',
 		},
 	],
-	walls: [],
 	floors: [{ h: 96, a: 0, w: 360, material: 'gsolid' }],
-	objects: [],
 	player: {
 		type: 'jacques',
 		a: 135,

@@ -2,12 +2,13 @@ import CoordAR from './CoordAR';
 import { Facing } from './dirs';
 
 export default interface EditorData {
-	platforms: EditorPlatform[];
-	walls: EditorWall[];
-	floors: EditorFloor[];
-	objects: EditorObject[];
+	platforms?: EditorPlatform[];
+	walls?: EditorWall[];
+	floors?: EditorFloor[];
+	objects?: EditorObject[];
 	player: EditorPlayer;
-	enemies: EditorEnemy[];
+	enemies?: EditorEnemy[];
+	weapons?: EditorWeapon[];
 }
 
 export interface EditorEnemy extends CoordAR {
@@ -51,4 +52,8 @@ export interface EditorWall {
 	motion?: number;
 	dir: 1 | -1;
 	material: string;
+}
+
+export interface EditorWeapon extends CoordAR {
+	weapon: string;
 }
