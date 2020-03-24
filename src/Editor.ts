@@ -38,6 +38,7 @@ import {
 	weaponTypes,
 } from './corpus';
 import WeaponObject from './weapon/WeaponObject';
+import ItemObject from './item/ItemObject';
 
 var materials: string[];
 var objects: string[];
@@ -106,7 +107,6 @@ export default class Editor implements LevelGenerator, MapGenerator {
 				{ type: 'buster', a: 0, r: 150, dir: 'L' },
 				{ type: 'krillna', a: 150, r: 150, dir: 'R' },
 			],
-			weapons: [],
 		};
 
 		this.makeDom(parent);
@@ -143,6 +143,7 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			player,
 			enemies,
 			weapons,
+			items,
 		} = data;
 
 		platforms &&
@@ -192,6 +193,17 @@ export default class Editor implements LevelGenerator, MapGenerator {
 						a: w.a,
 						r: w.r,
 						weapon: weaponTypes[w.weapon],
+					})
+				);
+			});
+
+		items &&
+			items.forEach(i => {
+				game.pickups.push(
+					new ItemObject(game, {
+						a: i.a,
+						r: i.r,
+						item: itemTypes[i.item],
 					})
 				);
 			});
@@ -299,6 +311,11 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			a: 0,
 			r: 300,
 		});
+		this.makeSection(c, 'items', 'Items', 'makeItemDom', {
+			item: itemNames[1],
+			a: 0,
+			r: 300,
+		});
 
 		const dc = mel(c, 'div', { className: 'section section-dump' });
 		mel(dc, 'h2', { innerText: 'Dump' });
@@ -336,7 +353,9 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			example
 		);
 		this[name] = mel(container);
-		this.data[name].forEach(o => this[maker](this[name], o));
+
+		const sec = this.data[name];
+		sec && sec.forEach(o => this[maker](this[name], o));
 	}
 
 	makeNumInput(parent, object, label, attribute, filter = x => x) {
@@ -458,6 +477,8 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			{
 				click: () => {
 					const o = Object.assign({}, example);
+					if (!this.data[list]) this.data[list] = [];
+
 					this.data[list].push(o);
 					this[maker](this[list], o);
 					this.refresh();
@@ -541,6 +562,20 @@ export default class Editor implements LevelGenerator, MapGenerator {
 			'Weapon',
 			'weapon',
 			weaponNames.filter(x => x)
+		);
+		this.makeNumInput(e, o, 'Height', 'r');
+		this.makeAngleInput(e, o, 'Angle', 'a');
+	}
+
+	makeItemDom(parent: HTMLElement, o: EditorWeapon) {
+		const e = mel(parent, 'div', { className: 'entry' });
+		this.makeDel(e, o, 'items');
+		this.makeChoiceInput(
+			e,
+			o,
+			'Item',
+			'item',
+			itemNames.filter(x => x)
 		);
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');

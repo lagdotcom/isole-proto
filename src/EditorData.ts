@@ -9,6 +9,7 @@ export default interface EditorData {
 	player: EditorPlayer;
 	enemies?: EditorEnemy[];
 	weapons?: EditorWeapon[];
+	items?: EditorItem[];
 }
 
 export interface EditorEnemy extends CoordAR {
@@ -56,4 +57,8 @@ export interface EditorWall {
 
 export interface EditorWeapon extends CoordAR {
 	weapon: string;
+}
+
+export interface EditorItem extends CoordAR {
+	item: string;
 }
