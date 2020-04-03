@@ -112,17 +112,22 @@ export default class Inventory implements DrawnComponent {
 		c.font = '20px sans-serif';
 		c.fillStyle = '#ffffff';
 
+		// icons image: mana, health, keys, money (each 32x32)
+
 		x = 0;
 		for (var i = 0; i < health; i++) {
-			c.drawImage(img, 36, 0, 36, 36, x, 0, 36, 36);
-			x += 27;
+			c.drawImage(img, 32, 0, 32, 32, x, 0, 32, 32);
+			x += 32;
 		}
 
-		c.drawImage(img, 0, 0, 36, 36, 0, 36, 36, 36);
-		c.fillText(money.toString(), 40, 60);
+		c.drawImage(img, 0, 0, 32, 32, 0, 32, 32, 32);
+		c.fillText('manabar', 40, 54);
 
-		c.drawImage(img, 72, 0, 36, 36, 0, 72, 36, 36);
-		c.fillText(keys.toString(), 40, 96);
+		c.drawImage(img, 96, 0, 32, 32, 0, 64, 32, 32);
+		c.fillText(money.toString(), 40, 88);
+
+		c.drawImage(img, 64, 0, 32, 32, 128, 64, 32, 32);
+		c.fillText(keys.toString(), 168, 88);
 	}
 
 	canThrow(): boolean {
