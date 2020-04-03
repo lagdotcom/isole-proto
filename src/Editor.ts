@@ -12,6 +12,8 @@ import Game, {
 	MapMode,
 	LevelGenerator,
 	MapGenerator,
+	ShopMode,
+	ShopGenerator,
 } from './Game';
 import Platform from './component/Platform';
 import MapNode from './MapNode';
@@ -39,6 +41,10 @@ import {
 } from './corpus';
 import WeaponObject from './weapon/WeaponObject';
 import ItemObject from './item/ItemObject';
+import { gTimeScale } from './nums';
+import RockItem from './item/Rock';
+import AxeWeapon from './weapon/axe';
+import BombItem from './item/Bomb';
 
 var materials: string[];
 var objects: string[];
@@ -51,7 +57,8 @@ interface EditorInit {
 	parent: HTMLElement;
 }
 
-export default class Editor implements LevelGenerator, MapGenerator {
+export default class Editor
+	implements LevelGenerator, MapGenerator, ShopGenerator {
 	container: HTMLElement;
 	data: EditorData;
 	dump: HTMLTextAreaElement;
@@ -115,6 +122,7 @@ export default class Editor implements LevelGenerator, MapGenerator {
 	refresh() {
 		if (this.mode == LevelMode) this.game.enter(this);
 		if (this.mode == MapMode) this.game.show(this);
+		if (this.mode == ShopMode) this.game.shop(this);
 	}
 
 	makeMap(game: Game) {
@@ -219,6 +227,14 @@ export default class Editor implements LevelGenerator, MapGenerator {
 		this.dump.value = JSON.stringify(data);
 	}
 
+	makeShop(game: Game) {
+		game.shopView.clear();
+
+		game.shopView.item(RockItem, 10);
+		game.shopView.weapon(AxeWeapon, 40);
+		game.shopView.item(BombItem, 15);
+	}
+
 	makeEnemy(e: EditorEnemy) {
 		return new enemyTypes[e.type](this.game, e);
 	}
@@ -260,6 +276,18 @@ export default class Editor implements LevelGenerator, MapGenerator {
 				click: () => {
 					this.me = false;
 					this.mode = MapMode;
+					this.refresh();
+				},
+			}
+		);
+		mel(
+			c,
+			'button',
+			{ innerText: 'Shop Mode' },
+			{
+				click: () => {
+					this.me = false;
+					this.mode = ShopMode;
 					this.refresh();
 				},
 			}

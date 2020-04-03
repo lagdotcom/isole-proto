@@ -4,6 +4,7 @@ import Game from '../Game';
 import Weapon from '../Weapon';
 import Item from '../Item';
 import { InputButton } from '../InputMapper';
+import { drawCross } from '../tools';
 
 export default class Inventory implements DrawnComponent {
 	cycling: boolean;
@@ -100,7 +101,7 @@ export default class Inventory implements DrawnComponent {
 		const { game, items, money, health, keys, img, weapon } = this;
 
 		const y = game.options.height - 48;
-		var x = 0;
+		var x = 60;
 
 		if (weapon) weapon.draw(c, game.options.width - 48, y);
 
@@ -128,6 +129,26 @@ export default class Inventory implements DrawnComponent {
 
 		c.drawImage(img, 64, 0, 32, 32, 128, 64, 32, 32);
 		c.fillText(keys.toString(), 168, 88);
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { game } = this;
+		const y = game.options.height - 48;
+
+		// weapon position
+		drawCross(c, 'lime', game.options.width - 48, y);
+
+		// item positions
+		var x = 60;
+		drawCross(c, 'lime', x, y);
+		drawCross(c, 'lime', x + 48, y);
+		drawCross(c, 'lime', x + 48 + 48, y);
+
+		// icon positions
+		drawCross(c, 'green', 0, 0);
+		drawCross(c, 'green', 0, 32);
+		drawCross(c, 'green', 0, 64);
+		drawCross(c, 'green', 128, 64);
 	}
 
 	canThrow(): boolean {

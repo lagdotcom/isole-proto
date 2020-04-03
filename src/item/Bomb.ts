@@ -252,17 +252,15 @@ export default class BombItem implements Item {
 			game,
 			sprite: new BombController(game.resources['item.bomb']),
 			thrown: this.thrown.bind(this),
-			xo: 30,
-			yo: 30,
 		});
 
 		this.sprite.idle();
 	}
 
 	draw(c: CanvasRenderingContext2D, x: number, y: number) {
-		c.translate(x + this.xo, y + this.yo);
+		c.translate(x, y);
 		this.sprite.draw(c);
-		c.translate(-x - this.xo, -y - this.yo);
+		c.translate(-x, -y);
 	}
 
 	canUse() {

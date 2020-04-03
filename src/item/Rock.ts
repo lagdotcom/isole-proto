@@ -30,7 +30,7 @@ const gFloatTime = 80,
 	gWindLoss = 0.995;
 
 const controller = (img: CanvasImageSource) =>
-	new Controller({ img, w: 48, h: 48 });
+	new Controller({ img, w: 48, h: 48, xo: -24, yo: -36 });
 
 class Rock implements DrawnComponent {
 	a: number;
@@ -62,9 +62,6 @@ class Rock implements DrawnComponent {
 			},
 			options
 		);
-
-		this.sprite.xo = -24;
-		this.sprite.yo = -36;
 	}
 
 	update(time: number): void {

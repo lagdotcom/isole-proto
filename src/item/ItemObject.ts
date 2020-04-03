@@ -6,7 +6,7 @@ import { cIgnore } from '../colours';
 import Hitbox from '../Hitbox';
 import { Pickup } from '../Pickup';
 
-type ItemConstructor = new (game: Game) => Item;
+export type ItemConstructor = new (game: Game) => Item;
 interface ItemObjectInit {
 	a: number;
 	item: ItemConstructor;

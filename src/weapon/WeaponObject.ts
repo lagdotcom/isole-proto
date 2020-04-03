@@ -6,10 +6,11 @@ import { cIgnore } from '../colours';
 import Hitbox from '../Hitbox';
 import { Pickup } from '../Pickup';
 
+export type WeaponConstructor = new (game: Game) => Weapon;
 interface WeaponObjectInit {
 	a: number;
 	r: number;
-	weapon: new (game: Game) => Weapon;
+	weapon: WeaponConstructor;
 }
 
 export default class WeaponObject implements Pickup {

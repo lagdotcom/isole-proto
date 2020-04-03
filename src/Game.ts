@@ -1,7 +1,7 @@
 import Flat from './component/Flat';
 import Inventory from './component/Inventory';
 import Wall from './component/Wall';
-import { eLevelEntered, eGameReady, eMapEntered } from './events';
+import { eLevelEntered, eGameReady, eMapEntered, eShopEntered } from './events';
 import { min } from './tools';
 import { gMaxTimeStep } from './nums';
 import mel from './makeElement';
@@ -24,11 +24,13 @@ import MapView from './component/MapView';
 import InputMapper, { InputButton } from './InputMapper';
 import LeaveTimer from './Component/LeaveTimer';
 import { Pickup } from './Pickup';
+import ShopView from './component/ShopView';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
 export const MapMode = 'map';
-export type GameMode = 'level' | 'loading' | 'map';
+export const ShopMode = 'shop';
+export type GameMode = 'level' | 'loading' | 'map' | 'shop';
 
 export interface LevelGenerator {
 	makeLevel: (game: Game) => void;
@@ -36,6 +38,10 @@ export interface LevelGenerator {
 
 export interface MapGenerator {
 	makeMap: (game: Game) => void;
+}
+
+export interface ShopGenerator {
+	makeShop: (game: Game) => void;
 }
 
 interface GameInit {
@@ -99,6 +105,7 @@ export default class Game {
 	resources: { [name: string]: any };
 	running: boolean;
 	runningRaf: number;
+	shopView: ShopView;
 	textures: { [name: string]: Texture };
 	time: number;
 	walls: Wall[];
@@ -180,6 +187,7 @@ export default class Game {
 	ready() {
 		this.inventory = new Inventory(this);
 		this.mapView = new MapView(this);
+		this.shopView = new ShopView(this);
 
 		this.fire(eGameReady);
 	}
@@ -208,6 +216,7 @@ export default class Game {
 	 */
 	show(gen: MapGenerator): void {
 		this.clear();
+		this.zoomer.reset();
 
 		gen.makeMap(this);
 		this.components = [this.inventory, this.mapView];
@@ -221,6 +230,7 @@ export default class Game {
 	 */
 	enter(gen: LevelGenerator): void {
 		this.clear();
+		this.zoomer.reset();
 
 		gen.makeLevel(this);
 		this.components = [
@@ -242,6 +252,21 @@ export default class Game {
 		this.mode = LevelMode;
 		this.addAttachments();
 		this.fire(eLevelEntered);
+	}
+
+	/**
+	 * Enter the shop!
+	 * @param {ShopGenerator} gen shop generator
+	 */
+	shop(gen: ShopGenerator) {
+		this.clear();
+		this.zoomer.reset();
+
+		gen.makeShop(this);
+		this.components = [this.shopView, this.inventory];
+
+		this.mode = ShopMode;
+		this.fire(eShopEntered);
 	}
 
 	/**
@@ -342,6 +367,7 @@ export default class Game {
 
 			case LevelMode:
 			case MapMode:
+			case ShopMode:
 				this.showGameScreen(step);
 				break;
 		}

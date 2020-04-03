@@ -27,6 +27,7 @@ import {
 	first,
 	drawWedge,
 	anglecollides,
+	drawCross,
 } from '../tools';
 import mel from '../makeElement';
 import { zPlayer } from '../layers';
@@ -360,10 +361,10 @@ export default abstract class AbstractPlayer implements Player {
 		const h = cart(a, r);
 		c.strokeStyle = cHotspot;
 		c.beginPath();
-		c.strokeRect(cx + h.x - 4, cy + h.y - 4, 9, 9);
 		c.moveTo(cx + h.x, cy + h.y);
 		c.lineTo(cx + p.x, cy + p.y);
 		c.stroke();
+		drawCross(c, cHotspot, cx + h.x, cy + h.y);
 	}
 
 	getHitbox(): Hitbox {

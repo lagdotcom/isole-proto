@@ -40,6 +40,7 @@ import grassMaterials from './material/grass';
 import greyboxMaterials from './material/greybox';
 
 import bluegrassObjects from './object/bluegrass';
+import shopBgImg from '../media/gfx/shop.png';
 import Game from './Game';
 import Texture from './Texture';
 import Controller from './Controller';
@@ -130,6 +131,8 @@ function sound(fn: string, onload: (e: Event) => void): HTMLAudioElement {
  * @param {Game} game game instance
  */
 export default function PreloadResources(game: Game) {
+	game.require('shop.bg', image, shopBgImg);
+
 	game.require('enemy.bat', image, batImg);
 	game.require('enemy.booster', image, boosterImg);
 	game.require('enemy.buster', image, busterImg);

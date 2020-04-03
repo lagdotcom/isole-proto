@@ -8,5 +8,6 @@ export const eAnimationEnded = 'onanimend',
 	ePlayerDied = 'died.player.isole',
 	ePlayerDying = 'dying.player.isole',
 	ePlayerHurt = 'hurt.player.isole',
+	eShopEntered = 'entered.shop.isole',
 	eThrow = 'onthrow',
 	eSwing = 'onswing';

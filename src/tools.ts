@@ -381,3 +381,27 @@ export function drawArc(
 	c.arc(x, y, r, a - width, a + width);
 	c.stroke();
 }
+
+/**
+ * Draw a cross
+ * @param {CanvasRenderingContext2D} c canvas context
+ * @param {string | CanvasGradient | CanvasPattern} style line style
+ * @param {number} x center x
+ * @param {number} y center y
+ * @param {number} size cross size
+ */
+export function drawCross(
+	c: CanvasRenderingContext2D,
+	style: string | CanvasGradient | CanvasPattern,
+	x: number,
+	y: number,
+	size: number = 4
+) {
+	c.strokeStyle = style;
+	c.beginPath();
+	c.moveTo(x - size, y - size);
+	c.lineTo(x + size, y + size);
+	c.moveTo(x + size, y - size);
+	c.lineTo(x - size, y + size);
+	c.stroke();
+}
