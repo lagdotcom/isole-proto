@@ -7,6 +7,7 @@ export const kJump = 'ArrowUp';
 export const kThrow = 'Space';
 export const kCycle = 'KeyZ';
 export const kSwing = 'KeyA';
+export const kFreeMoney = 'KeyM';
 
 export const jLeft = 'JoypadLeft';
 export const jRight = 'JoypadRight';

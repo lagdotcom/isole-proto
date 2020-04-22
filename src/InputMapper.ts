@@ -17,6 +17,7 @@ import {
 	kSwing,
 	kThrow,
 	kCycle,
+	kFreeMoney,
 } from './keys';
 
 export enum InputButton {
@@ -30,6 +31,7 @@ export enum InputButton {
 	Swing,
 	Cycle,
 	Pickup,
+	FreeMoney,
 }
 
 interface InputDevice {
@@ -131,6 +133,7 @@ export default class InputMapper {
 		this.map(kThrow, InputButton.Throw);
 		this.map(kCycle, InputButton.Cycle);
 		this.map(kDown, InputButton.Pickup);
+		this.map(kFreeMoney, InputButton.FreeMoney);
 
 		this.map(jLeft, InputButton.Left);
 		this.map(jUp, InputButton.Up);

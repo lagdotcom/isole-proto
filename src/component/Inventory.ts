@@ -95,6 +95,10 @@ export default class Inventory implements DrawnComponent {
 		} else {
 			this.cycling = false;
 		}
+
+		if (game.keys.has(InputButton.FreeMoney)) {
+			this.money = 10000;
+		}
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
