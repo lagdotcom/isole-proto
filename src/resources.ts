@@ -19,6 +19,7 @@ import flazzaImg from '../media/gfx/mon/flazza.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
 import batImg from '../media/gfx/mon/bat.png';
 import minatoadImg from '../media/gfx/mon/minatoad.png';
+import shockwaveImg from '../media/gfx/mon/minatoad.shockwave.png';
 
 import bombImg from '../media/gfx/it/bomb.png';
 import rockImg from '../media/gfx/it/rock.png';
@@ -142,6 +143,7 @@ export default function PreloadResources(game: Game) {
 	game.require('enemy.flazza', image, flazzaImg);
 	game.require('enemy.krillna', image, krillnaImg);
 	game.require('enemy.minatoad', image, minatoadImg);
+	game.require('enemy.minatoad.shockwave', image, shockwaveImg);
 	game.require('item.bomb', image, bombImg);
 	game.require('item.rock', image, rockImg);
 	game.require('weapon.axe', image, axeImg);

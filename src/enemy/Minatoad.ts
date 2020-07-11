@@ -25,9 +25,10 @@ import {
 	angledist,
 	π,
 	anglewrap,
-	chance,
+	collides,
+	damage,
 } from '../tools';
-import { cHurt } from '../colours';
+import { cHurt, cAI } from '../colours';
 import Hitbox from '../Hitbox';
 import DrawnComponent from '../DrawnComponent';
 import { zSpark } from '../layers';
@@ -249,6 +250,148 @@ class Reticle implements DrawnComponent {
 	}
 }
 
+class ShockwaveController extends AnimController {
+	constructor(img: CanvasImageSource) {
+		super({
+			img,
+			leftflip: false,
+			animations: {
+				idle: {
+					loop: true,
+					frames: [
+						{ c: 0, r: 0, t: 75 },
+						{ c: 0, r: 1, t: 75 },
+						{ c: 0, r: 2, t: 75 },
+					],
+				},
+			},
+			w: 96,
+			h: 96,
+			xo: -48,
+			yo: -96,
+		});
+
+		this.play('idle');
+	}
+
+	update(t: number) {
+		this.next(t);
+	}
+}
+class Shockwave extends AbstractEnemy {
+	active: boolean;
+	sprite: ShockwaveController;
+
+	constructor(game: Game, a: number, r: number, va: number) {
+		super({
+			name: 'Minatoad Shockwave',
+			game,
+			active: true,
+			a,
+			r,
+			va,
+			vr: 0,
+			layer: zSpark,
+			width: 48,
+			height: 48,
+			sprite: new ShockwaveController(
+				game.resources['enemy.minatoad.shockwave']
+			),
+		});
+
+		if (va > 0) this.sprite.right();
+
+		// don't want the deg2rad conversion
+		this.a = a;
+	}
+
+	update(t: number) {
+		const { active, game, sprite } = this;
+
+		sprite.update(t);
+		this.a += this.va;
+		this.va *= 0.9;
+
+		if (Math.abs(this.va) < gStandThreshold) {
+			this.die(this);
+			return;
+		}
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			if (collides(a, game.player.getHitbox()) && game.player.alive) {
+				damage(game.player, this, 1);
+				this.active = false;
+			}
+		}
+
+		if (this.del) {
+			const { va, vr, r, a } = this;
+
+			this.debug({
+				active: `${active ? 'yes' : 'no'}`,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+			});
+		}
+	}
+
+	draw(c: CanvasRenderingContext2D) {
+		const { a, r, game, sprite } = this;
+		const { cx, cy } = game;
+
+		const { x, y } = cart(a, r);
+		const normal = a + πHalf;
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { active, game } = this;
+		const { cx, cy } = game;
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			drawWedge(c, cAI, cx, cy, a.bot, a.top);
+		}
+	}
+
+	getHitbox(): Hitbox {
+		// this doesn't have a hitbox as such
+		return {
+			bot: { r: 0, a: 0, width: 0 },
+			top: { r: 0, a: 0, width: 0 },
+		};
+	}
+
+	getAttackHitbox(): Hitbox {
+		const { r, a, width, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(width, br),
+			taw = scalew(width, tr);
+
+		return {
+			bot: {
+				r: br,
+				a,
+				width: baw,
+			},
+			top: {
+				r: tr,
+				a,
+				width: taw,
+			},
+		};
+	}
+}
+
 class MinatoadController extends AnimController {
 	parent: MinatoadListenerMap;
 
@@ -335,6 +478,7 @@ type MinatoadState =
 const gBetweenAttacks = 1000;
 const gJumpStrength = 5;
 const gJumpSpeed = 0.4;
+const gShockwaveSpeed = 0.08;
 
 export default class Minatoad extends AbstractEnemy {
 	dir: Facing;
@@ -470,7 +614,7 @@ export default class Minatoad extends AbstractEnemy {
 			this.r = 1000;
 
 			this.game.components.push(this.reticle);
-			this.game.drawn.push(this.reticle);
+			this.game.redraw = true;
 
 			this.state = 'track';
 			this.vr = 0;
@@ -503,6 +647,22 @@ export default class Minatoad extends AbstractEnemy {
 			this.r = floor.r;
 			this.vr = 0;
 			this.state = 'slam';
+
+			const leftsh = new Shockwave(
+				this.game,
+				this.a,
+				this.r,
+				-gShockwaveSpeed
+			);
+			const rightsh = new Shockwave(
+				this.game,
+				this.a,
+				this.r,
+				gShockwaveSpeed
+			);
+
+			this.game.components.push(leftsh, rightsh);
+			this.game.redraw = true;
 		}
 	}
 
