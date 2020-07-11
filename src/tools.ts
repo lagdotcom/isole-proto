@@ -5,9 +5,9 @@ import Hitbox, { Hitsize } from './Hitbox';
 import Damageable from './Damageable';
 import { eEnemyDied } from './events';
 
-export const pi = Math.PI,
-	pi2 = pi * 2,
-	piHalf = pi / 2;
+export const π = Math.PI,
+	π2 = π * 2,
+	πHalf = π / 2;
 
 /**
  * Wrap an angle over 2π
@@ -15,8 +15,8 @@ export const pi = Math.PI,
  * @returns {number} wrapped angle
  */
 export function anglewrap(a: number): number {
-	a = a % pi2;
-	if (a < 0) a += pi2;
+	a = a % π2;
+	if (a < 0) a += π2;
 	return a;
 }
 
@@ -28,8 +28,8 @@ export function anglewrap(a: number): number {
  */
 export function angledist(a: number, b: number): number {
 	var d = a - b;
-	if (d > pi) d -= pi2;
-	else if (d < -pi) d += pi2;
+	if (d > π) d -= π2;
+	else if (d < -π) d += π2;
 	return Math.abs(d);
 }
 
@@ -87,7 +87,7 @@ export function unscalew(ws: number, r: number): number {
  * @return {number} angle in radians
  */
 export function deg2rad(a: number): number {
-	return (pi2 * a) / 360;
+	return (π2 * a) / 360;
 }
 
 export const max = Math.max;

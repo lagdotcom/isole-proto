@@ -1,6 +1,6 @@
 import { cWall } from '../colours';
 import { gHitboxScale } from '../nums';
-import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
+import { anglewrap, cart, deg2rad, πHalf, scalew } from '../tools';
 import { zStructure } from '../layers';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
@@ -103,7 +103,7 @@ export default class Flat implements DrawnComponent {
 				a = right - step;
 			}
 
-			const normal = a + offset + piHalf;
+			const normal = a + offset + πHalf;
 			const { x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);

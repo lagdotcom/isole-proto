@@ -22,8 +22,8 @@ import {
 	fittest,
 	lerp,
 	min,
-	pi,
-	piHalf,
+	π,
+	πHalf,
 	rnd,
 	rnda,
 	rndr,
@@ -180,7 +180,7 @@ export default class Bat extends AbstractEnemy {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		Object.assign(this, { a: anglewrap(a), r, va, vr, tscale });
@@ -422,7 +422,7 @@ export default class Bat extends AbstractEnemy {
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

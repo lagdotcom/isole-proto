@@ -1,7 +1,7 @@
 import Controller from '../Controller';
 import { cIgnore } from '../colours';
 import { gTimeScale } from '../nums';
-import { anglewrap, cart, deg2rad, piHalf, scalew, drawWedge } from '../tools';
+import { anglewrap, cart, deg2rad, πHalf, scalew, drawWedge } from '../tools';
 import { zBackground } from '../layers';
 import Game from '../Game';
 import PointAR from '../CoordAR';
@@ -76,7 +76,7 @@ export default class Decal implements Component {
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

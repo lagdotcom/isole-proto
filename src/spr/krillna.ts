@@ -1,6 +1,6 @@
 import Controller from '../Controller';
 import { dRight, dDown, dLeft, dUp } from '../dirs';
-import { pi, piHalf } from '../tools';
+import { π, πHalf } from '../tools';
 
 // MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
 
@@ -56,19 +56,19 @@ export default class KrillnaController extends Controller {
 
 	wleft(): void {
 		this.stuck = 'wleft';
-		this.normal = -piHalf;
+		this.normal = -πHalf;
 		this.yo = -45;
 	}
 
 	wright(): void {
 		this.stuck = 'wright';
-		this.normal = piHalf;
+		this.normal = πHalf;
 		this.yo = -45;
 	}
 
 	ceiling(): void {
 		this.stuck = 'ceiling';
-		this.normal = pi;
+		this.normal = π;
 		this.fliptwice = true;
 		this.yo = -32;
 	}

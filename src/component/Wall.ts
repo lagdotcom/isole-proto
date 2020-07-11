@@ -1,5 +1,5 @@
 import { cWall } from '../colours';
-import { anglewrap, cart, deg2rad, piHalf, scalew } from '../tools';
+import { anglewrap, cart, deg2rad, πHalf, scalew } from '../tools';
 import { gHitboxScale, gWallGap } from '../nums';
 import { zStructure } from '../layers';
 import Game from '../Game';
@@ -106,7 +106,7 @@ export default class Wall implements DrawnComponent {
 
 			const offset = scalew(scale! / 2, r),
 				amod = a - scalew(scale!, r),
-				normal = amod + offset + piHalf,
+				normal = amod + offset + πHalf,
 				{ x, y } = cart(amod, r);
 
 			c.translate(x + cx, y + cy);
@@ -139,7 +139,7 @@ export default class Wall implements DrawnComponent {
 			}
 
 			const offset = scalew(scale! / 2, r),
-				normal = a + offset + piHalf,
+				normal = a + offset + πHalf,
 				{ x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);

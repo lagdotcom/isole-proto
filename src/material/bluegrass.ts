@@ -1,7 +1,7 @@
 import textures from '../texture/bluegrass';
 import TileController from '../texture/TileController';
 import { zDecal } from '../layers';
-import { cart, piHalf, scalew } from '../tools';
+import { cart, πHalf, scalew } from '../tools';
 import Flat from '../component/Flat';
 import Game from '../Game';
 import DrawnComponent from '../DrawnComponent';
@@ -46,7 +46,7 @@ class GrassTips implements DrawnComponent {
 				a = right - step;
 			}
 
-			var normal = a + offset + piHalf;
+			var normal = a + offset + πHalf;
 			var { x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);

@@ -12,8 +12,8 @@ import {
 	angledist,
 	anglewrap,
 	cart,
-	pi,
-	piHalf,
+	π,
+	πHalf,
 	scalew,
 	unscalew,
 	first,
@@ -215,7 +215,7 @@ export default class Buster extends AbstractEnemy {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		this.a = anglewrap(a);
@@ -249,13 +249,13 @@ export default class Buster extends AbstractEnemy {
 	}
 
 	getJumpSide() {
-		return anglewrap(this.a - this.game.player.a) > pi ? 1 : -1;
+		return anglewrap(this.a - this.game.player.a) > π ? 1 : -1;
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

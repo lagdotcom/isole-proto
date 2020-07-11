@@ -17,8 +17,8 @@ import {
 	cart,
 	deg2rad,
 	jbr,
-	pi,
-	piHalf,
+	π,
+	πHalf,
 	scalew,
 	collides,
 	damage,
@@ -296,7 +296,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		this.a = anglewrap(a);
@@ -333,7 +333,7 @@ export default abstract class AbstractPlayer implements Player {
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite, invincible } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

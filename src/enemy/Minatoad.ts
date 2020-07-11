@@ -17,13 +17,13 @@ import {
 import {
 	scalew,
 	drawWedge,
-	piHalf,
+	πHalf,
 	cart,
 	choose,
 	rndr,
 	first,
 	angledist,
-	pi,
+	π,
 	anglewrap,
 	chance,
 } from '../tools';
@@ -589,7 +589,7 @@ export default class Minatoad extends AbstractEnemy {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		this.a = anglewrap(a);
@@ -603,7 +603,7 @@ export default class Minatoad extends AbstractEnemy {
 		if (hidden) return;
 
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 
@@ -653,7 +653,7 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	private getJumpDir() {
-		return anglewrap(this.a - this.game.player.a) > pi
+		return anglewrap(this.a - this.game.player.a) > π
 			? gJumpSpeed
 			: -gJumpSpeed;
 	}

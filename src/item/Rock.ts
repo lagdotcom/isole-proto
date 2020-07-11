@@ -9,8 +9,8 @@ import {
 	anglewrap,
 	cart,
 	collides,
-	pi,
-	piHalf,
+	π,
+	πHalf,
 	scalew,
 	damage,
 	first,
@@ -112,7 +112,7 @@ class Rock implements DrawnComponent {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		this.a = anglewrap(a);
@@ -123,7 +123,7 @@ class Rock implements DrawnComponent {
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

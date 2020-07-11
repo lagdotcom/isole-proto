@@ -1,7 +1,7 @@
 import Enemy from '../Enemy';
 import {
 	deg2rad,
-	piHalf,
+	πHalf,
 	cart,
 	scalew,
 	collides,
@@ -225,7 +225,7 @@ export default class ChompChamp implements Enemy {
 	draw(c: CanvasRenderingContext2D) {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 
@@ -312,7 +312,10 @@ export default class ChompChamp implements Enemy {
 		if (collides(g, player.getHitbox()) && !player.invincible) {
 			this.state = aStruggle;
 
-			player.a = this.a; player.r = this.r; player.va = 0; player.vr = 0;
+			player.a = this.a;
+			player.r = this.r;
+			player.va = 0;
+			player.vr = 0;
 			player.hidden = true;
 			player.invincible = true;
 			player.removecontrol = true;
@@ -322,7 +325,8 @@ export default class ChompChamp implements Enemy {
 	onRelease() {
 		const player = this.game.player;
 
-		player.a = this.a; player.r = this.r;
+		player.a = this.a;
+		player.r = this.r;
 		player.hidden = false;
 		player.invincible = false;
 		player.removecontrol = false;

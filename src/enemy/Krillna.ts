@@ -10,8 +10,8 @@ import {
 	angledist,
 	anglewrap,
 	cart,
-	pi,
-	piHalf,
+	π,
+	πHalf,
 	scalew,
 	first,
 	drawWedge,
@@ -56,7 +56,7 @@ export default class Krillna extends AbstractEnemy {
 			last: {},
 			width: 40,
 			height: 28,
-			a: options.a || piHalf,
+			a: options.a || πHalf,
 			r: options.r || 200,
 			va: 0,
 			vr: 0,
@@ -253,7 +253,7 @@ export default class Krillna extends AbstractEnemy {
 
 		if (r < 0) {
 			r *= -1;
-			a += pi;
+			a += π;
 		}
 
 		this.a = anglewrap(a);
@@ -276,7 +276,7 @@ export default class Krillna extends AbstractEnemy {
 	draw(c) {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf + sprite.normal;
+		const normal = a + πHalf + sprite.normal;
 
 		const { x, y } = cart(a, r);
 

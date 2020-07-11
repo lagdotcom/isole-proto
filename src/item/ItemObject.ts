@@ -1,4 +1,4 @@
-import { deg2rad, cart, piHalf, drawWedge, scalew } from '../tools';
+import { deg2rad, cart, πHalf, drawWedge, scalew } from '../tools';
 import { zDecal } from '../layers';
 import Game from '../Game';
 import Item from '../Item';
@@ -46,7 +46,7 @@ export default class ItemObject implements Pickup {
 	draw(c: CanvasRenderingContext2D) {
 		const { a, r, game, item } = this;
 		const { cx, cy } = game;
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		const { x, y } = cart(a, r);
 

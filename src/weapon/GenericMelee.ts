@@ -1,6 +1,6 @@
 import AnimController from '../AnimController';
 import { zSpark } from '../layers';
-import { piHalf, cart, displace, scalew, collides, drawWedge } from '../tools';
+import { πHalf, cart, displace, scalew, collides, drawWedge } from '../tools';
 import { aAxe } from '../anims';
 import { eAnimationEnded, ePlayerHurt } from '../events';
 import { cHit } from '../colours';
@@ -103,7 +103,7 @@ class Swing implements DrawnComponent {
 		const { cx, cy } = game;
 		const { a, r } = this.getPosition();
 
-		const normal = a + piHalf;
+		const normal = a + πHalf;
 
 		if (!owner.alive) return;
 
