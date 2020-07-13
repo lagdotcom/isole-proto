@@ -270,7 +270,7 @@ export function rndr(
  * @param {number} max maximum angle
  * @returns {number}
  */
-export function rnda(min: number, max: number): number {
+export function rnda(min: number = 0, max: number = π2): number {
 	return anglewrap(rndr(min, max, n => n));
 }
 

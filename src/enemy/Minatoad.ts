@@ -27,6 +27,7 @@ import {
 	anglewrap,
 	collides,
 	damage,
+	rnda,
 } from '../tools';
 import { cHurt, cAI } from '../colours';
 import Hitbox from '../Hitbox';
@@ -392,6 +393,280 @@ class Shockwave extends AbstractEnemy {
 	}
 }
 
+class BulletController extends AnimController {
+	constructor(img: CanvasImageSource, xo = -40, yo = -80) {
+		super({
+			img,
+			leftflip: false,
+			animations: {
+				big: {
+					loop: true,
+					frames: [
+						{ c: 0, r: 0, t: 75 },
+						{ c: 0, r: 1, t: 75 },
+						{ c: 0, r: 2, t: 75 },
+					],
+				},
+				small: {
+					loop: true,
+					frames: [
+						{ c: 3, r: 0, t: 75 },
+						{ c: 3, r: 1, t: 75 },
+						{ c: 3, r: 2, t: 75 },
+					],
+				},
+			},
+			w: 80,
+			h: 80,
+			xo,
+			yo,
+		});
+	}
+
+	update(t: number) {
+		this.next(t);
+	}
+}
+
+class SmallBullet extends AbstractEnemy {
+	active: boolean;
+	sprite: BulletController;
+
+	constructor(game: Game, a: number, r: number, vr: number) {
+		super({
+			name: 'Minatoad Small Bullet',
+			game,
+			active: true,
+			a,
+			r,
+			va: 0,
+			vr,
+			layer: zSpark,
+			width: 10,
+			height: 10,
+			sprite: new BulletController(
+				game.resources['projectile'],
+				-40,
+				-40
+			),
+		});
+
+		this.sprite.play('small');
+
+		// don't want the deg2rad conversion
+		this.a = a;
+	}
+
+	update(t: number) {
+		const { active, game, sprite } = this;
+
+		sprite.update(t);
+		this.r += this.vr;
+
+		// TODO: floor
+		if (this.r < 10) {
+			this.die(this);
+			return;
+		}
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			if (collides(a, game.player.getHitbox()) && game.player.alive) {
+				damage(game.player, this, 1);
+				this.active = false;
+				this.die(this);
+			}
+		}
+
+		if (this.del) {
+			const { va, vr, r, a } = this;
+
+			this.debug({
+				active: `${active ? 'yes' : 'no'}`,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+			});
+		}
+	}
+
+	draw(c: CanvasRenderingContext2D) {
+		const { a, r, game, sprite } = this;
+		const { cx, cy } = game;
+
+		const { x, y } = cart(a, r);
+		const normal = a + πHalf;
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { active, game } = this;
+		const { cx, cy } = game;
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			drawWedge(c, cAI, cx, cy, a.bot, a.top);
+		}
+	}
+
+	getHitbox(): Hitbox {
+		// this doesn't have a hitbox as such
+		return {
+			bot: { r: 0, a: 0, width: 0 },
+			top: { r: 0, a: 0, width: 0 },
+		};
+	}
+
+	getAttackHitbox(): Hitbox {
+		const { r, a, width, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(width, br),
+			taw = scalew(width, tr);
+
+		return {
+			bot: {
+				r: br,
+				a,
+				width: baw,
+			},
+			top: {
+				r: tr,
+				a,
+				width: taw,
+			},
+		};
+	}
+}
+
+class BigBullet extends AbstractEnemy {
+	active: boolean;
+	sprite: BulletController;
+
+	constructor(game: Game, a: number, r: number, vr: number) {
+		super({
+			name: 'Minatoad Big Bullet',
+			game,
+			active: true,
+			a,
+			r,
+			va: 0,
+			vr,
+			layer: zSpark,
+			width: 40,
+			height: 40,
+			sprite: new BulletController(game.resources['projectile']),
+		});
+
+		this.sprite.play('big');
+
+		// don't want the deg2rad conversion
+		this.a = a;
+	}
+
+	update(t: number) {
+		const { active, game, sprite } = this;
+
+		sprite.update(t);
+		this.r += this.vr;
+
+		if (this.r >= gRadiusCap) {
+			for (var i = 0; i < gSplitCount; i++) {
+				const bullet = new SmallBullet(
+					this.game,
+					rnda(),
+					this.r,
+					gSmallBulletSpeed()
+				);
+				this.game.components.push(bullet);
+			}
+
+			this.die(this);
+			this.game.redraw = true;
+			return;
+		}
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			if (collides(a, game.player.getHitbox()) && game.player.alive) {
+				damage(game.player, this, 1);
+				this.active = false;
+			}
+		}
+
+		if (this.del) {
+			const { va, vr, r, a } = this;
+
+			this.debug({
+				active: `${active ? 'yes' : 'no'}`,
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+			});
+		}
+	}
+
+	draw(c: CanvasRenderingContext2D) {
+		const { a, r, game, sprite } = this;
+		const { cx, cy } = game;
+
+		const { x, y } = cart(a, r);
+		const normal = a + πHalf;
+
+		c.translate(x + cx, y + cy);
+		c.rotate(normal);
+
+		sprite.draw(c);
+
+		c.rotate(-normal);
+		c.translate(-x - cx, -y - cy);
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { active, game } = this;
+		const { cx, cy } = game;
+
+		if (active) {
+			const a = this.getAttackHitbox();
+			drawWedge(c, cAI, cx, cy, a.bot, a.top);
+		}
+	}
+
+	getHitbox(): Hitbox {
+		// this doesn't have a hitbox as such
+		return {
+			bot: { r: 0, a: 0, width: 0 },
+			top: { r: 0, a: 0, width: 0 },
+		};
+	}
+
+	getAttackHitbox(): Hitbox {
+		const { r, a, width, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(width, br),
+			taw = scalew(width, tr);
+
+		return {
+			bot: {
+				r: br,
+				a,
+				width: baw,
+			},
+			top: {
+				r: tr,
+				a,
+				width: taw,
+			},
+		};
+	}
+}
+
 class MinatoadController extends AnimController {
 	parent: MinatoadListenerMap;
 
@@ -479,6 +754,11 @@ const gBetweenAttacks = 1000;
 const gJumpStrength = 5;
 const gJumpSpeed = 0.4;
 const gShockwaveSpeed = 0.08;
+const gRadiusCap = 1000;
+const gLeapSpeed = 20;
+const gBigBulletSpeed = 10;
+const gSplitCount = 5;
+const gSmallBulletSpeed = () => rndr(-11, -8);
 
 export default class Minatoad extends AbstractEnemy {
 	dir: Facing;
@@ -539,10 +819,19 @@ export default class Minatoad extends AbstractEnemy {
 		this.waittimer = 0;
 	}
 
-	onFire() {}
+	onFire() {
+		const bullet = new BigBullet(
+			this.game,
+			this.a,
+			this.r + this.height,
+			gBigBulletSpeed
+		);
+		this.game.components.push(bullet);
+		this.game.redraw = true;
+	}
 
 	onLeap() {
-		this.vr = 5;
+		this.vr = gLeapSpeed;
 	}
 
 	onRefire() {
@@ -605,13 +894,13 @@ export default class Minatoad extends AbstractEnemy {
 
 	leapUpdate(t: number) {
 		this.sprite.leap(t);
-		if (this.vr) this.vr = 20;
+		if (this.vr) this.vr = gLeapSpeed;
 
 		this.physics(t);
 
-		if (this.r >= 1000) {
+		if (this.r >= gRadiusCap) {
 			this.hidden = true;
-			this.r = 1000;
+			this.r = gRadiusCap;
 
 			this.game.components.push(this.reticle);
 			this.game.redraw = true;

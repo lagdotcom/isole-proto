@@ -27,6 +27,7 @@ import rockImg from '../media/gfx/it/rock.png';
 import axeImg from '../media/gfx/wp/axe.png';
 
 import reticleImg from '../media/gfx/reticle.png';
+import projectileImg from '../media/gfx/projectiles.png';
 
 import batPunchSnd from '../media/sfx/bat-punch.wav';
 import bonkSnd from '../media/sfx/Head_Bonk.wav';
@@ -148,6 +149,7 @@ export default function PreloadResources(game: Game) {
 	game.require('item.rock', image, rockImg);
 	game.require('weapon.axe', image, axeImg);
 	game.require('reticle', image, reticleImg);
+	game.require('projectile', image, projectileImg);
 	game.require('player.jacques', image, jacquesImg);
 	game.require('player.woody', image, woodyImg);
 	game.require('tile.grass', image, grassImg);
