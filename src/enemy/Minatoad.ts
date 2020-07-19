@@ -7,13 +7,7 @@ import AnimController, {
 } from '../AnimController';
 import { eAnimationEnded } from '../events';
 import AbstractEnemy from './AbstractEnemy';
-import {
-	gWalkScale,
-	gTimeScale,
-	gStandThreshold,
-	gGroundFriction,
-	gGravityStrength,
-} from '../nums';
+import { gWalkScale, gTimeScale, gStandThreshold } from '../nums';
 import {
 	scalew,
 	drawWedge,
@@ -21,8 +15,6 @@ import {
 	cart,
 	choose,
 	rndr,
-	first,
-	angledist,
 	π,
 	anglewrap,
 	collides,
@@ -33,15 +25,14 @@ import { cHurt, cAI } from '../colours';
 import Hitbox from '../Hitbox';
 import DrawnComponent from '../DrawnComponent';
 import { zSpark } from '../layers';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
+import physics from '../physics';
 
 /*
-Column 1: IDLE 
+Column 1: IDLE
 	- 75ms, stays active between the boss's various attacks
 
 Column 2: BIG LEAP
-	- Frames 1-3 65ms, Frames 4-6 75ms, Frame 7 150ms, Frame 8-9 75ms, Frame 10 300ms, Frame 11-12 75ms. 
+	- Frames 1-3 65ms, Frames 4-6 75ms, Frame 7 150ms, Frame 8-9 75ms, Frame 10 300ms, Frame 11-12 75ms.
 	- Frame 13 hold this behavior til the Minatoad vanishes off screen, have the target reticle effect appear and follow the player for a few seconds
 	- Frame 14-15 75ms, hold on frame 16 til the Minatoad lands, upon hitting the ground send shockwaves out left and right and maybe stun player if they don't jump
 	- Frame 17 75ms, Frame 18 300 ms, Frame 19-24 75ms, return to idle motion after behavior completes
@@ -53,7 +44,7 @@ Column 3: SMALL HOP
 	- Loop back to frame 1, while this behavior is active have the boss leap continually clockwise or counterclockwise towards the player, like the Boosters
 	- Random number of hops, no less than 3 and no more than 6 potentially? Can be adjusted later
 
-Column 4: POISON SPRAY 
+Column 4: POISON SPRAY
 	- Frames 1-4 75ms, Frame 5 300ms
 	- Frames 6-14 75ms, During this animation spread a slightly transluscent purple wavey mist in an AOE around the Minatoad that stays for a duration.
 	- Unsure if purple mist would need a sprite? Seems like it'd fit mostly as a programatic effect
@@ -430,17 +421,23 @@ class BulletController extends AnimController {
 
 class SmallBullet extends AbstractEnemy {
 	active: boolean;
+	ignoreGravity: boolean;
+	owner: Minatoad;
 	sprite: BulletController;
+	vfa: number;
 
-	constructor(game: Game, a: number, r: number, vr: number) {
+	constructor(owner: Minatoad, game: Game, a: number, r: number, vr: number) {
 		super({
 			name: 'Minatoad Small Bullet',
+			owner,
 			game,
 			active: true,
 			a,
 			r,
 			va: 0,
+			vfa: 0,
 			vr,
+			ignoreGravity: true,
 			layer: zSpark,
 			width: 10,
 			height: 10,
@@ -451,6 +448,7 @@ class SmallBullet extends AbstractEnemy {
 			),
 		});
 
+		this.owner.bullets++;
 		this.sprite.play('small');
 
 		// don't want the deg2rad conversion
@@ -461,10 +459,10 @@ class SmallBullet extends AbstractEnemy {
 		const { active, game, sprite } = this;
 
 		sprite.update(t);
-		this.r += this.vr;
+		const { floor } = physics(this, t);
 
-		// TODO: floor
-		if (this.r < 10) {
+		if (floor || this.r < 10) {
+			this.owner.bullets--;
 			this.die(this);
 			return;
 		}
@@ -516,11 +514,7 @@ class SmallBullet extends AbstractEnemy {
 	}
 
 	getHitbox(): Hitbox {
-		// this doesn't have a hitbox as such
-		return {
-			bot: { r: 0, a: 0, width: 0 },
-			top: { r: 0, a: 0, width: 0 },
-		};
+		return this.getAttackHitbox();
 	}
 
 	getAttackHitbox(): Hitbox {
@@ -547,11 +541,13 @@ class SmallBullet extends AbstractEnemy {
 
 class BigBullet extends AbstractEnemy {
 	active: boolean;
+	owner: Minatoad;
 	sprite: BulletController;
 
-	constructor(game: Game, a: number, r: number, vr: number) {
+	constructor(owner: Minatoad, game: Game, a: number, r: number, vr: number) {
 		super({
 			name: 'Minatoad Big Bullet',
+			owner,
 			game,
 			active: true,
 			a,
@@ -564,6 +560,7 @@ class BigBullet extends AbstractEnemy {
 			sprite: new BulletController(game.resources['projectile']),
 		});
 
+		this.owner.bullets++;
 		this.sprite.play('big');
 
 		// don't want the deg2rad conversion
@@ -579,6 +576,7 @@ class BigBullet extends AbstractEnemy {
 		if (this.r >= gRadiusCap) {
 			for (var i = 0; i < gSplitCount; i++) {
 				const bullet = new SmallBullet(
+					this.owner,
 					this.game,
 					rnda(),
 					this.r,
@@ -587,6 +585,7 @@ class BigBullet extends AbstractEnemy {
 				this.game.components.push(bullet);
 			}
 
+			this.owner.bullets--;
 			this.die(this);
 			this.game.redraw = true;
 			return;
@@ -758,11 +757,13 @@ const gRadiusCap = 1000;
 const gLeapSpeed = 20;
 const gBigBulletSpeed = 10;
 const gSplitCount = 5;
-const gSmallBulletSpeed = () => rndr(-11, -8);
+const gSmallBulletSpeed = () => rndr(-8, -5);
 
 export default class Minatoad extends AbstractEnemy {
+	bullets: number;
 	dir: Facing;
 	hidden: boolean;
+	ignoreCeilings: boolean;
 	jumps: number;
 	last: MinatoadState;
 	reticle: Reticle;
@@ -776,6 +777,7 @@ export default class Minatoad extends AbstractEnemy {
 	constructor(game: Game, options: MinatoadOptions = {}) {
 		super({
 			game,
+			bullets: 0,
 			width: 80,
 			height: 80,
 			name: 'Minatoad',
@@ -787,6 +789,7 @@ export default class Minatoad extends AbstractEnemy {
 			va: 0,
 			vfa: 0,
 			vr: 0,
+			ignoreCeilings: false,
 			health: 10,
 			waittimer: 0,
 			shots: 0,
@@ -821,6 +824,7 @@ export default class Minatoad extends AbstractEnemy {
 
 	onFire() {
 		const bullet = new BigBullet(
+			this,
 			this.game,
 			this.a,
 			this.r + this.height,
@@ -832,6 +836,7 @@ export default class Minatoad extends AbstractEnemy {
 
 	onLeap() {
 		this.vr = gLeapSpeed;
+		this.ignoreCeilings = true;
 	}
 
 	onRefire() {
@@ -883,10 +888,10 @@ export default class Minatoad extends AbstractEnemy {
 
 	idleUpdate(t: number) {
 		this.sprite.idle(t);
-		this.physics(t);
+		physics(this, t);
 
 		this.waittimer += t;
-		if (this.waittimer > gBetweenAttacks) {
+		if (this.waittimer > gBetweenAttacks && !this.bullets) {
 			const next = this.getNextAttack();
 			this.last = this.state = next;
 		}
@@ -896,7 +901,7 @@ export default class Minatoad extends AbstractEnemy {
 		this.sprite.leap(t);
 		if (this.vr) this.vr = gLeapSpeed;
 
-		this.physics(t);
+		physics(this, t);
 
 		if (this.r >= gRadiusCap) {
 			this.hidden = true;
@@ -929,7 +934,7 @@ export default class Minatoad extends AbstractEnemy {
 
 	fallUpdate(t: number) {
 		const { sprite } = this;
-		const { floor } = this.physics(t);
+		const { floor } = physics(this, t);
 		sprite.leapFall(t);
 
 		if (floor) {
@@ -956,8 +961,10 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	slamUpdate(t: number) {
+		this.ignoreCeilings = false;
+
 		this.sprite.leapLand(t);
-		this.physics(t);
+		physics(this, t);
 	}
 
 	hopUpdate(t: number) {
@@ -965,86 +972,17 @@ export default class Minatoad extends AbstractEnemy {
 		else if (this.vr > 0) this.sprite.rise(t);
 		else this.sprite.jump(t);
 
-		this.physics(t);
+		physics(this, t);
 	}
 
 	sprayUpdate(t: number) {
 		this.sprite.spray(t);
-		this.physics(t);
+		physics(this, t);
 	}
 
 	rapidUpdate(t: number) {
 		this.sprite.rapid(t);
-		this.physics(t);
-	}
-
-	physics(time: number) {
-		var { a, r, va, vr, vfa, game } = this;
-		const { walls, ceilings, floors } = game,
-			tscale = time / gTimeScale;
-		const { bot, top } = this.getHitbox();
-
-		var floor: Flat | null = null;
-		if (vr <= 0) {
-			floor = first(floors, f => {
-				var da = angledist(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-		}
-
-		var ceiling: Flat | null = null;
-		if (vr > 0) {
-			ceiling = first(ceilings, f => {
-				var da = angledist(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-			if (ceiling) {
-				vr = 0;
-			}
-		}
-
-		var wall: Wall | null = null;
-		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
-			const vas = Math.sign(va + vfa);
-			wall = first(walls, w => {
-				if (vas != w.direction && !w.motion) return false;
-
-				return (
-					bot.a - bot.width <= w.a &&
-					bot.a + bot.width >= w.a &&
-					top.r >= w.bottom &&
-					bot.r <= w.top
-				);
-			});
-		}
-
-		if (floor) {
-			r = floor.r;
-			vr = 0;
-			va *= gGroundFriction;
-			vfa = floor.motion * time;
-		} else {
-			vr -= gGravityStrength;
-			vfa = 0;
-		}
-
-		this.va = va;
-		this.vfa = vfa;
-		this.vr = vr;
-		a += (va / r) * tscale * gWalkScale + vfa;
-		r += vr * tscale;
-
-		if (r < 0) {
-			r *= -1;
-			a += π;
-		}
-
-		this.a = anglewrap(a);
-		this.r = r;
-
-		return { floor, ceiling, wall };
+		physics(this, t);
 	}
 
 	draw(c: CanvasRenderingContext2D) {
