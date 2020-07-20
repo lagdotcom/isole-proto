@@ -15,13 +15,13 @@ import {
 	cart,
 	choose,
 	rndr,
-	π,
-	anglewrap,
 	collides,
 	damage,
 	rnda,
+	isRightOf,
+	fillWedge,
 } from '../tools';
-import { cHurt, cAI } from '../colours';
+import { cHurt, cAI, cAIDark } from '../colours';
 import Hitbox from '../Hitbox';
 import DrawnComponent from '../DrawnComponent';
 import { zSpark } from '../layers';
@@ -61,6 +61,7 @@ Likely an obvious note, but Minatoad shouldn't be able to use any of it's skills
 const eLeap = 'leap';
 const eFire = 'fire';
 const eRefire = 'refire';
+const eSpray = 'spray';
 
 interface MinatoadListenerMap extends ListenerMap {
 	[eLeap]: Listener;
@@ -156,7 +157,7 @@ const animations: AnimSpecMap = {
 			{ c: 3, r: 3, t: 75 },
 			{ c: 3, r: 4, t: 500 },
 			{ c: 3, r: 5, t: 75 },
-			{ c: 3, r: 6, t: 75 },
+			{ c: 3, r: 6, t: 75, event: eSpray },
 			{ c: 3, r: 7, t: 75 },
 			{ c: 3, r: 8, t: 75 },
 			{ c: 3, r: 9, t: 75 },
@@ -209,23 +210,53 @@ class ReticleController extends AnimController {
 		this.next(t);
 	}
 }
+
+const gMaxReticleVA = 0.1;
+const gMaxReticleVR = 5;
+
 class Reticle implements DrawnComponent {
 	a: number;
 	sprite: ReticleController;
 	game: Game;
 	layer: number;
 	r: number;
+	va: number;
+	vr: number;
 
-	constructor(game: Game, a: number, r: number) {
-		this.a = a;
+	constructor(game: Game) {
+		this.a = 0;
 		this.sprite = new ReticleController(game.resources['reticle']);
 		this.game = game;
 		this.layer = zSpark;
-		this.r = r;
+		this.r = 0;
+	}
+
+	reset() {
+		this.a = this.game.player.a;
+		this.r = this.game.player.r;
+		this.va = 0;
+		this.vr = 0;
 	}
 
 	update(t: number) {
 		this.sprite.update(t);
+
+		const target = this.game.player;
+
+		if (isRightOf(this.a, target.a)) this.va += 0.005;
+		else this.va -= 0.005;
+
+		if (target.r < this.r) this.vr -= 1;
+		else if (target.r > this.r) this.vr += 1;
+
+		if (this.va < -gMaxReticleVA) this.va = -gMaxReticleVA;
+		else if (this.va > gMaxReticleVA) this.va = gMaxReticleVA;
+
+		if (this.vr < -gMaxReticleVR) this.vr = -gMaxReticleVR;
+		else if (this.vr > gMaxReticleVR) this.vr = gMaxReticleVR;
+
+		this.a += this.va;
+		this.r += this.vr;
 	}
 
 	draw(c: CanvasRenderingContext2D) {
@@ -472,6 +503,7 @@ class SmallBullet extends AbstractEnemy {
 			if (collides(a, game.player.getHitbox()) && game.player.alive) {
 				damage(game.player, this, 1);
 				this.active = false;
+				this.owner.bullets--;
 				this.die(this);
 			}
 		}
@@ -666,6 +698,109 @@ class BigBullet extends AbstractEnemy {
 	}
 }
 
+class PoisonSprayField extends AbstractEnemy {
+	a: number;
+	duration: number;
+	game: Game;
+	height: number;
+	name: string;
+	owner: Minatoad;
+	r: number;
+	spread: number;
+	width: number;
+	va: number;
+	vr: number;
+
+	constructor(
+		owner: Minatoad,
+		game: Game,
+		duration: number,
+		spread: number,
+		a: number,
+		r: number
+	) {
+		super({
+			name: 'Poison Spray',
+			owner,
+			game,
+			duration,
+			spread,
+			a,
+			r,
+			width: 150,
+			height: 100,
+			va: 0,
+			vr: 0,
+		});
+
+		// don't want the deg2rad conversion
+		this.a = a;
+	}
+
+	update(t: number) {
+		this.duration -= t;
+		if (this.duration <= 0) {
+			this.owner.poisonField = undefined;
+			return this.die(this);
+		}
+
+		this.spread -= t;
+		if (this.spread > 0) this.width += 5;
+
+		if (this.del) {
+			const { va, vr, r, a } = this;
+
+			this.debug({
+				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+			});
+		}
+	}
+
+	draw(c: CanvasRenderingContext2D) {
+		const { game } = this;
+		const { cx, cy } = game;
+		const { bot, top } = this.getHitbox();
+
+		c.globalAlpha = 0.5;
+		fillWedge(c, 'purple', cx, cy, bot, top);
+		c.globalAlpha = 1;
+	}
+
+	drawHitbox(c: CanvasRenderingContext2D) {
+		const { game } = this;
+		const { cx, cy } = game;
+
+		const a = this.getAttackHitbox();
+		drawWedge(c, cAIDark, cx, cy, a.bot, a.top);
+	}
+
+	getHitbox() {
+		return this.getAttackHitbox();
+	}
+
+	getAttackHitbox() {
+		const { r, a, width, height } = this;
+		const br = r;
+		const tr = r + height;
+		const baw = scalew(width, br),
+			taw = scalew(width, tr);
+
+		return {
+			bot: {
+				r: br,
+				a,
+				width: baw,
+			},
+			top: {
+				r: tr,
+				a,
+				width: taw,
+			},
+		};
+	}
+}
+
 class MinatoadController extends AnimController {
 	parent: MinatoadListenerMap;
 
@@ -766,6 +901,7 @@ export default class Minatoad extends AbstractEnemy {
 	ignoreCeilings: boolean;
 	jumps: number;
 	last: MinatoadState;
+	poisonField?: PoisonSprayField;
 	reticle: Reticle;
 	shots: number;
 	sprite: MinatoadController;
@@ -803,11 +939,12 @@ export default class Minatoad extends AbstractEnemy {
 				[eFire]: this.onFire.bind(this),
 				[eLeap]: this.onLeap.bind(this),
 				[eRefire]: this.onRefire.bind(this),
+				[eSpray]: this.onSpray.bind(this),
 			},
 			game.resources[options.img || 'enemy.minatoad']
 		);
 
-		this.reticle = new Reticle(this.game, 0, 0);
+		this.reticle = new Reticle(this.game);
 	}
 
 	onAnimEnd() {
@@ -844,6 +981,14 @@ export default class Minatoad extends AbstractEnemy {
 		if (this.shots >= 0) this.sprite.afi = 0;
 	}
 
+	onSpray() {
+		const { game, a, r } = this;
+
+		this.poisonField = new PoisonSprayField(this, game, 10000, 1000, a, r);
+		game.components.push(this.poisonField);
+		game.redraw = true;
+	}
+
 	getNextAttack() {
 		var next: MinatoadState = this.last;
 
@@ -857,6 +1002,9 @@ export default class Minatoad extends AbstractEnemy {
 				'rapid',
 				'rapid',
 			]);
+
+			// can't have two fields at once
+			if (this.poisonField && next == 'spray') next = this.last;
 		}
 
 		this.last = next;
@@ -907,6 +1055,7 @@ export default class Minatoad extends AbstractEnemy {
 			this.hidden = true;
 			this.r = gRadiusCap;
 
+			this.reticle.reset();
 			this.game.components.push(this.reticle);
 			this.game.redraw = true;
 
@@ -917,10 +1066,6 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	trackUpdate(t: number) {
-		// TODO: correct r
-		this.reticle.r = this.game.player.r;
-		this.reticle.a = this.game.player.a;
-
 		this.waittimer -= t;
 		if (this.waittimer <= 0) {
 			this.state = 'fall';
@@ -1040,8 +1185,6 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	private getJumpDir() {
-		return anglewrap(this.a - this.game.player.a) > π
-			? gJumpSpeed
-			: -gJumpSpeed;
+		return isRightOf(this.a, this.game.player.a) ? gJumpSpeed : -gJumpSpeed;
 	}
 }

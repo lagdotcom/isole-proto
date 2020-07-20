@@ -19,6 +19,7 @@ import {
 	first,
 	drawWedge,
 	drawArc,
+	isRightOf,
 } from '../tools';
 import controller from '../spr/buster';
 import { zEnemy } from '../layers';
@@ -249,7 +250,7 @@ export default class Buster extends AbstractEnemy {
 	}
 
 	getJumpSide() {
-		return anglewrap(this.a - this.game.player.a) > π ? 1 : -1;
+		return isRightOf(this.a, this.game.player.a) ? 1 : -1;
 	}
 
 	draw(c: CanvasRenderingContext2D): void {

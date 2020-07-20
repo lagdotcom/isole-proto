@@ -21,6 +21,15 @@ export function anglewrap(a: number): number {
 }
 
 /**
+ * Determine whether an angle is to the right of another angle.
+ * @param {number} a first angle
+ * @param {number} b second angle
+ */
+export function isRightOf(a: number, b: number): boolean {
+	return anglewrap(a - b) > π;
+}
+
+/**
  * Find the distance between two angles
  * @param {number} a first angle
  * @param {number} b second angle
@@ -355,6 +364,30 @@ export function drawWedge(
 	c.arc(x, y, t.r, t.a + t.width, t.a - t.width, true);
 	c.arc(x, y, b.r, b.a - b.width, b.a + b.width);
 	c.stroke();
+}
+
+/**
+ * Fill a ...wedge?
+ * @param {CanvasRenderingContext2D} c canvas context
+ * @param {string | CanvasGradient | CanvasPattern} style fill style
+ * @param {number} x center x
+ * @param {number} y center y
+ * @param {Hitsize} b bottom hitsize
+ * @param {Hitsize} t top hitsize
+ */
+export function fillWedge(
+	c: CanvasRenderingContext2D,
+	style: string | CanvasGradient | CanvasPattern,
+	x: number,
+	y: number,
+	b: Hitsize,
+	t: Hitsize
+) {
+	c.fillStyle = style;
+	c.beginPath();
+	c.arc(x, y, b.r, b.a - b.width, b.a + b.width);
+	c.arc(x, y, t.r, t.a + t.width, t.a - t.width, true);
+	c.fill();
 }
 
 /**
