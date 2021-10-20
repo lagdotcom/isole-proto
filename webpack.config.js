@@ -1,13 +1,19 @@
 const path = require('path');
 
-module.exports = {
+module.exports = env => ({
 	entry: './src/main',
 	plugins: [],
 	output: {
-		path: __dirname + '/dist',
+		path: path.join(__dirname, 'dist'),
 		filename: 'main.js',
 	},
-	devtool: 'source-map',
+	mode: env.production ? 'production' : 'development',
+	devtool: env.production ? 'source-map' : 'eval',
+	devServer: {
+		static: { directory: path.join(__dirname, 'public') },
+		compress: true,
+		open: true,
+	},
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js'],
 	},
@@ -20,9 +26,9 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				loader: ['style-loader', 'css-loader'],
+				use: ['style-loader', 'css-loader'],
 			},
 			{ test: /\.tsx?$/, loader: 'ts-loader' },
 		],
 	},
-};
+});
