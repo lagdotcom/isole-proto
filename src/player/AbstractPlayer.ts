@@ -1,6 +1,16 @@
-import { cHurt, cStep, cHotspot } from '../colours';
+import Channel from '../Channel';
+import { cHotspot, cHurt, cStep } from '../colours';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
+import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
-import { ePlayerDying, ePlayerHurt, ePlayerDied } from '../events';
+import Enemy from '../Enemy';
+import { ePlayerDied, ePlayerDying, ePlayerHurt } from '../events';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { InputButton } from '../InputMapper';
+import { zPlayer } from '../layers';
+import mel from '../makeElement';
 import {
 	gAirWalk,
 	gGravityStrength,
@@ -12,35 +22,25 @@ import {
 	gWalkScale,
 	gWallBounce,
 } from '../nums';
-import {
-	anglewrap,
-	cart,
-	deg2rad,
-	jbr,
-	π,
-	πHalf,
-	scalew,
-	collides,
-	damage,
-	dirv,
-	displace,
-	first,
-	drawWedge,
-	anglecollides,
-	drawCross,
-} from '../tools';
-import mel from '../makeElement';
-import { zPlayer } from '../layers';
-import Channel from '../Channel';
-import Game from '../Game';
-import Damageable from '../Damageable';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
-import Enemy from '../Enemy';
-import Hitbox from '../Hitbox';
 import Player, { PlayerInit } from '../Player';
 import PlayerController from '../spr/PlayerController';
-import { InputButton } from '../InputMapper';
+import {
+	anglecollides,
+	anglewrap,
+	cart,
+	collides,
+	damage,
+	deg2rad,
+	dirv,
+	displace,
+	drawCross,
+	drawWedge,
+	first,
+	jbr,
+	scalew,
+	π,
+	πHalf,
+} from '../tools';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
@@ -119,15 +119,15 @@ export default abstract class AbstractPlayer implements Player {
 	abstract getDefaultInit(game: Game, options: PlayerInit): any;
 
 	update(time: number): void {
-		var { a, r, va, vr, vfa, game, sprite, jumpd, jumplg } = this;
+		let { a, r, va, vr, vfa, game, sprite, jumpd, jumplg } = this;
 		const { walls, ceilings, floors, keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
 		const { bot, top, step } = this.getHitbox();
-		var debug = '',
+		let debug = '',
 			flags: string[] = [];
 
-		var floor: Flat | null = null;
+		let floor: Flat | null = null;
 		if (vr <= 0) {
 			flags.push('down');
 			floor = first(
@@ -136,7 +136,7 @@ export default abstract class AbstractPlayer implements Player {
 			);
 		}
 
-		var ceiling: Flat | null = null;
+		let ceiling: Flat | null = null;
 		if (vr > 0) {
 			flags.push('up');
 			ceiling = first(
@@ -150,12 +150,12 @@ export default abstract class AbstractPlayer implements Player {
 			}
 		}
 
-		var wall: Wall | null = null;
+		let wall: Wall | null = null;
 		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
 			flags.push('sideways');
 			const vas = Math.sign(va + vfa);
 			wall = first(walls, w => {
-				if (vas != w.direction && !w.motion) return false;
+				if (vas !== w.direction && !w.motion) return false;
 
 				return (
 					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
@@ -163,7 +163,7 @@ export default abstract class AbstractPlayer implements Player {
 			});
 		}
 
-		var hurtenemy: Enemy | null = null;
+		let hurtenemy: Enemy | null = null;
 		if (vr < 0) {
 			hurtenemy = first(enemies, (e, i) => {
 				if (collides({ bot, top: step }, e.getHitbox())) {
@@ -175,7 +175,7 @@ export default abstract class AbstractPlayer implements Player {
 			});
 		}
 
-		var hitenemy = first(enemies, (e, i) => {
+		const hitenemy = first(enemies, (e, i) => {
 			if (e !== hurtenemy && collides({ bot, top }, e.getHitbox())) {
 				debug += `hit by e${i}: ${e.name}<br>`;
 				return true;
@@ -211,9 +211,9 @@ export default abstract class AbstractPlayer implements Player {
 		}
 
 		const ok = game.mode === 'level';
-		var controls: string[] = [];
+		const controls: string[] = [];
 		if (ok && !sprite.flags.noControl && !this.removecontrol) {
-			var strength = this.grounded ? gGroundWalk : gAirWalk;
+			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				va -= strength;
 				controls.push('left');
@@ -278,7 +278,7 @@ export default abstract class AbstractPlayer implements Player {
 		if (wall && !ceiling) {
 			flags.push('wall');
 			const bounce = wall.direction * gWallBounce;
-			if (wall.direction == 1) {
+			if (wall.direction === 1) {
 				a = wall.a - bot.width;
 				if (va > bounce) va = bounce;
 			} else {
@@ -372,7 +372,7 @@ export default abstract class AbstractPlayer implements Player {
 		const baw = scalew(w, r),
 			taw = scalew(w, r + h),
 			saw = scalew(w, r + steph);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 

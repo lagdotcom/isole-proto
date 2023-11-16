@@ -1,34 +1,9 @@
+import Cartographer from './Cartographer';
+import clearChildren from './clearChildren';
 import Decal, { normalPosition, staticPosition } from './component/Decal';
 import Flat from './component/Flat';
-import Wall from './component/Wall';
-import mel from './makeElement';
-import clearChildren from './clearChildren';
-import { eGameReady, eLevelEnter, eMapEnter } from './events';
-import layers, { zBackground } from './layers';
-import { dLeft, dRight } from './dirs';
-import Game, {
-	GameMode,
-	LevelMode,
-	MapMode,
-	LevelGenerator,
-	MapGenerator,
-	ShopMode,
-	ShopGenerator,
-} from './Game';
 import Platform from './component/Platform';
-import MapNode from './MapNode';
-import Cartographer from './Cartographer';
-import { choose } from './tools';
-import { roundwoods } from './worlds';
-import EditorData, {
-	EditorEnemy,
-	EditorPlayer,
-	EditorPlatform,
-	EditorWall,
-	EditorFloor,
-	EditorObject,
-	EditorWeapon,
-} from './EditorData';
+import Wall from './component/Wall';
 import {
 	enemyNames,
 	enemyTypes,
@@ -39,14 +14,39 @@ import {
 	weaponNames,
 	weaponTypes,
 } from './corpus';
-import WeaponObject from './weapon/WeaponObject';
+import { dLeft, dRight } from './dirs';
+import EditorData, {
+	EditorEnemy,
+	EditorFloor,
+	EditorObject,
+	EditorPlatform,
+	EditorPlayer,
+	EditorWall,
+	EditorWeapon,
+} from './EditorData';
+import { eGameReady, eLevelEnter, eMapEnter } from './events';
+import Game, {
+	GameMode,
+	LevelGenerator,
+	LevelMode,
+	MapGenerator,
+	MapMode,
+	ShopGenerator,
+	ShopMode,
+} from './Game';
+import BombItem from './item/Bomb';
 import ItemObject from './item/ItemObject';
 import RockItem from './item/Rock';
+import layers, { zBackground } from './layers';
+import mel from './makeElement';
+import MapNode from './MapNode';
+import { choose } from './tools';
 import AxeWeapon from './weapon/Axe';
-import BombItem from './item/Bomb';
+import WeaponObject from './weapon/WeaponObject';
+import { roundwoods } from './worlds';
 
-var materials: string[];
-var objects: string[];
+let materials: string[];
+let objects: string[];
 const wallDirections = [1, -1];
 const objectPositions = [normalPosition, staticPosition];
 
@@ -57,7 +57,8 @@ interface EditorInit {
 }
 
 export default class Editor
-	implements LevelGenerator, MapGenerator, ShopGenerator {
+	implements LevelGenerator, MapGenerator, ShopGenerator
+{
 	container: HTMLElement;
 	data: EditorData;
 	dump: HTMLTextAreaElement;
@@ -115,9 +116,9 @@ export default class Editor
 	}
 
 	refresh() {
-		if (this.mode == LevelMode) this.game.enter(this);
-		if (this.mode == MapMode) this.game.show(this);
-		if (this.mode == ShopMode) this.game.shop(this);
+		if (this.mode === LevelMode) this.game.enter(this);
+		if (this.mode === MapMode) this.game.show(this);
+		if (this.mode === ShopMode) this.game.shop(this);
 	}
 
 	makeMap(game: Game) {
@@ -240,7 +241,7 @@ export default class Editor
 
 	makeDom(parent?: HTMLElement) {
 		const { data } = this;
-		var c = this.container;
+		let c = this.container;
 
 		if (c) {
 			clearChildren(c);
@@ -365,7 +366,13 @@ export default class Editor
 		);
 	}
 
-	makeSection(parent, name, label, maker, example) {
+	makeSection(
+		parent: HTMLElement,
+		name: string,
+		label: string,
+		maker: string,
+		example: any
+	) {
 		const container = mel(parent, 'div', {
 			className: 'section section-' + name,
 		});
@@ -381,7 +388,13 @@ export default class Editor
 		sec && sec.forEach(o => this[maker](this[name], o));
 	}
 
-	makeNumInput(parent, object, label, attribute, filter = x => x) {
+	makeNumInput(
+		parent: HTMLElement,
+		object: any,
+		label: string,
+		attribute: string,
+		filter = x => x
+	) {
 		const el = mel(
 			mel(parent, 'label', {
 				className: 'input number',
@@ -391,11 +404,11 @@ export default class Editor
 			{ type: 'number', value: object[attribute] || 0 },
 			{
 				change: () => {
-					var f = filter(el.valueAsNumber);
+					const f = filter(el.valueAsNumber);
 					object[attribute] = f;
 					this.refresh();
 
-					if (el.valueAsNumber != f) el.value = f;
+					if (el.valueAsNumber !== f) el.value = f;
 				},
 			}
 		) as HTMLInputElement;
@@ -403,9 +416,14 @@ export default class Editor
 		return el;
 	}
 
-	makeAngleInput(parent, object, label, attribute) {
+	makeAngleInput(
+		parent: HTMLElement,
+		object: any,
+		label: string,
+		attribute: string
+	) {
 		return this.makeNumInput(parent, object, label, attribute, x => {
-			var a = x % 360;
+			const a = x % 360;
 			if (a < 0) return a + 360;
 			return a;
 		});
@@ -433,13 +451,13 @@ export default class Editor
 		) as HTMLInputElement;
 	}
 
-	makeChoiceInput(
+	makeChoiceInput<T>(
 		parent: HTMLElement,
 		object: any,
 		label: string,
 		attribute: string,
-		choices: any[] | { [key: string]: any },
-		parser: (raw: string) => any = x => x
+		choices: T[] | { [key: string]: T },
+		parser: (raw: string) => T = x => x as T
 	) {
 		const el = mel(
 			mel(parent, 'label', {

@@ -1,4 +1,9 @@
 import { cAI, cAIDark, cHurt } from '../colours';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
+import Game from '../Game';
+import { Hitsize } from '../Hitbox';
+import { zEnemy } from '../layers';
 import {
 	gGravityStrength,
 	gGroundFriction,
@@ -8,26 +13,21 @@ import {
 	gWalkScale,
 	gWallBounce,
 } from '../nums';
+import Player from '../Player';
+import controller from '../spr/buster';
 import {
 	angledist,
 	anglewrap,
 	cart,
-	π,
-	πHalf,
+	drawArc,
+	drawWedge,
+	first,
+	isRightOf,
 	scalew,
 	unscalew,
-	first,
-	drawWedge,
-	drawArc,
-	isRightOf,
+	π,
+	πHalf,
 } from '../tools';
-import controller from '../spr/buster';
-import { zEnemy } from '../layers';
-import Game from '../Game';
-import { Hitsize } from '../Hitbox';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
-import Player from '../Player';
 import AbstractEnemy from './AbstractEnemy';
 
 const gJumpFatigue = 150,
@@ -104,26 +104,26 @@ export default class Buster extends AbstractEnemy {
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		var { a, r, va, vr, vfa, game, sprite, state } = this;
+		let { a, r, va, vr, vfa, game, sprite, state } = this;
 		const { player, walls, ceilings, floors } = game,
 			tscale = time / gTimeScale;
 		const { bot, top } = this.getHitbox();
 		const playerDist = unscalew(angledist(a, player.a), r),
 			near = player.alive && playerDist - player.w <= gNearWidth;
 
-		var floor: Flat | null = null;
+		let floor: Flat | null = null;
 		if (vr <= 0) {
 			floor = first(floors, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
-		var ceiling: Flat | null = null;
+		let ceiling: Flat | null = null;
 		if (vr > 0) {
 			ceiling = first(ceilings, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -132,11 +132,11 @@ export default class Buster extends AbstractEnemy {
 			}
 		}
 
-		var wall: Wall | null = null;
+		let wall: Wall | null = null;
 		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
 			const vas = Math.sign(va + vfa);
 			wall = first(walls, w => {
-				if (vas != w.direction && !w.motion) return false;
+				if (vas !== w.direction && !w.motion) return false;
 
 				return (
 					bot.a - bot.width <= w.a &&
@@ -198,7 +198,7 @@ export default class Buster extends AbstractEnemy {
 
 		if (wall && !ceiling) {
 			const bounce = wall.direction * gWallBounce;
-			if (wall.direction == 1) {
+			if (wall.direction === 1) {
 				a = wall.a - bot.width;
 				if (va > bounce) va = bounce;
 			} else {
@@ -286,7 +286,7 @@ export default class Buster extends AbstractEnemy {
 			taw = scalew(width, r + height),
 			aaw = scalew(gAttackWidth, r),
 			naw = scalew(gNearWidth, r);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 

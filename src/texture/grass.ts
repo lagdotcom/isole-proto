@@ -1,5 +1,5 @@
-import TileController from './TileController';
 import { TileDataMap } from '../Texture';
+import TileController from './TileController';
 
 const tcm = (resource: string, tiles: TileDataMap) => game =>
 	new TileController(game.resources[resource], tiles);

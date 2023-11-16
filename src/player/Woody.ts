@@ -1,7 +1,7 @@
-import controller from '../spr/woody';
 import Channel from '../Channel';
 import Game from '../Game';
 import { PlayerInit } from '../Player';
+import controller from '../spr/woody';
 import AbstractPlayer from './AbstractPlayer';
 
 export default class Woody extends AbstractPlayer {

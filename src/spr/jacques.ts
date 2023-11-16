@@ -1,18 +1,18 @@
 import {
-	aStand,
-	aFlip,
-	aJFlip,
-	aWalk,
-	aJump,
-	aFall,
-	aLand,
-	aThrow,
 	aAxe,
-	aHurt,
-	aStatus,
 	aDying,
+	aFall,
+	aFlip,
+	aHurt,
+	aJFlip,
+	aJump,
+	aLand,
+	aStand,
+	aStatus,
+	aThrow,
+	aWalk,
 } from '../anims';
-import { eThrow, eSwing } from '../events';
+import { eSwing, eThrow } from '../events';
 import Player from '../Player';
 import PlayerController from './PlayerController';
 
@@ -71,7 +71,10 @@ export default function woodyController(
 
 			[aLand]: {
 				priority: 1,
-				frames: [{ c: 3, r: 6, t: 75 }, { c: 3, r: 7, t: 75 }],
+				frames: [
+					{ c: 3, r: 6, t: 75 },
+					{ c: 3, r: 7, t: 75 },
+				],
 			},
 
 			[aJFlip]: {

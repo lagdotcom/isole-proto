@@ -1,4 +1,4 @@
-import { Mutator, GameState } from '../Cartographer';
+import { GameState, Mutator } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
 import { chance } from '../tools';
 
@@ -16,7 +16,7 @@ export default class IfInDoubtFight implements Mutator {
 		);
 
 		nodes.forEach(n => {
-			if (n.type == NodeType.Indeterminate)
+			if (n.type === NodeType.Indeterminate)
 				n.type =
 					n.stage > 0 && hard()
 						? NodeType.ThreeSkulls

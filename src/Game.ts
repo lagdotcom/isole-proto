@@ -1,30 +1,30 @@
+import Component from './Component';
+import Decal from './component/Decal';
 import Flat from './component/Flat';
 import Inventory from './component/Inventory';
-import Wall from './component/Wall';
-import { eLevelEntered, eGameReady, eMapEntered, eShopEntered } from './events';
-import { min } from './tools';
-import { gMaxTimeStep } from './nums';
-import mel from './makeElement';
-import dispatch from './dispatchEvent';
-import addResources from './resources';
-import Component from './Component';
-import DrawnComponent from './DrawnComponent';
-import Texture from './Texture';
-import Decal from './component/Decal';
-import Enemy from './Enemy';
-import Player from './Player';
-import Controller from './Controller';
-import Material from './Material';
-import Zoomer from './Zoomer';
-import { zBeforeUI } from './layers';
-import Platform from './component/Platform';
-import emptyElement from './emptyElement';
-import MapNode from './MapNode';
-import MapView from './component/MapView';
-import InputMapper, { InputButton } from './InputMapper';
 import LeaveTimer from './component/LeaveTimer';
-import { Pickup } from './Pickup';
+import MapView from './component/MapView';
+import Platform from './component/Platform';
 import ShopView from './component/ShopView';
+import Wall from './component/Wall';
+import Controller from './Controller';
+import dispatch from './dispatchEvent';
+import DrawnComponent from './DrawnComponent';
+import emptyElement from './emptyElement';
+import Enemy from './Enemy';
+import { eGameReady, eLevelEntered, eMapEntered, eShopEntered } from './events';
+import InputMapper, { InputButton } from './InputMapper';
+import { zBeforeUI } from './layers';
+import mel from './makeElement';
+import MapNode from './MapNode';
+import Material from './Material';
+import { gMaxTimeStep } from './nums';
+import { Pickup } from './Pickup';
+import Player from './Player';
+import addResources from './resources';
+import Texture from './Texture';
+import { min } from './tools';
+import Zoomer from './Zoomer';
 
 export const LevelMode = 'level';
 export const LoadingMode = 'loading';
@@ -129,7 +129,7 @@ export default class Game {
 		this.nodes = [];
 		this.objects = {};
 		this.options = options;
-		this.resources = [];
+		this.resources = {};
 		this.running = false;
 		this.textures = {};
 		this.time = 0;
@@ -176,7 +176,7 @@ export default class Game {
 	resourceLoaded() {
 		this.loaded++;
 
-		if (this.loaded == this.loading) {
+		if (this.loaded === this.loading) {
 			this.ready();
 		}
 	}
@@ -272,9 +272,9 @@ export default class Game {
 	/**
 	 * Fire an event
 	 * @param {string} event event name
-	 * @param {any} detail event details
+	 * @param {unknown} detail event details
 	 */
-	fire(event: string, detail?: any): void {
+	fire(event: string, detail?: unknown): void {
 		dispatch(this.element, event, detail);
 	}
 
@@ -323,7 +323,7 @@ export default class Game {
 	showLoadScreen(): void {
 		const { width, height } = this.options;
 		const { loaded, loading } = this;
-		var c = this.context;
+		const c = this.context;
 
 		c.fillStyle = '#000000';
 		c.fillRect(0, 0, width, height);
@@ -338,7 +338,7 @@ export default class Game {
 	 * @param {Component} component component
 	 */
 	remove(component: Component): void {
-		const match = (c: Component) => c != component;
+		const match = (c: Component) => c !== component;
 		this.components = this.components.filter(match);
 		if (component.isEnemy) this.enemies = this.enemies.filter(match);
 		this.drawn = this.drawn.filter(match);
@@ -381,7 +381,7 @@ export default class Game {
 	 */
 	showGameScreen(step: number) {
 		const { width, height, showFps, showHitboxes } = this.options;
-		var c = this.context;
+		const c = this.context;
 
 		c.fillStyle = '#000000';
 		c.fillRect(0, 0, width, height);

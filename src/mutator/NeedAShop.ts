@@ -1,4 +1,4 @@
-import { Mutator, GameState } from '../Cartographer';
+import { GameState, Mutator } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
 import { choose } from '../tools';
 
@@ -16,7 +16,7 @@ export default class NeedAShop implements Mutator {
 				n.stage > after &&
 				n.stage < before &&
 				n.type === NodeType.Indeterminate &&
-				n.connections.length == 1
+				n.connections.length === 1
 		);
 		// TODO: this shuld cause a bigger error
 		if (!candidates.length) return false;

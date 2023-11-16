@@ -8,8 +8,8 @@ import MapNode from '../MapNode';
  */
 export function sever(nodes: MapNode[], to: number, except?: number) {
 	nodes
-		.filter(n => n.id != except && n.connections.includes(to))
+		.filter(n => n.id !== except && n.connections.includes(to))
 		.forEach(n => {
-			n.connections = n.connections.filter(c => c != to);
+			n.connections = n.connections.filter(c => c !== to);
 		});
 }

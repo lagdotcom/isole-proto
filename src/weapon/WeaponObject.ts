@@ -1,10 +1,10 @@
-import { deg2rad, cart, πHalf, drawWedge, scalew } from '../tools';
-import { zDecal } from '../layers';
-import Game from '../Game';
-import Weapon from '../Weapon';
 import { cIgnore } from '../colours';
+import Game from '../Game';
 import Hitbox from '../Hitbox';
+import { zDecal } from '../layers';
 import { Pickup } from '../Pickup';
+import { cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
+import Weapon from '../Weapon';
 
 export type WeaponConstructor = new (game: Game) => Weapon;
 interface WeaponObjectInit {
@@ -21,7 +21,10 @@ export default class WeaponObject implements Pickup {
 	weapon: Weapon;
 	width: number;
 
-	constructor(public game: Game, init: WeaponObjectInit) {
+	constructor(
+		public game: Game,
+		init: WeaponObjectInit
+	) {
 		this.a = deg2rad(init.a);
 		this.height = 30;
 		this.layer = zDecal;

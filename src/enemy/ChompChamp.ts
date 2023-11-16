@@ -1,21 +1,21 @@
-import Enemy from '../Enemy';
-import {
-	deg2rad,
-	πHalf,
-	cart,
-	scalew,
-	collides,
-	jbr,
-	damage,
-	drawWedge,
-} from '../tools';
-import Game from '../Game';
-import { zFlying } from '../layers';
-import Hitbox from '../Hitbox';
-import AnimController, { ListenerMap, Listener } from '../AnimController';
+import AnimController, { Listener, ListenerMap } from '../AnimController';
 import { cAI, cHurt } from '../colours';
-import mel from '../makeElement';
+import Enemy from '../Enemy';
 import { eAnimationEnded } from '../events';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { zFlying } from '../layers';
+import mel from '../makeElement';
+import {
+	cart,
+	collides,
+	damage,
+	deg2rad,
+	drawWedge,
+	jbr,
+	scalew,
+	πHalf,
+} from '../tools';
 
 const aIdle = 'idle',
 	aClose = 'close',
@@ -186,7 +186,7 @@ export default class ChompChamp implements Enemy {
 
 	update(time: number) {
 		switch (this.state) {
-			case aIdle:
+			case aIdle: {
 				const a = this.getAttackHitbox();
 				if (
 					collides(a, this.game.player.getHitbox()) &&
@@ -197,6 +197,7 @@ export default class ChompChamp implements Enemy {
 
 				this.sprite.idle(time);
 				break;
+			}
 
 			case aClose:
 				this.sprite.close(time);
@@ -243,15 +244,16 @@ export default class ChompChamp implements Enemy {
 		const { cx, cy } = game;
 
 		switch (state) {
-			case aIdle:
+			case aIdle: {
 				const a = this.getAttackHitbox();
 				drawWedge(c, cAI, cx, cy, a.bot, a.top);
 				break;
-
-			case aClose:
+			}
+			case aClose: {
 				const g = this.getCatchHitbox();
 				drawWedge(c, cHurt, cx, cy, g.bot, g.top);
 				break;
+			}
 		}
 	}
 

@@ -1,9 +1,9 @@
-import { gHitboxScale } from './nums';
 import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
-import Hitbox, { Hitsize } from './Hitbox';
 import Damageable from './Damageable';
 import { eEnemyDied } from './events';
+import Hitbox, { Hitsize } from './Hitbox';
+import { gHitboxScale } from './nums';
 
 export const π = Math.PI,
 	π2 = π * 2,
@@ -36,7 +36,7 @@ export function isRightOf(a: number, b: number): boolean {
  * @returns {number} angle distance
  */
 export function angledist(a: number, b: number): number {
-	var d = a - b;
+	let d = a - b;
 	if (d > π) d -= π2;
 	else if (d < -π) d += π2;
 	return Math.abs(d);
@@ -48,8 +48,8 @@ export function angledist(a: number, b: number): number {
  * @returns {string} joined items
  */
 export function jbr(...args: string[]): string {
-	var s = '';
-	for (var i = 0; i < args.length; i++) {
+	let s = '';
+	for (let i = 0; i < args.length; i++) {
 		if (i) s += '<br>';
 		s += args[i];
 	}
@@ -104,12 +104,12 @@ export const min = Math.min;
 
 /**
  * Check if any item matches a predicate
- * @param {any[]} a items
- * @param {(any) => boolean} fn callback
+ * @param {T[]} a items
+ * @param {(T) => boolean} fn callback
  * @returns {boolean} match found
  */
-export function any(a: any[], fn: (value: any) => boolean): boolean {
-	for (var i = a.length - 1; i >= 0; i--) {
+export function any<T>(a: T[], fn: (value: T) => boolean): boolean {
+	for (let i = a.length - 1; i >= 0; i--) {
 		if (fn(a[i])) return true;
 	}
 
@@ -126,7 +126,7 @@ export function first<T>(
 	a: T[],
 	fn: (object: T, index?: number) => boolean
 ): T | null {
-	for (var i = 0; i < a.length; i++) {
+	for (let i = 0; i < a.length; i++) {
 		if (fn(a[i], i)) return a[i];
 	}
 
@@ -220,7 +220,7 @@ export function displace(
 	flip: boolean = false
 ): CoordAR {
 	const { a, r } = origin;
-	var x = 0,
+	let x = 0,
 		y = 0;
 
 	offsets.forEach(h => {
@@ -243,10 +243,10 @@ export function fittest<T>(
 	objects: T[],
 	scorer: (object: T) => number
 ): T | null {
-	var bestScore: number = -Infinity,
+	let bestScore: number = -Infinity,
 		best: T | null = null;
 	objects.forEach(o => {
-		var score = scorer(o);
+		const score = scorer(o);
 		if (score > bestScore) {
 			bestScore = score;
 			best = o;
@@ -309,7 +309,7 @@ export function sum(items: number[], start: number = 0): number {
  * @returns {T}
  */
 export function rndweight<T>(...weightings: [T, number][]): T {
-	const total = sum(weightings.map(([_, weight]) => weight));
+	const total = sum(weightings.map(([, weight]) => weight));
 	const roll = rndr(0, total);
 	let accumulator = 0;
 	for (let i = 0; i < weightings.length; i++) {

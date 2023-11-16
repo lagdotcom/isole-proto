@@ -35,7 +35,7 @@ export default class BusterController extends Controller {
 	}
 
 	idle(t: number) {
-		if (this.state === aFall || this.state == aLand) {
+		if (this.state === aFall || this.state === aLand) {
 			if (!this.land(t)) return;
 		}
 

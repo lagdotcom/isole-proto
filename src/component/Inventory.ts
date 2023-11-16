@@ -1,10 +1,10 @@
-import { zUI } from '../layers';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
-import Weapon from '../Weapon';
-import Item from '../Item';
 import { InputButton } from '../InputMapper';
+import Item from '../Item';
+import { zUI } from '../layers';
 import { drawCross } from '../tools';
+import Weapon from '../Weapon';
 
 export default class Inventory implements DrawnComponent {
 	cycling: boolean;
@@ -105,7 +105,7 @@ export default class Inventory implements DrawnComponent {
 		const { game, items, money, health, keys, img, weapon } = this;
 
 		const y = game.options.height - 48;
-		var x = 60;
+		let x = 60;
 
 		if (weapon) weapon.draw(c, game.options.width - 48, y);
 
@@ -120,7 +120,7 @@ export default class Inventory implements DrawnComponent {
 		// icons image: mana, health, keys, money (each 32x32)
 
 		x = 0;
-		for (var i = 0; i < health; i++) {
+		for (let i = 0; i < health; i++) {
 			c.drawImage(img, 32, 0, 32, 32, x, 0, 32, 32);
 			x += 32;
 		}
@@ -143,7 +143,7 @@ export default class Inventory implements DrawnComponent {
 		drawCross(c, 'lime', game.options.width - 48, y);
 
 		// item positions
-		var x = 60;
+		const x = 60;
 		drawCross(c, 'lime', x, y);
 		drawCross(c, 'lime', x + 48, y);
 		drawCross(c, 'lime', x + 48 + 48, y);

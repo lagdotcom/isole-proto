@@ -1,8 +1,8 @@
-import Game from '../Game';
-import Buster from './Buster';
 import Controller from '../Controller';
 import { Facing } from '../dirs';
+import Game from '../Game';
 import Player from '../Player';
+import Buster from './Buster';
 
 class BoosterController extends Controller {
 	constructor(img: CanvasImageSource) {
@@ -75,6 +75,6 @@ export default class Booster extends Buster {
 	}
 
 	getJumpSide() {
-		return this.dir == 'R' ? 1 : -1;
+		return this.dir === 'R' ? 1 : -1;
 	}
 }

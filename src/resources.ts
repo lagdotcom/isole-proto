@@ -1,57 +1,49 @@
 import iconsImg from '../media/gfx/icons.png';
-import mapIconsImg from '../media/gfx/mapicons.png';
-import mapBossImg from '../media/gfx/mapboss.png';
+import bombImg from '../media/gfx/it/bomb.png';
+import rockImg from '../media/gfx/it/rock.png';
 import jacquesImg from '../media/gfx/jacques.png';
-import woodyImg from '../media/gfx/woody.png';
-
-import bluegrassImg from '../media/gfx/tile/bluegrass.png';
-import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
-import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
-import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
-import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
-import grassImg from '../media/gfx/tile/grass.png';
-import greyboxImg from '../media/gfx/tile/greybox.png';
-
+import mapBossImg from '../media/gfx/mapboss.png';
+import mapIconsImg from '../media/gfx/mapicons.png';
+import batImg from '../media/gfx/mon/bat.png';
 import boosterImg from '../media/gfx/mon/booster.png';
 import busterImg from '../media/gfx/mon/buster.png';
 import chompChampImg from '../media/gfx/mon/chompchamp.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
-import batImg from '../media/gfx/mon/bat.png';
 import minatoadImg from '../media/gfx/mon/minatoad.png';
 import shockwaveImg from '../media/gfx/mon/minatoad.shockwave.png';
-
-import bombImg from '../media/gfx/it/bomb.png';
-import rockImg from '../media/gfx/it/rock.png';
-
-import axeImg from '../media/gfx/wp/axe.png';
-
-import reticleImg from '../media/gfx/reticle.png';
 import projectileImg from '../media/gfx/projectiles.png';
-
+import reticleImg from '../media/gfx/reticle.png';
+import shopBgImg from '../media/gfx/shop.png';
+import bluegrassImg from '../media/gfx/tile/bluegrass.png';
+import grassImg from '../media/gfx/tile/grass.png';
+import greyboxImg from '../media/gfx/tile/greybox.png';
+import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
+import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
+import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
+import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
+import woodyImg from '../media/gfx/woody.png';
+import axeImg from '../media/gfx/wp/axe.png';
 import batPunchSnd from '../media/sfx/bat-punch.wav';
-import bonkSnd from '../media/sfx/Head_Bonk.wav';
 import bopSnd from '../media/sfx/Enemy_Bop.wav';
-import deathSnd from '../media/sfx/Player_Death.wav';
-import jumpSnd from '../media/sfx/Jump.wav';
 import step1Snd from '../media/sfx/Footstep1_Bubbly.wav';
 import step2Snd from '../media/sfx/Footstep2_Bubbly.wav';
+import bonkSnd from '../media/sfx/Head_Bonk.wav';
+import jumpSnd from '../media/sfx/Jump.wav';
+import deathSnd from '../media/sfx/Player_Death.wav';
 import jacquesHurtSnd from '../media/sfx/Player_Hurt_Jacques.wav';
 import woodyHurtSnd from '../media/sfx/Player_Hurt_Woody.wav';
-
+import Controller from './Controller';
+import Game from './Game';
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
 import greyboxMaterials from './material/greybox';
-
 import bluegrassObjects from './object/bluegrass';
-import shopBgImg from '../media/gfx/shop.png';
-import Game from './Game';
 import Texture from './Texture';
-import Controller from './Controller';
 
 interface MaterialMap {
 	[name: string]: {
-		spawner?(parent: any): void;
+		spawner?(parent: unknown): void;
 		texture(game: Game): Texture;
 	};
 }
@@ -98,8 +90,8 @@ function addObjects(game: Game, objects: ObjectMap[]) {
  * @returns {HTMLImageElement} image element
  */
 function image(fn: string, onload: (e: Event) => void): HTMLImageElement {
-	var el = document.createElement('img');
-	el.addEventListener('load', onload)
+	const el = document.createElement('img');
+	el.addEventListener('load', onload);
 	el.src = fn;
 
 	return el;
@@ -120,12 +112,12 @@ const MediaErrors = [
  * @returns {HTMLAudioElement} audio element
  */
 function sound(fn: string, onload: (e: Event) => void): HTMLAudioElement {
-	var el = new Audio(fn);
-	el.addEventListener('canplaythrough', onload)
+	const el = new Audio(fn);
+	el.addEventListener('canplaythrough', onload);
 	el.addEventListener('error', e => {
 		console.log(`could not load ${fn} - ${MediaErrors[el.error!.code]}`);
 		onload(e as Event);
-	})
+	});
 
 	return el;
 }

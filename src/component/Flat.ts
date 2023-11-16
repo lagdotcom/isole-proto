@@ -1,12 +1,12 @@
 import { cWall } from '../colours';
-import { gHitboxScale } from '../nums';
-import { anglewrap, cart, deg2rad, πHalf, scalew } from '../tools';
-import { zStructure } from '../layers';
+import Component from '../Component';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
+import { zStructure } from '../layers';
+import { gHitboxScale } from '../nums';
 import Texture from '../Texture';
+import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
 import Wall from './Wall';
-import Component from '../Component';
 
 /** Floor or Ceiling */
 export default class Flat implements DrawnComponent {
@@ -90,7 +90,7 @@ export default class Flat implements DrawnComponent {
 		const { cx, cy } = game;
 		const step = scalew(scale, r),
 			offset = scalew(scale / 2, r);
-		var remaining = width * 2,
+		let remaining = width * 2,
 			a = left;
 
 		if (!sprite) return;
@@ -109,7 +109,7 @@ export default class Flat implements DrawnComponent {
 			c.translate(x + cx, y + cy);
 			c.rotate(normal);
 
-			sprite!.draw(c);
+			sprite.draw(c);
 
 			c.rotate(-normal);
 			c.translate(-x - cx, -y - cy);

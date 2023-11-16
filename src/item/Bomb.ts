@@ -1,34 +1,34 @@
+import AnimController from '../AnimController';
 import { aThrow } from '../anims';
 import { cHit } from '../colours';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
 import { dLeft } from '../dirs';
+import DrawnComponent from '../DrawnComponent';
 import { eThrow } from '../events';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import Item from '../Item';
+import { zFlying } from '../layers';
 import {
 	gGravityStrength,
+	gGroundFriction,
 	gTimeScale,
 	gWalkScale,
-	gGroundFriction,
 } from '../nums';
+import Player from '../Player';
 import {
+	anglecollides,
 	angledist,
 	anglewrap,
 	cart,
 	collides,
+	drawWedge,
+	first,
+	scalew,
 	π,
 	πHalf,
-	scalew,
-	first,
-	drawWedge,
-	anglecollides,
 } from '../tools';
-import { zFlying } from '../layers';
-import Item from '../Item';
-import Game from '../Game';
-import DrawnComponent from '../DrawnComponent';
-import Flat from '../component/Flat';
-import Player from '../Player';
-import Wall from '../component/Wall';
-import Hitbox from '../Hitbox';
-import AnimController from '../AnimController';
 
 const gBombTimer = 3000,
 	gBombWarning = 1000,
@@ -125,27 +125,30 @@ class Bomb implements DrawnComponent {
 	}
 
 	update(time: number): void {
-		var { game, va, vfa, vr, a, r, timer } = this,
+		let { game, va, vfa, vr, a, r, timer } = this,
 			{ enemies, floors, walls } = game,
 			tscale = time / gTimeScale;
 
 		const { bot, top } = this.getHitbox();
-		var enemy = first(enemies, e => collides({ bot, top }, e.getHitbox()));
+		const enemy = first(enemies, e =>
+			collides({ bot, top }, e.getHitbox())
+		);
 
 		this.tscale = tscale;
 
-		var floor: Flat | null = null;
+		let floor: Flat | null = null;
 		if (vr < 0) {
 			floor = first(floors, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
-		var wall: Wall | null = null;
-		wall = first(walls, w => {
-			return top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w);
-		});
+		let wall: Wall | null = null;
+		wall = first(
+			walls,
+			w => top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+		);
 
 		if (wall) {
 			va *= -gBounciness;
@@ -216,7 +219,7 @@ class Bomb implements DrawnComponent {
 		const { r, a, va, vr, w, h, tscale } = this;
 		const baw = scalew(w, r),
 			taw = scalew(w, r + h);
-		var amod,
+		let amod,
 			vbr = 0,
 			vtr = 0;
 

@@ -19,7 +19,7 @@ export default class GCBDController extends Controller {
 	}
 
 	ground(): void {
-		if (this.r == 0 || this.r == 4) this.r++;
+		if (this.r === 0 || this.r === 4) this.r++;
 	}
 
 	air(): void {

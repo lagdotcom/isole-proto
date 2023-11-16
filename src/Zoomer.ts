@@ -1,5 +1,5 @@
-import Game from './Game';
 import DrawnComponent from './DrawnComponent';
+import Game from './Game';
 import { zFirst } from './layers';
 import { cart } from './tools';
 
@@ -42,8 +42,8 @@ export default class Zoomer implements DrawnComponent {
 	}
 
 	draw(context: CanvasRenderingContext2D) {
-		let ss = Math.abs(this.py) * this.vert;
-		let cs = Math.abs(this.px);
+		const ss = Math.abs(this.py) * this.vert;
+		const cs = Math.abs(this.px);
 
 		let s = this.scale / Math.max(ss, cs);
 		if (s < this.min) s = this.min;

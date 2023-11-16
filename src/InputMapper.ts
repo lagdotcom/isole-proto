@@ -1,24 +1,24 @@
-import { any } from './tools';
-import { gPadAxisThreshold } from './nums';
 import {
-	jLeft,
-	jRight,
-	jUp,
-	jDown,
 	jButton1,
 	jButton2,
 	jButton3,
 	jButton4,
-	kLeft,
-	kUp,
-	kRight,
+	jDown,
+	jLeft,
+	jRight,
+	jUp,
+	kCycle,
 	kDown,
+	kFreeMoney,
 	kJump,
+	kLeft,
+	kRight,
 	kSwing,
 	kThrow,
-	kCycle,
-	kFreeMoney,
+	kUp,
 } from './keys';
+import { gPadAxisThreshold } from './nums';
+import { any } from './tools';
 
 export enum InputButton {
 	None,

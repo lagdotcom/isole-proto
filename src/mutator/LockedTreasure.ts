@@ -1,6 +1,6 @@
-import { Mutator, GameState } from '../Cartographer';
+import { GameState, Mutator } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
-import { chance, rndweight, choose } from '../tools';
+import { chance, choose, rndweight } from '../tools';
 import { sever } from './tools';
 
 const MoreTreasureChance = 5;
@@ -41,7 +41,7 @@ export default class LockedTreasure implements Mutator {
 				n.stage > after &&
 				n.stage < before &&
 				n.type === NodeType.Indeterminate &&
-				n.connections.length == 1
+				n.connections.length === 1
 		);
 		if (!candidates.length) return false;
 

@@ -1,6 +1,6 @@
 import Controller, { ControllerInit } from './Controller';
-import { eAnimationEnded } from './events';
 import PointXY from './CoordXY';
+import { eAnimationEnded } from './events';
 import HitboxXYWH from './HitboxXYWH';
 
 export interface AnimInit extends ControllerInit {
@@ -44,7 +44,7 @@ export interface Frame {
 
 export type AnimMap = { [name: string]: Anim };
 export type AnimSpecMap = { [name: string]: AnimSpec };
-export type Listener = (details: any) => void;
+export type Listener = (details: unknown) => void;
 export type ListenerMap = { [name: string]: Listener };
 
 export default class AnimController extends Controller {
@@ -92,18 +92,16 @@ export default class AnimController extends Controller {
 		this.hotspot = { x: 0, y: 0 };
 
 		// pre-calculations
-		for (var key in options.animations) {
+		for (const key in options.animations) {
 			const spec = options.animations[key];
 			this.animations[key] = {
 				extend: spec.extend || false,
 				flags: spec.flags || {},
 				frames: spec.frames.map(
-					(f: FrameSpec): Frame => {
-						return {
-							...f,
-							hotspot: f.hotspot || { x: 0, y: 0 },
-						};
-					}
+					(f: FrameSpec): Frame => ({
+						...f,
+						hotspot: f.hotspot || { x: 0, y: 0 },
+					})
 				),
 				last: spec.frames.length - 1,
 				loop: spec.loop || false,
@@ -194,9 +192,9 @@ export default class AnimController extends Controller {
 	/**
 	 * Fire an event
 	 * @param {string} e event name
-	 * @param {any} details event details
+	 * @param {unknown} details event details
 	 */
-	dispatch(e: string, details: any = null): void {
+	dispatch(e: string, details: unknown = null): void {
 		if (this.al && this.al[e]) this.al[e](details);
 		if (this[e]) this[e](details);
 	}

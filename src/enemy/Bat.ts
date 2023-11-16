@@ -10,37 +10,37 @@ Column 4 - Wake-up: Frame 1 is 150ms, Frames 2-4 are 75ms, Frames 5-9 are 55ms a
 NOTES: the bat can be jumped on unless it is in the spinning animation during wake up, when it goes to punch it can still be jumped on like normal around it's head area, but it's fist will always damage the player. The hitbox for this creature would roughly be the head region and it's hands potentially, wings I don't see being part of it's hitbox for being jumped on or harming the player.
 */
 
+import Channel from '../Channel';
 import { cAI, cHurt } from '../colours';
+import Flat from '../component/Flat';
 import { dLeft, dRight, Facing } from '../dirs';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
-import {
-	angledist,
-	anglewrap,
-	cart,
-	choose,
-	collides,
-	fittest,
-	lerp,
-	min,
-	π,
-	πHalf,
-	rnd,
-	rnda,
-	rndr,
-	scalew,
-	drawWedge,
-} from '../tools';
 import controller, {
 	ePunchDone,
 	ePunchForward,
 	ePunchPullback,
 	eWakeDone,
 } from '../spr/bat';
-import { zFlying } from '../layers';
-import Channel from '../Channel';
-import Flat from '../component/Flat';
-import Game from '../Game';
-import Hitbox from '../Hitbox';
+import {
+	angledist,
+	anglewrap,
+	cart,
+	choose,
+	collides,
+	drawWedge,
+	fittest,
+	lerp,
+	min,
+	rnd,
+	rnda,
+	rndr,
+	scalew,
+	π,
+	πHalf,
+} from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
 const gAttackFar = 160,
@@ -173,7 +173,7 @@ export default class Bat extends AbstractEnemy {
 	physics(time: number, va: number, vr: number): void {
 		const tscale = time / gTimeScale;
 
-		var { a, r } = this;
+		let { a, r } = this;
 
 		a += (va / r) * tscale * gWalkScale;
 		r += vr * tscale;
@@ -219,7 +219,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	[sFlying + ssNormal + 'Update'](time: number): number {
-		var { dir, va } = this;
+		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gNormalSpeed);
 		else va = lerp(va, -gNormalSpeed);
@@ -229,7 +229,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	[sFlying + ssTurn + 'Update'](time: number): number {
-		var { va } = this;
+		let { va } = this;
 
 		va = lerp(va, 0);
 		if (Math.abs(va) < gZeroAngleThreshold) {
@@ -243,7 +243,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	[sFlying + ssFast + 'Update'](time: number): number {
-		var { dir, va } = this;
+		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gFastSpeed);
 		else va = lerp(va, -gFastSpeed);
@@ -253,7 +253,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	[sFlying + ssSlow + 'Update'](time: number): number {
-		var { dir, va } = this;
+		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gSlowSpeed);
 		else va = lerp(va, -gSlowSpeed);
@@ -263,7 +263,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	flyingVerticalUpdate(time: number): number {
-		var { r, minradius, maxradius, targetradius, vr } = this;
+		let { r, minradius, maxradius, targetradius, vr } = this;
 
 		const rdiff = targetradius - r;
 		vr = gVerticalAcceleration * time * rdiff;
@@ -298,9 +298,9 @@ export default class Bat extends AbstractEnemy {
 	canAttack(): boolean {
 		const { a } = this.getHitbox();
 		return (
-			a &&
+			!!a &&
 			this.game.player.alive &&
-			collides(a!, this.game.player.getHitbox())
+			collides(a, this.game.player.getHitbox())
 		);
 	}
 
@@ -369,7 +369,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	roostingAngleUpdate(): number {
-		var { dir, roostangle, va } = this;
+		let { dir, roostangle, va } = this;
 
 		const adiff = angledist(this.a, roostangle!);
 		if (adiff < gZeroAngleThreshold) {
@@ -384,7 +384,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	roostingRadiusUpdate(time: number): number {
-		var { r, roostradius, vr } = this;
+		let { r, roostradius, vr } = this;
 
 		const rdiff = roostradius! - r;
 		if (rdiff < gZeroRadiusThreshold) {
@@ -445,11 +445,11 @@ export default class Bat extends AbstractEnemy {
 		if (a) drawWedge(c, cAI, cx, cy, a.bot, a.top);
 	}
 
-	getHitbox(): Hitbox {
+	getHitbox() {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 
@@ -475,9 +475,9 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getAttackHitbox(): Hitbox | null {
-		if (this.state == sFlying || this.state == sRoosting)
+		if (this.state === sFlying || this.state === sRoosting)
 			return this.getPunchHitbox();
-		if (this.state == sSleeping) return this.getSleepingHitbox();
+		if (this.state === sSleeping) return this.getSleepingHitbox();
 		return null;
 	}
 
@@ -487,7 +487,7 @@ export default class Bat extends AbstractEnemy {
 		const left = dir === dLeft;
 		const aoffset = left ? -attackWidth : attackWidth;
 
-		var amod: number,
+		let amod: number,
 			vbr = 0;
 
 		if (tscale) amod = a + (va / r) * tscale * gWalkScale;

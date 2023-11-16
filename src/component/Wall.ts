@@ -1,10 +1,10 @@
 import { cWall } from '../colours';
-import { anglewrap, cart, deg2rad, πHalf, scalew } from '../tools';
-import { gHitboxScale, gWallGap } from '../nums';
-import { zStructure } from '../layers';
-import Game from '../Game';
 import DrawnComponent from '../DrawnComponent';
+import Game from '../Game';
+import { zStructure } from '../layers';
+import { gHitboxScale, gWallGap } from '../nums';
 import Texture from '../Texture';
+import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
 import Flat from './Flat';
 
 export default class Wall implements DrawnComponent {
@@ -94,7 +94,7 @@ export default class Wall implements DrawnComponent {
 		const { cx, cy } = game;
 		const step = sprite!.h;
 
-		var remaining = t - b,
+		let remaining = t - b,
 			r = t;
 
 		sprite!.tile('tr');
@@ -128,7 +128,7 @@ export default class Wall implements DrawnComponent {
 		const { cx, cy } = game;
 		const step = sprite!.h;
 
-		var remaining = t - b,
+		let remaining = t - b,
 			r = t;
 
 		sprite!.tile('tl');

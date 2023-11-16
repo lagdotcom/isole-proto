@@ -1,7 +1,7 @@
-import controller from '../spr/jacques';
 import Channel from '../Channel';
 import Game from '../Game';
 import { PlayerInit } from '../Player';
+import controller from '../spr/jacques';
 import AbstractPlayer from './AbstractPlayer';
 
 export default class Jacques extends AbstractPlayer {

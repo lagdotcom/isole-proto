@@ -1,7 +1,7 @@
 import Channel from './Channel';
 import Damageable from './Damageable';
-import DrawnComponent from './DrawnComponent';
 import { Facing } from './dirs';
+import DrawnComponent from './DrawnComponent';
 import Hitbox from './Hitbox';
 import PlayerController from './spr/PlayerController';
 

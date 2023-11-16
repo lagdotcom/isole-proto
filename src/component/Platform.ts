@@ -1,11 +1,11 @@
-import { gHitboxScale } from '../nums';
-import { anglewrap, cart, deg2rad, πHalf, scalew } from '../tools';
-import { zStructure } from '../layers';
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
+import { zStructure } from '../layers';
+import { gHitboxScale } from '../nums';
 import Texture from '../Texture';
-import Wall from './Wall';
+import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
 import Flat from './Flat';
+import Wall from './Wall';
 
 export interface PlatformInit {
 	h: number;
@@ -128,7 +128,7 @@ export default class Platform implements DrawnComponent {
 		const { cx, cy } = game;
 		const step = scalew(scale, r),
 			offset = scalew(scale / 2, r);
-		var remaining = width * 2,
+		let remaining = width * 2,
 			a = left;
 
 		sprite.tile(row + (this.circle ? 'm' : 'l'));

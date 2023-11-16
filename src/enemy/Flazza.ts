@@ -9,25 +9,25 @@ NOTES: After the body slam recovery, the flying animation will begin playing aga
 */
 
 import { cAI, cHurt } from '../colours';
+import Flat from '../component/Flat';
 import { dLeft, Facing } from '../dirs';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
+import controller, { eDrop, eRecover } from '../spr/flazza';
 import {
+	anglecollides,
 	angledist,
 	anglewrap,
 	cart,
-	π,
-	πHalf,
+	drawWedge,
+	first,
 	scalew,
 	unscalew,
-	first,
-	drawWedge,
-	anglecollides,
+	π,
+	πHalf,
 } from '../tools';
-import controller, { eDrop, eRecover } from '../spr/flazza';
-import { zFlying } from '../layers';
-import Game from '../Game';
-import Hitbox from '../Hitbox';
-import Flat from '../component/Flat';
 import AbstractEnemy from './AbstractEnemy';
 
 const gAttackWidth = 120,
@@ -93,7 +93,7 @@ export default class Flazza extends AbstractEnemy {
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		var {
+		let {
 			a,
 			r,
 			rtop,
@@ -124,9 +124,9 @@ export default class Flazza extends AbstractEnemy {
 				vr = gFlopSpeed;
 				break;
 
-			case sDrop:
+			case sDrop: {
 				va = 0;
-				var floor = this.getFloor();
+				const floor = this.getFloor();
 				if (floor) {
 					r = floor.r;
 					vr = 0;
@@ -135,6 +135,7 @@ export default class Flazza extends AbstractEnemy {
 					vr = dropSpeed;
 				}
 				break;
+			}
 
 			case sRecovery:
 				if (r >= rtop) {
@@ -222,7 +223,7 @@ export default class Flazza extends AbstractEnemy {
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height),
 			aaw = scalew(gAttackWidth, r);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 

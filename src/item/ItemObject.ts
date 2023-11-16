@@ -1,10 +1,10 @@
-import { deg2rad, cart, πHalf, drawWedge, scalew } from '../tools';
-import { zDecal } from '../layers';
-import Game from '../Game';
-import Item from '../Item';
 import { cIgnore } from '../colours';
+import Game from '../Game';
 import Hitbox from '../Hitbox';
+import Item from '../Item';
+import { zDecal } from '../layers';
 import { Pickup } from '../Pickup';
+import { cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
 
 export type ItemConstructor = new (game: Game) => Item;
 interface ItemObjectInit {
@@ -22,7 +22,10 @@ export default class ItemObject implements Pickup {
 	r: number;
 	width: number;
 
-	constructor(public game: Game, init: ItemObjectInit) {
+	constructor(
+		public game: Game,
+		init: ItemObjectInit
+	) {
 		this.a = deg2rad(init.a);
 		this.height = 30;
 		this.item = new init.item(game);

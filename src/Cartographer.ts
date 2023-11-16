@@ -1,9 +1,10 @@
 import Delaunay from 'delaunay-fast';
+
 import MapNode, { NodeType } from './MapNode';
-import { rndr } from './tools';
 import IfInDoubtFight from './mutator/IfInDoubtFight';
 import LockedTreasure from './mutator/LockedTreasure';
 import NeedAShop from './mutator/NeedAShop';
+import { rndr } from './tools';
 
 const stageCount = [10, 12, 14];
 const stageGap = [120, 100, 85];
@@ -37,13 +38,13 @@ export default class Cartographer {
 		const stages = stageCount[gs.floor];
 		const gap = stageGap[gs.floor];
 
-		for (var stage = 0; stage < stages; stage++) {
-			const first = stage == 0;
-			const last = stage == stages - 1;
+		for (let stage = 0; stage < stages; stage++) {
+			const first = stage === 0;
+			const last = stage === stages - 1;
 			const size = first ? 1 : last ? 1 : rndr(2, 4);
 			const yo = offsets[size - 1];
 
-			for (var i = 0; i < size; i++) {
+			for (let i = 0; i < size; i++) {
 				nodes.push({
 					id: nodes.length,
 					connections: [],
@@ -56,13 +57,16 @@ export default class Cartographer {
 		}
 
 		const tris = Delaunay.triangulate(nodes.map(n => [n.x, n.y]));
-		for (var i = 0; i < tris.length; i += 3) {
+		for (let i = 0; i < tris.length; i += 3) {
 			const indices = [tris[i], tris[i + 1], tris[i + 2]];
 			const set = indices.map(x => nodes[x]);
 
 			set.forEach(n => {
 				set.forEach(o => {
-					if (n.stage == o.stage - 1 && !n.connections.includes(o.id))
+					if (
+						n.stage === o.stage - 1 &&
+						!n.connections.includes(o.id)
+					)
 						n.connections.push(o.id);
 				});
 

@@ -1,9 +1,9 @@
+import Damageable from '../Damageable';
 import Enemy from '../Enemy';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
-import { deg2rad, jbr } from '../tools';
 import mel from '../makeElement';
-import Damageable from '../Damageable';
+import { deg2rad, jbr } from '../tools';
 
 const gStunMultiplier = 200;
 

@@ -1,8 +1,8 @@
 import AnimController, { AnimSpecMap } from '../AnimController';
-import { damage, dirv } from '../tools';
 import { aAxe } from '../anims';
-import Game from '../Game';
 import Enemy from '../Enemy';
+import Game from '../Game';
+import { damage } from '../tools';
 import GenericMelee, { aIdle, aSwing } from './GenericMelee';
 
 const gCooldown = 700;

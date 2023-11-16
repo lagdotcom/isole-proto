@@ -1,10 +1,10 @@
+import Flat from '../component/Flat';
+import DrawnComponent from '../DrawnComponent';
+import Game from '../Game';
+import { zDecal } from '../layers';
 import textures from '../texture/bluegrass';
 import TileController from '../texture/TileController';
-import { zDecal } from '../layers';
-import { cart, πHalf, scalew } from '../tools';
-import Flat from '../component/Flat';
-import Game from '../Game';
-import DrawnComponent from '../DrawnComponent';
+import { cart, scalew, πHalf } from '../tools';
 
 const bluegrassTips = game =>
 	new TileController(game.resources['tile.bluegrass'], {
@@ -34,9 +34,9 @@ class GrassTips implements DrawnComponent {
 		const { flat, game, r, sprite } = this;
 		const { left, right, scale, width } = flat;
 		const { cx, cy } = game;
-		const step = scalew(scale!, r),
-			offset = scalew(scale! / 2, r);
-		var remaining = width * 2,
+		const step = scalew(scale, r),
+			offset = scalew(scale / 2, r);
+		let remaining = width * 2,
 			a = left;
 
 		sprite.tile('tl');
@@ -46,8 +46,8 @@ class GrassTips implements DrawnComponent {
 				a = right - step;
 			}
 
-			var normal = a + offset + πHalf;
-			var { x, y } = cart(a, r);
+			const normal = a + offset + πHalf;
+			const { x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);
 			c.rotate(normal);

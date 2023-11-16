@@ -1,5 +1,5 @@
-import DrawnComponent from './DrawnComponent';
 import CoordAR from './CoordAR';
+import DrawnComponent from './DrawnComponent';
 
 export default interface Damageable extends CoordAR, DrawnComponent {
 	alive: boolean;

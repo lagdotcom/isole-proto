@@ -1,15 +1,15 @@
 import AnimController from '../AnimController';
 import {
-	aStand,
-	aFlip,
-	aJFlip,
-	aWalk,
-	aJump,
-	aFall,
-	aLand,
-	aThrow,
-	aHurt,
 	aDying,
+	aFall,
+	aFlip,
+	aHurt,
+	aJFlip,
+	aJump,
+	aLand,
+	aStand,
+	aThrow,
+	aWalk,
 } from '../anims';
 import Player from '../Player';
 
@@ -45,7 +45,7 @@ export default class PlayerController extends AnimController {
 	}
 
 	face(vr: 1 | -1, grounded: boolean): void {
-		if (vr != this.facing) {
+		if (vr !== this.facing) {
 			this.facing = vr;
 
 			if (grounded) {

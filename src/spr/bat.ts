@@ -12,8 +12,8 @@ NOTES: the bat can be jumped on unless it is in the spinning animation during wa
 
 import AnimController, {
 	AnimSpecMap,
-	ListenerMap,
 	Listener,
+	ListenerMap,
 } from '../AnimController';
 
 const aMove = 'move',
@@ -106,7 +106,7 @@ interface BatListenerMap extends ListenerMap {
 export default class BatController extends AnimController {
 	map: BatListenerMap;
 
-	constructor(img: any) {
+	constructor(img: CanvasImageSource) {
 		super({
 			animations,
 			img,

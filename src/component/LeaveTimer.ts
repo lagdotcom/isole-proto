@@ -1,7 +1,7 @@
 import DrawnComponent from '../DrawnComponent';
+import { eEnemyDied, eMapEnter } from '../events';
 import Game from '../Game';
 import { zUI } from '../layers';
-import { eEnemyDied, eMapEnter } from '../events';
 
 const gLeaveTimer = 5000;
 
@@ -27,7 +27,7 @@ export default class LeaveTimer implements DrawnComponent {
 	}
 
 	update(t: number) {
-		if (this.active && this.game.mode == 'level') {
+		if (this.active && this.game.mode === 'level') {
 			this.timer -= t;
 			if (this.timer <= 0) {
 				this.active = false;

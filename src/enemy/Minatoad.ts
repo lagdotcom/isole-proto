@@ -1,31 +1,31 @@
-import Game from '../Game';
-import { Facing } from '../dirs';
 import AnimController, {
 	AnimSpecMap,
-	ListenerMap,
 	Listener,
+	ListenerMap,
 } from '../AnimController';
+import { cAI, cAIDark, cHurt } from '../colours';
+import { Facing } from '../dirs';
+import DrawnComponent from '../DrawnComponent';
 import { eAnimationEnded } from '../events';
-import AbstractEnemy from './AbstractEnemy';
-import { gWalkScale, gTimeScale, gStandThreshold } from '../nums';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { zSpark } from '../layers';
+import { gStandThreshold, gTimeScale, gWalkScale } from '../nums';
+import physics from '../physics';
 import {
-	scalew,
-	drawWedge,
-	πHalf,
 	cart,
 	choose,
-	rndr,
 	collides,
 	damage,
-	rnda,
-	isRightOf,
+	drawWedge,
 	fillWedge,
+	isRightOf,
+	rnda,
+	rndr,
+	scalew,
+	πHalf,
 } from '../tools';
-import { cHurt, cAI, cAIDark } from '../colours';
-import Hitbox from '../Hitbox';
-import DrawnComponent from '../DrawnComponent';
-import { zSpark } from '../layers';
-import physics from '../physics';
+import AbstractEnemy from './AbstractEnemy';
 
 /*
 Column 1: IDLE
@@ -606,7 +606,7 @@ class BigBullet extends AbstractEnemy {
 		this.r += this.vr;
 
 		if (this.r >= gRadiusCap) {
-			for (var i = 0; i < gSplitCount; i++) {
+			for (let i = 0; i < gSplitCount; i++) {
 				const bullet = new SmallBullet(
 					this.owner,
 					this.game,
@@ -948,7 +948,7 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	onAnimEnd() {
-		if (this.state == 'hop' && this.jumps > 0) {
+		if (this.state === 'hop' && this.jumps > 0) {
 			this.va = this.getJumpDir();
 			this.vr = gJumpStrength;
 			this.jumps--;
@@ -990,9 +990,9 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	getNextAttack() {
-		var next: MinatoadState = this.last;
+		let next: MinatoadState = this.last;
 
-		while (next == this.last) {
+		while (next === this.last) {
 			next = choose([
 				'leap',
 				'hop',
@@ -1004,7 +1004,7 @@ export default class Minatoad extends AbstractEnemy {
 			]);
 
 			// can't have two fields at once
-			if (this.poisonField && next == 'spray') next = this.last;
+			if (this.poisonField && next === 'spray') next = this.last;
 		}
 
 		this.last = next;
@@ -1160,7 +1160,7 @@ export default class Minatoad extends AbstractEnemy {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 

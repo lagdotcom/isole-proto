@@ -1,30 +1,30 @@
-import Controller from '../Controller';
 import { aThrow } from '../anims';
 import { cHit } from '../colours';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
+import Controller from '../Controller';
 import { dLeft } from '../dirs';
+import DrawnComponent from '../DrawnComponent';
 import { eThrow } from '../events';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import Item from '../Item';
+import { zFlying } from '../layers';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
+import Player from '../Player';
 import {
+	anglecollides,
 	angledist,
 	anglewrap,
 	cart,
 	collides,
+	damage,
+	drawWedge,
+	first,
+	scalew,
 	π,
 	πHalf,
-	scalew,
-	damage,
-	first,
-	drawWedge,
-	anglecollides,
 } from '../tools';
-import { zFlying } from '../layers';
-import Item from '../Item';
-import Game from '../Game';
-import DrawnComponent from '../DrawnComponent';
-import Flat from '../component/Flat';
-import Player from '../Player';
-import Wall from '../component/Wall';
-import Hitbox from '../Hitbox';
 
 const gFloatTime = 80,
 	gWindLoss = 0.995;
@@ -65,12 +65,14 @@ class Rock implements DrawnComponent {
 	}
 
 	update(time: number): void {
-		var { game, va, vfa, vr, a, r, float } = this,
+		let { game, va, vfa, vr, a, r, float } = this,
 			{ enemies, floors, walls } = game,
 			tscale = time / gTimeScale;
 
 		const { bot, top } = this.getHitbox();
-		var enemy = first(enemies, e => collides({ bot, top }, e.getHitbox()));
+		const enemy = first(enemies, e =>
+			collides({ bot, top }, e.getHitbox())
+		);
 
 		if (enemy) {
 			// TODO: bounce etc
@@ -85,18 +87,19 @@ class Rock implements DrawnComponent {
 		if (float <= 0) vr -= gGravityStrength;
 		va *= gWindLoss;
 
-		var floor: Flat | null = null;
+		let floor: Flat | null = null;
 		if (vr < 0) {
 			floor = first(floors, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
-		var wall: Wall | null = null;
-		wall = first(walls, w => {
-			return top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w);
-		});
+		let wall: Wall | null = null;
+		wall = first(
+			walls,
+			w => top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+		);
 
 		if (floor || wall) {
 			// TODO: bounce etc
@@ -148,7 +151,7 @@ class Rock implements DrawnComponent {
 		const { r, a, va, vr, w, h, tscale } = this;
 		const baw = scalew(w, r),
 			taw = scalew(w, r + h);
-		var amod: number,
+		let amod: number,
 			vbr = 0,
 			vtr = 0;
 
@@ -201,7 +204,9 @@ export default class RockItem implements Item {
 	}
 
 	use() {
-		this.game.player.sprite.play(aThrow, false, { [eThrow]: this.thrown });
+		this.game.player.sprite.play(aThrow, false, {
+			[eThrow]: this.thrown.bind(this),
+		});
 	}
 
 	thrown() {

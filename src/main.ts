@@ -4,10 +4,9 @@ import Editor from './Editor';
 import Game from './Game';
 import mel from './makeElement';
 
-var options: HTMLElement;
+let options: HTMLElement;
 
-/** @var {Game} */
-var G: Game;
+let G: Game;
 
 /**
  * Create a checkbox
@@ -45,9 +44,11 @@ window.addEventListener('load', () => {
 		showFps: true,
 		showHitboxes: true,
 	});
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	(window as any).G = G;
 
 	const editor = new Editor({ parent: layout, game: G });
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	(window as any).E = editor;
 
 	addCheckbox('Show FPS', G.options.showFps || false, e => {

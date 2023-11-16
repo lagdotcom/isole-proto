@@ -1,9 +1,9 @@
 import Controller from '../Controller';
 import DrawnComponent from '../DrawnComponent';
-import Game from '../Game';
-import { zUI } from '../layers';
-import { InputButton } from '../InputMapper';
 import { eLevelEnter } from '../events';
+import Game from '../Game';
+import { InputButton } from '../InputMapper';
+import { zUI } from '../layers';
 import { NodeType } from '../MapNode';
 
 const connection = '#444444',
@@ -70,7 +70,9 @@ export default class MapView implements DrawnComponent {
 				const o = game.nodes[i];
 
 				ctx.strokeStyle =
-					current == n.id && selected == i ? highlighted : connection;
+					current === n.id && selected === i
+						? highlighted
+						: connection;
 				ctx.beginPath();
 				ctx.moveTo(x + n.x, y + n.y);
 				ctx.lineTo(x + o.x, y + o.y);

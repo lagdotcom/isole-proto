@@ -1,22 +1,18 @@
-import DecalController from './DecalController';
 import Game from '../Game';
+import DecalController from './DecalController';
 
-const decal = (
-	resource: string,
-	x: number,
-	y: number,
-	w: number,
-	h: number
-) => (game: Game, options?: any) =>
-	new DecalController(game.resources[resource], {
-		x,
-		y,
-		w,
-		h,
-		xo: -w / 2,
-		yo: -h,
-		...(options || {}),
-	});
+const decal =
+	(resource: string, x: number, y: number, w: number, h: number) =>
+	(game: Game, options?: any) =>
+		new DecalController(game.resources[resource], {
+			x,
+			y,
+			w,
+			h,
+			xo: -w / 2,
+			yo: -h,
+			...(options || {}),
+		});
 
 export default {
 	greenfl: decal('tile.bluegrass', 20, 634, 52, 72),

@@ -1,22 +1,23 @@
 import AnimController from '../AnimController';
-import { zSpark } from '../layers';
-import { πHalf, cart, displace, scalew, collides, drawWedge } from '../tools';
 import { aAxe } from '../anims';
-import { eAnimationEnded, ePlayerHurt } from '../events';
 import { cHit } from '../colours';
 import CoordAR from '../CoordAR';
-import Game from '../Game';
 import DrawnComponent from '../DrawnComponent';
 import Enemy from '../Enemy';
+import { eAnimationEnded, ePlayerHurt } from '../events';
+import Game from '../Game';
 import Hitbox from '../Hitbox';
+import HitboxXYWH from '../HitboxXYWH';
+import { zSpark } from '../layers';
 import Player from '../Player';
+import { cart, collides, displace, drawWedge, scalew, πHalf } from '../tools';
 import Weapon from '../Weapon';
 
 export const aIdle = 'idle',
 	aSwing = 'swing';
 
 type ControllerGen = (img: CanvasImageSource, flip?: boolean) => AnimController;
-type OnEnemyHit = (enemy: Enemy) => any;
+type OnEnemyHit = (enemy: Enemy) => void;
 
 class Swing implements DrawnComponent {
 	game: Game;
@@ -48,17 +49,15 @@ class Swing implements DrawnComponent {
 	}
 
 	update(ti: number): void {
-		const me = this;
 		this.sprite.next(ti);
 
-		if (this.hasHitbox()) {
-			const { bot, top } = this.getHitbox();
-			var enemy = null;
-			this.game.enemies.forEach(e => {
+		if (this.sprite.acf.hitbox) {
+			const { bot, top } = this.getHitbox(this.sprite.acf.hitbox);
+			for (const e of this.game.enemies) {
 				if (collides({ bot, top }, e.getHitbox())) {
-					me.hit(e);
+					this.hit(e);
 				}
-			});
+			}
 		}
 	}
 
@@ -80,19 +79,15 @@ class Swing implements DrawnComponent {
 		);
 	}
 
-	hasHitbox(): boolean {
-		return !!this.sprite.acf.hitbox;
-	}
-
-	getHitboxPosition() {
+	getHitboxPosition(hitbox: HitboxXYWH) {
 		const { owner, sprite } = this;
 
 		return {
-			w: sprite.acf.hitbox!.w,
-			h: sprite.acf.hitbox!.h,
+			w: hitbox.w,
+			h: hitbox.h,
 			...displace(
 				owner,
-				[owner.sprite.hotspot, sprite.hotspot, sprite.acf.hitbox!],
+				[owner.sprite.hotspot, sprite.hotspot, hitbox],
 				sprite.flip
 			),
 		};
@@ -119,23 +114,24 @@ class Swing implements DrawnComponent {
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
-		if (!this.hasHitbox()) return;
+		const hitbox = this.sprite.acf.hitbox;
+		if (!hitbox) return;
 
 		const { game } = this;
 		const { cx, cy } = game;
-		const { bot, top } = this.getHitbox();
+		const { bot, top } = this.getHitbox(hitbox);
 
 		drawWedge(c, cHit, cx, cy, bot, top);
 	}
 
-	getHitbox(): Hitbox {
-		const { r, a, w, h } = this.getHitboxPosition();
+	getHitbox(hitbox: HitboxXYWH): Hitbox {
+		const { r, a, w, h } = this.getHitboxPosition(hitbox);
 		const baw = scalew(w, r),
 			taw = scalew(w, r + h);
 
 		return {
 			bot: {
-				r: r,
+				r,
 				a,
 				width: baw,
 			},

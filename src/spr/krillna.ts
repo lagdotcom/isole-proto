@@ -1,5 +1,5 @@
 import Controller from '../Controller';
-import { dRight, dDown, dLeft, dUp } from '../dirs';
+import { dDown, dLeft, dRight, dUp } from '../dirs';
 import { π, πHalf } from '../tools';
 
 // MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
@@ -74,7 +74,7 @@ export default class KrillnaController extends Controller {
 	}
 
 	walk(t: number, dir: string): void {
-		const { fliptwice, stuck } = this;
+		const { fliptwice } = this;
 
 		this.xo = xoffsets[dir];
 

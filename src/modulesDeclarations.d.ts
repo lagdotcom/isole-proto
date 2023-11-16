@@ -1,9 +1,9 @@
 declare module '*.png' {
-	const content: any;
-	export default content;
+	const url: string;
+	export default url;
 }
 
 declare module '*.wav' {
-	const content: any;
-	export default content;
+	const url: string;
+	export default url;
 }

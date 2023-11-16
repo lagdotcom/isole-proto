@@ -2,12 +2,12 @@
  * Fire an event
  * @param {HTMLElement} element event context
  * @param {string} type event name
- * @param {any} detail event details
+ * @param {unknown} detail event details
  */
 export default function dispatchEvent(
 	element: HTMLElement,
 	type: string,
-	detail: any = {}
+	detail: unknown = {}
 ): void {
 	element.dispatchEvent(new CustomEvent(type, { detail }));
 }

@@ -1,15 +1,15 @@
+import Flat from './component/Flat';
+import Wall from './component/Wall';
 import Game from './Game';
+import Hitbox from './Hitbox';
 import {
-	gTimeScale,
-	gStandThreshold,
-	gGroundFriction,
 	gGravityStrength,
+	gGroundFriction,
+	gStandThreshold,
+	gTimeScale,
 	gWalkScale,
 } from './nums';
-import Flat from './component/Flat';
-import { first, angledist, π, anglewrap } from './tools';
-import Wall from './component/Wall';
-import Hitbox from './Hitbox';
+import { angledist, anglewrap, first, π } from './tools';
 
 interface PhysicsObject {
 	a: number;
@@ -26,7 +26,7 @@ interface PhysicsObject {
 }
 
 export default function physics(obj: PhysicsObject, time: number) {
-	var {
+	let {
 		a,
 		game,
 		ignoreCeilings,
@@ -42,19 +42,19 @@ export default function physics(obj: PhysicsObject, time: number) {
 		tscale = time / gTimeScale;
 	const { bot, top } = obj.getHitbox();
 
-	var floor: Flat | null = null;
+	let floor: Flat | null = null;
 	if (vr <= 0 && !ignoreFloors) {
 		floor = first(floors, f => {
-			var da = angledist(a, f.a);
+			const da = angledist(a, f.a);
 
 			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 		});
 	}
 
-	var ceiling: Flat | null = null;
+	let ceiling: Flat | null = null;
 	if (vr > 0 && !ignoreCeilings) {
 		ceiling = first(ceilings, f => {
-			var da = angledist(a, f.a);
+			const da = angledist(a, f.a);
 
 			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 		});
@@ -63,14 +63,14 @@ export default function physics(obj: PhysicsObject, time: number) {
 		}
 	}
 
-	var wall: Wall | null = null;
+	let wall: Wall | null = null;
 	if (
 		!ignoreWalls &&
 		(Math.abs(va) > gStandThreshold || game.wallsInMotion)
 	) {
 		const vas = Math.sign(va + vfa);
 		wall = first(walls, w => {
-			if (vas != w.direction && !w.motion) return false;
+			if (vas !== w.direction && !w.motion) return false;
 
 			return (
 				bot.a - bot.width <= w.a &&

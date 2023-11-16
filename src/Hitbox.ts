@@ -6,7 +6,7 @@ export default interface Hitbox {
 	top: Hitsize;
 
 	// allow arbitrary extension
-	[field: string]: any;
+	[field: string]: unknown;
 }
 
 export interface Hitsize {

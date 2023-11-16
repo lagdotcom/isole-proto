@@ -1,28 +1,28 @@
 import { cHurt } from '../colours';
-import { dRight, dDown, dLeft, dUp } from '../dirs';
+import Flat from '../component/Flat';
+import Wall from '../component/Wall';
+import { dDown, dLeft, dRight, dUp } from '../dirs';
+import Game from '../Game';
+import Hitbox from '../Hitbox';
+import { zEnemy } from '../layers';
 import {
 	gGravityStrength,
 	gStandThreshold,
 	gTimeScale,
 	gWalkScale,
 } from '../nums';
+import controller from '../spr/krillna';
 import {
+	anglecollides,
 	angledist,
 	anglewrap,
 	cart,
+	drawWedge,
+	first,
+	scalew,
 	π,
 	πHalf,
-	scalew,
-	first,
-	drawWedge,
-	anglecollides,
 } from '../tools';
-import controller from '../spr/krillna';
-import { zEnemy } from '../layers';
-import Game from '../Game';
-import Hitbox from '../Hitbox';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
 import AbstractEnemy from './AbstractEnemy';
 
 const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
@@ -63,7 +63,7 @@ export default class Krillna extends AbstractEnemy {
 			vfa: 0,
 			vfr: 0,
 			tscale: 0,
-			movefn: (fr, n) => gFrameMotion[fr] * n,
+			movefn: (fr: number, n: number) => gFrameMotion[fr] * n,
 			sprite: new controller(
 				game.resources[options.img || 'enemy.krillna']
 			),
@@ -76,7 +76,7 @@ export default class Krillna extends AbstractEnemy {
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		var {
+		let {
 			a,
 			r,
 			va,
@@ -96,19 +96,19 @@ export default class Krillna extends AbstractEnemy {
 		this.tscale = tscale;
 		const { bot, top } = this.getHitbox();
 
-		var floor: Flat | null = null;
+		let floor: Flat | null = null;
 		if (vr <= 0 || last.floor) {
 			floor = first(floors, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
 
-		var ceiling: Flat | null = null;
+		let ceiling: Flat | null = null;
 		if (vr > 0 || last.ceiling) {
 			ceiling = first(ceilings, f => {
-				var da = angledist(a, f.a);
+				const da = angledist(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -117,12 +117,12 @@ export default class Krillna extends AbstractEnemy {
 			}
 		}
 
-		var wall: Wall | null = null;
+		let wall: Wall | null = null;
 		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
-			var vas = Math.sign(va + vfa);
+			const vas = Math.sign(va + vfa);
 
 			wall = first(walls, w => {
-				if (vas != w.direction && !w.motion) return false;
+				if (vas !== w.direction && !w.motion) return false;
 
 				return (
 					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
@@ -136,8 +136,8 @@ export default class Krillna extends AbstractEnemy {
 			stuck = f;
 			r = f.r;
 			vr = 0;
-			dir = dir == dRight ? dir : dLeft;
-			va = dir == dRight ? speed : -speed;
+			dir = dir === dRight ? dir : dLeft;
+			va = dir === dRight ? speed : -speed;
 			vfa = f.motion * time;
 
 			if (last.wall) {
@@ -154,12 +154,12 @@ export default class Krillna extends AbstractEnemy {
 			ceiling = null;
 			stuck = w;
 			va = 0;
-			dir = dir == dDown ? dir : dUp;
-			vr = (dir == dUp ? speed : -speed) * gRadiusMult;
+			dir = dir === dDown ? dir : dUp;
+			vr = (dir === dUp ? speed : -speed) * gRadiusMult;
 			vfa = w.motion * time;
 
-			var wsw = scalew(width, r);
-			if (w.direction == 1) {
+			const wsw = scalew(width, r);
+			if (w.direction === 1) {
 				sprite.wleft();
 				a = w.a - wsw;
 			} else {
@@ -174,8 +174,8 @@ export default class Krillna extends AbstractEnemy {
 			stuck = c;
 			r = c.r - height;
 			vr = 0;
-			dir = dir == dRight ? dir : dLeft;
-			va = dir == dRight ? speed : -speed;
+			dir = dir === dRight ? dir : dLeft;
+			va = dir === dRight ? speed : -speed;
 			vfa = c.motion * time;
 
 			if (last.wall) {
@@ -186,7 +186,7 @@ export default class Krillna extends AbstractEnemy {
 			sprite.ceiling();
 		}
 
-		var stuck: Flat | Wall | null = null;
+		let stuck: Flat | Wall | null = null;
 		if (floor && !last.wall) {
 			applyfloor(floor);
 		} else if (last.floor) {
@@ -227,12 +227,12 @@ export default class Krillna extends AbstractEnemy {
 		} else if (last.wall) {
 			if (bot.r <= last.wall.top && top.r >= last.wall.bottom) {
 				applywall(last.wall);
-			} else if (dir == dDown && last.wall.ceiling) {
-				if (last.wall.direction == 1) dir = dRight;
+			} else if (dir === dDown && last.wall.ceiling) {
+				if (last.wall.direction === 1) dir = dRight;
 				else dir = dLeft;
 				applyceiling(last.wall.ceiling);
-			} else if (dir == dUp && last.wall.floor) {
-				if (last.wall.direction == 1) dir = dRight;
+			} else if (dir === dUp && last.wall.floor) {
+				if (last.wall.direction === 1) dir = dRight;
 				else dir = dLeft;
 				applyfloor(last.wall.floor);
 			}
@@ -301,7 +301,7 @@ export default class Krillna extends AbstractEnemy {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height);
-		var amod,
+		let amod,
 			vbr = 0,
 			vtr = 0;
 

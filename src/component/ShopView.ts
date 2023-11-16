@@ -1,11 +1,11 @@
 import DrawnComponent from '../DrawnComponent';
 import Game from '../Game';
-import { zBeforeUI } from '../layers';
 import Item from '../Item';
-import Weapon from '../Weapon';
 import { ItemConstructor } from '../item/ItemObject';
-import { WeaponConstructor } from '../weapon/WeaponObject';
+import { zBeforeUI } from '../layers';
 import { drawCross } from '../tools';
+import Weapon from '../Weapon';
+import { WeaponConstructor } from '../weapon/WeaponObject';
 
 const ItemGap = 200;
 
@@ -49,7 +49,7 @@ export default class ShopView implements DrawnComponent {
 
 			const oloc = {
 				image: o.object,
-				text: text,
+				text,
 				iloc: { x, y: 560 },
 				tloc: { x: x - size.width / 2, y: 600 },
 			};

@@ -1,12 +1,12 @@
-import Controller from '../Controller';
 import { cIgnore } from '../colours';
-import { gTimeScale } from '../nums';
-import { anglewrap, cart, deg2rad, πHalf, scalew, drawWedge } from '../tools';
-import { zBackground } from '../layers';
-import Game from '../Game';
-import PointAR from '../CoordAR';
 import Component from '../Component';
+import Controller from '../Controller';
+import PointAR from '../CoordAR';
+import Game from '../Game';
 import Hitbox from '../Hitbox';
+import { zBackground } from '../layers';
+import { gTimeScale } from '../nums';
+import { anglewrap, cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
 
 export const normalPosition = 'normal';
 export const staticPosition = 'static';
@@ -60,7 +60,7 @@ export default class Decal implements Component {
 
 	update?(time: number): void {
 		const { a, game, motion, parallax } = this;
-		var amod = 0;
+		let amod = 0;
 
 		if (motion) {
 			amod += time * motion;
@@ -115,7 +115,7 @@ export default class Decal implements Component {
 
 		return {
 			bot: {
-				r: r,
+				r,
 				a,
 				width: baw,
 			},
