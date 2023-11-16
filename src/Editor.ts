@@ -41,9 +41,8 @@ import {
 } from './corpus';
 import WeaponObject from './weapon/WeaponObject';
 import ItemObject from './item/ItemObject';
-import { gTimeScale } from './nums';
 import RockItem from './item/Rock';
-import AxeWeapon from './weapon/axe';
+import AxeWeapon from './weapon/Axe';
 import BombItem from './item/Bomb';
 
 var materials: string[];
@@ -104,16 +103,12 @@ export default class Editor
 			objects: [],
 			player: {
 				type: 'jacques',
-				a: 140,
-				r: 1000,
+				a: 50,
+				r: 200,
 				item: 'rock',
 				weapon: 'axe',
 			},
-			enemies: [
-				{ type: 'bat', a: 200, r: 250, dir: 'L' },
-				{ type: 'buster', a: 0, r: 150, dir: 'L' },
-				{ type: 'krillna', a: 150, r: 150, dir: 'R' },
-			],
+			enemies: [{ type: 'minatoad', a: 0, r: 150, dir: 'L' }],
 		};
 
 		this.makeDom(parent);

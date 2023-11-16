@@ -99,7 +99,7 @@ function addObjects(game: Game, objects: ObjectMap[]) {
  */
 function image(fn: string, onload: (e: Event) => void): HTMLImageElement {
 	var el = document.createElement('img');
-	el.onload = onload;
+	el.addEventListener('load', onload)
 	el.src = fn;
 
 	return el;
@@ -121,11 +121,11 @@ const MediaErrors = [
  */
 function sound(fn: string, onload: (e: Event) => void): HTMLAudioElement {
 	var el = new Audio(fn);
-	el.oncanplaythrough = onload;
-	el.onerror = e => {
+	el.addEventListener('canplaythrough', onload)
+	el.addEventListener('error', e => {
 		console.log(`could not load ${fn} - ${MediaErrors[el.error!.code]}`);
 		onload(e as Event);
-	};
+	})
 
 	return el;
 }

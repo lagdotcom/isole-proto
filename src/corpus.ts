@@ -1,5 +1,5 @@
-import AxeWeapon from './weapon/axe';
-import Bat from './enemy/bat';
+import AxeWeapon from './weapon/Axe';
+import Bat from './enemy/Bat';
 import BombItem from './item/Bomb';
 import Booster from './enemy/Booster';
 import Buster from './enemy/Buster';

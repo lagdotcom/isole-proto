@@ -22,7 +22,7 @@ import emptyElement from './emptyElement';
 import MapNode from './MapNode';
 import MapView from './component/MapView';
 import InputMapper, { InputButton } from './InputMapper';
-import LeaveTimer from './Component/LeaveTimer';
+import LeaveTimer from './component/LeaveTimer';
 import { Pickup } from './Pickup';
 import ShopView from './component/ShopView';
 
@@ -59,7 +59,7 @@ interface GameInit {
 	width: number;
 }
 
-type ResourceLoader = (url: string, callback: () => void) => any;
+type ResourceLoader<T> = (url: string, callback: () => void) => T;
 
 class Unzoomer implements DrawnComponent {
 	game: Game;
@@ -165,7 +165,7 @@ export default class Game {
 	 * @param {ResourceLoader} typ resource loader
 	 * @param {string} src source URL
 	 */
-	require(key: string, typ: ResourceLoader, src: string): void {
+	require<T>(key: string, typ: ResourceLoader<T>, src: string): void {
 		this.loading++;
 		this.resources[key] = typ(src, () => this.resourceLoaded());
 	}
