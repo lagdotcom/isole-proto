@@ -35,7 +35,7 @@ const rw5: EditorData = {
 	],
 	floors: [{ h: 120, a: 0, w: 360, material: 'gsolid' }],
 	player: {
-		type: 'jacques',
+		type: 'woody',
 		a: 270,
 		r: 120,
 		item: 'rock',

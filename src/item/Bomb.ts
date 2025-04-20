@@ -23,6 +23,7 @@ import {
 	anglewrap,
 	cart,
 	collides,
+	displace,
 	drawWedge,
 	first,
 	scalew,
@@ -281,18 +282,20 @@ export default class BombItem implements Item {
 
 	thrown() {
 		const { game } = this;
-		const dirVa = game.player.facing === dLeft ? -gThrowVA : gThrowVA;
+		const facingLeft = game.player.facing === dLeft;
 
 		// TODO
 		//game.inventory.remove(this);
 
-		// TODO: change to use hotspot
 		game.redraw = true;
 		game.components.push(
 			new Bomb(game, {
-				r: game.player.r + 10,
-				a: game.player.a,
-				va: game.player.va + dirVa,
+				...displace(
+					game.player,
+					[game.player.sprite.hotspot],
+					facingLeft
+				),
+				va: game.player.va + (facingLeft ? -gThrowVA : gThrowVA),
 				vr: game.player.vr + gThrowVR,
 				owner: game.player,
 			})

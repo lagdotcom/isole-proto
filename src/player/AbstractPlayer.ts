@@ -116,10 +116,11 @@ export default abstract class AbstractPlayer implements Player {
 		}
 	}
 
-	abstract getDefaultInit(game: Game, options: PlayerInit): any;
+	abstract getDefaultInit(game: Game, options: PlayerInit): Partial<this>;
 
 	update(time: number): void {
-		let { a, r, va, vr, vfa, game, sprite, jumpd, jumplg } = this;
+		let { a, r, va, vr, vfa, jumpd, jumplg, jumpt } = this;
+		const { game, sprite } = this;
 		const { walls, ceilings, floors, keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
@@ -184,7 +185,7 @@ export default abstract class AbstractPlayer implements Player {
 			return false;
 		});
 
-		this.jumpt -= tscale;
+		this.jumpt = jumpt -= tscale;
 
 		if (hurtenemy) {
 			vr = gJumpStrength * 0.75;
@@ -195,9 +196,9 @@ export default abstract class AbstractPlayer implements Player {
 			damage(this, hitenemy, hitenemy.damage || 1);
 		}
 
-		if (floor && this.jumpt <= 0) {
+		if (floor && jumpt <= 0) {
 			this.grounded = true;
-			this.jumpd = true;
+			this.jumpd = jumpd = true;
 
 			r = floor.r;
 			vr = 0;
@@ -219,7 +220,7 @@ export default abstract class AbstractPlayer implements Player {
 				controls.push('left');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(-1, this.grounded);
+					sprite.face(-1, this.grounded, jumpd);
 					this.facing = dLeft;
 				}
 			} else if (keys.has(InputButton.Right)) {
@@ -227,7 +228,7 @@ export default abstract class AbstractPlayer implements Player {
 				controls.push('right');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(1, this.grounded);
+					sprite.face(1, this.grounded, jumpd);
 					this.facing = dRight;
 				}
 			}
@@ -235,23 +236,23 @@ export default abstract class AbstractPlayer implements Player {
 			if (keys.has(InputButton.Jump)) {
 				if (floor) {
 					vr += gJumpStrength;
-					this.jumpt = gJumpTimer;
+					this.jumpt = jumpt = gJumpTimer;
 					controls.push('jump');
 					this.body.play('player.jump');
-				} else if (this.jumpt < gJumpDoubleTimer && jumpd && jumplg) {
-					this.jumpt = gJumpTimer;
-					this.jumpd = false;
+				} else if (jumpt < gJumpDoubleTimer && jumpd && jumplg) {
+					this.jumpt = jumpt = gJumpTimer;
+					this.jumpd = jumpd = false;
 					vr = gJumpStrength;
 					controls.push('jumpd');
 					this.body.play('player.jump');
-				} else if (this.jumpt >= gJumpAffectTimer && !jumplg) {
+				} else if (jumpt >= gJumpAffectTimer && !jumplg) {
 					vr += gJumpAffectStrength;
 					controls.push('jump+');
 				}
 
-				this.jumplg = false;
+				this.jumplg = jumplg = false;
 			} else {
-				this.jumplg = true;
+				this.jumplg = jumplg = true;
 			}
 
 			if (keys.has(InputButton.Swing)) controls.push('swing');
@@ -303,15 +304,15 @@ export default abstract class AbstractPlayer implements Player {
 		this.r = r;
 
 		if (!this.grounded) {
-			if (vr > 0) sprite.jump(time);
-			else sprite.fall(time);
+			if (jumpd) sprite.jump(time);
+			else sprite.doubleJump(time);
 		} else if (Math.abs(va) < gStandThreshold) {
 			sprite.stand(time);
 		} else {
 			sprite.walk(time);
 		}
 
-		if (this.jumpt > 0) flags.push('jump');
+		if (jumpt > 0) flags.push('jump');
 		if (this.grounded) flags.push('grounded');
 
 		this.hurtTimer(time);

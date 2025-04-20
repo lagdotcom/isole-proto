@@ -1,7 +1,8 @@
 import AnimController from '../AnimController';
 import {
+	aDJFlip,
+	aDoubleJump,
 	aDying,
-	aFall,
 	aFlip,
 	aHurt,
 	aJFlip,
@@ -12,6 +13,8 @@ import {
 	aWalk,
 } from '../anims';
 import Player from '../Player';
+
+const midairAnimations = [aJump, aDoubleJump];
 
 export default class PlayerController extends AnimController {
 	facing: 1 | -1;
@@ -30,13 +33,13 @@ export default class PlayerController extends AnimController {
 		this.next(t);
 	}
 
-	fall(t: number): void {
-		this.play(aFall);
+	doubleJump(t: number): void {
+		this.play(aDoubleJump);
 		this.next(t);
 	}
 
 	stand(t: number): void {
-		if (this.a === aFall) {
+		if (midairAnimations.includes(this.a)) {
 			this.play(aLand);
 		}
 
@@ -44,14 +47,15 @@ export default class PlayerController extends AnimController {
 		this.next(t);
 	}
 
-	face(vr: 1 | -1, grounded: boolean): void {
+	face(vr: 1 | -1, grounded: boolean, canDoubleJump: boolean): void {
 		if (vr !== this.facing) {
 			this.facing = vr;
 
 			if (grounded) {
 				this.play(aFlip);
 			} else {
-				this.play(aJFlip);
+				if (canDoubleJump) this.play(aJFlip);
+				else this.play(aDJFlip);
 			}
 
 			this.flip = vr < 0;
@@ -59,7 +63,7 @@ export default class PlayerController extends AnimController {
 	}
 
 	walk(t: number): void {
-		if (this.a === aFall) {
+		if (midairAnimations.includes(this.a)) {
 			this.play(aLand);
 		}
 

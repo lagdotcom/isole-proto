@@ -19,6 +19,7 @@ import {
 	cart,
 	collides,
 	damage,
+	displace,
 	drawWedge,
 	first,
 	scalew,
@@ -211,17 +212,20 @@ export default class RockItem implements Item {
 
 	thrown() {
 		const { game } = this;
+		const facingLeft = game.player.facing === dLeft;
 
 		// TODO
 		//game.inventory.remove(this);
 
-		// TODO: change to use hotspot
 		game.redraw = true;
 		game.components.push(
 			new Rock(game, {
-				r: game.player.r + 10,
-				a: game.player.a,
-				va: game.player.facing === dLeft ? -1 : 1,
+				...displace(
+					game.player,
+					[game.player.sprite.hotspot],
+					facingLeft
+				),
+				va: facingLeft ? -1 : 1,
 				float: gFloatTime,
 				owner: game.player,
 			})

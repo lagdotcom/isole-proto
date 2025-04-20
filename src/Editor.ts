@@ -103,7 +103,7 @@ export default class Editor
 			],
 			objects: [],
 			player: {
-				type: 'jacques',
+				type: 'woody',
 				a: 50,
 				r: 200,
 				item: 'rock',

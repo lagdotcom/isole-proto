@@ -1,7 +1,8 @@
 import {
 	aAxe,
+	aDJFlip,
+	aDoubleJump,
 	aDying,
-	aFall,
 	aFlip,
 	aHurt,
 	aJFlip,
@@ -60,7 +61,7 @@ export default function woodyController(
 				],
 			},
 
-			[aFall]: {
+			[aDoubleJump]: {
 				extend: true,
 				frames: [
 					{ c: 3, r: 3, t: 75 },
@@ -82,6 +83,11 @@ export default function woodyController(
 				frames: [{ c: 4, r: 0, t: 75 }],
 			},
 
+			[aDJFlip]: {
+				priority: 5,
+				frames: [{ c: 4, r: 0, t: 75 }],
+			},
+
 			[aThrow]: {
 				priority: 2,
 				flags: { noAttack: true, noTurn: true },
@@ -89,7 +95,13 @@ export default function woodyController(
 					{ c: 5, r: 0, t: 75 },
 					{ c: 5, r: 1, t: 75 },
 					{ c: 5, r: 2, t: 75 },
-					{ c: 5, r: 3, t: 75, event: eThrow },
+					{
+						c: 5,
+						r: 3,
+						t: 75,
+						hotspot: { x: 65, y: 10 },
+						event: eThrow,
+					},
 					{ c: 5, r: 4, t: 75 },
 					{ c: 5, r: 5, t: 150 },
 				],

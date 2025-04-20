@@ -61,7 +61,7 @@ const rw4: EditorData = {
 	],
 	floors: [{ h: 240, a: 0, w: 360, material: 'gsolid' }],
 	player: {
-		type: 'jacques',
+		type: 'woody',
 		a: 180,
 		r: 640,
 		item: 'rock',

@@ -12,6 +12,7 @@ export interface AnimSpec {
 	flags?: { [name: string]: boolean };
 	frames: FrameSpec[];
 	loop?: boolean;
+	loopTo?: number;
 	priority?: number;
 }
 
@@ -21,6 +22,7 @@ export interface Anim {
 	frames: Frame[];
 	last: number;
 	loop: boolean;
+	loopTo: number;
 	priority: number;
 }
 
@@ -95,17 +97,18 @@ export default class AnimController extends Controller {
 		for (const key in options.animations) {
 			const spec = options.animations[key];
 			this.animations[key] = {
-				extend: spec.extend || false,
-				flags: spec.flags || {},
+				extend: spec.extend ?? false,
+				flags: spec.flags ?? {},
 				frames: spec.frames.map(
 					(f: FrameSpec): Frame => ({
 						...f,
-						hotspot: f.hotspot || { x: 0, y: 0 },
+						hotspot: f.hotspot ?? { x: 0, y: 0 },
 					})
 				),
 				last: spec.frames.length - 1,
-				loop: spec.loop || false,
-				priority: spec.priority || 0,
+				loop: spec.loop ?? false,
+				loopTo: spec.loopTo ?? 0,
+				priority: spec.priority ?? 0,
 			};
 		}
 	}
@@ -155,7 +158,7 @@ export default class AnimController extends Controller {
 		if (this.at > acf.t) {
 			if (last && !ac.extend) {
 				if (ac.loop) {
-					this.frame(0);
+					this.frame(ac.loopTo);
 				} else {
 					this.dispatch(eAnimationEnded, a);
 					if (ar) this.play(ar, true);

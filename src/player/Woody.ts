@@ -10,8 +10,8 @@ export default class Woody extends AbstractPlayer {
 			body: new Channel(game, 'Woody Body'),
 			voice: new Channel(game, 'Woody Voice'),
 			name: 'Woody',
-			w: 30,
-			h: 34,
+			w: 102,
+			h: 90,
 			sprite: controller(
 				this,
 				game.resources[options.img || 'player.woody']
