@@ -72,6 +72,10 @@ class Unzoomer implements DrawnComponent {
 	draw() {
 		this.game.zoomer.reset();
 	}
+
+	drawHitbox() {
+		this.game.zoomer.reset();
+	}
 }
 
 /** Everknot */
