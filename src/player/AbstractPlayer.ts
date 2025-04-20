@@ -7,7 +7,7 @@ import { dLeft, dRight, Facing } from '../dirs';
 import Enemy from '../Enemy';
 import { ePlayerDied, ePlayerDying, ePlayerHurt } from '../events';
 import Game from '../Game';
-import Hitbox from '../Hitbox';
+import { Hitsize } from '../Hitbox';
 import { InputButton } from '../InputMapper';
 import { zPlayer } from '../layers';
 import mel from '../makeElement';
@@ -124,8 +124,8 @@ export default abstract class AbstractPlayer implements Player {
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
 		const { bot, top, step } = this.getHitbox();
-		let debug = '',
-			flags: string[] = [];
+		let debug = '';
+		const flags: string[] = [];
 
 		let floor: Flat | null = null;
 		if (vr <= 0) {
@@ -367,7 +367,7 @@ export default abstract class AbstractPlayer implements Player {
 		drawCross(c, cHotspot, cx + h.x, cy + h.y);
 	}
 
-	getHitbox(): Hitbox {
+	getHitbox(): { bot: Hitsize; top: Hitsize; step: Hitsize } {
 		const { r, a, va, vr, w, h, steph, tscale } = this;
 		const baw = scalew(w, r),
 			taw = scalew(w, r + h),

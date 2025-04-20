@@ -12,7 +12,7 @@ import { cAI, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import { dLeft, Facing } from '../dirs';
 import Game from '../Game';
-import Hitbox from '../Hitbox';
+import { Hitsize } from '../Hitbox';
 import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
 import controller, { eDrop, eRecover } from '../spr/flazza';
@@ -218,7 +218,7 @@ export default class Flazza extends AbstractEnemy {
 		drawWedge(c, cAI, cx, cy, a, top);
 	}
 
-	getHitbox(): Hitbox {
+	getHitbox(): { bot: Hitsize; top: Hitsize; a: Hitsize } {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height),
@@ -247,7 +247,7 @@ export default class Flazza extends AbstractEnemy {
 			a: {
 				r: r + vbr,
 				a: amod,
-				w: aaw,
+				width: aaw,
 			},
 		};
 	}
