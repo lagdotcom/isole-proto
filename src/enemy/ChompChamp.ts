@@ -110,7 +110,7 @@ class ChompChampController extends AnimController implements ChompChampSprite {
 		this.parent = parent;
 	}
 
-	_play(anim: string, force: boolean = false): void {
+	_play(anim: string, force = false): void {
 		return this.play(anim, force, this.parent);
 	}
 

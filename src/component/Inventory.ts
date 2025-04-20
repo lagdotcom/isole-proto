@@ -17,7 +17,7 @@ export default class Inventory implements DrawnComponent {
 	money: number;
 	weapon?: Weapon;
 
-	constructor(game: Game, size: number = 3) {
+	constructor(game: Game, size = 3) {
 		Object.assign(this, {
 			layer: zUI,
 			game,

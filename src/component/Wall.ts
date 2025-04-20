@@ -37,7 +37,7 @@ export default class Wall implements DrawnComponent {
 		b: number,
 		angle: number,
 		direction: 1 | -1,
-		motion: number = 0,
+		motion = 0,
 		texture?: string
 	) {
 		const a = anglewrap(deg2rad(angle)),

@@ -9,7 +9,7 @@ export interface AnimInit extends ControllerInit {
 
 export interface AnimSpec {
 	extend?: boolean;
-	flags?: { [name: string]: boolean };
+	flags?: Record<string, boolean>;
 	frames: FrameSpec[];
 	loop?: boolean;
 	loopTo?: number;
@@ -18,7 +18,7 @@ export interface AnimSpec {
 
 export interface Anim {
 	extend: boolean;
-	flags: { [name: string]: boolean };
+	flags: Record<string, boolean>;
 	frames: Frame[];
 	last: number;
 	loop: boolean;
@@ -44,14 +44,14 @@ export interface Frame {
 	t: number;
 }
 
-export type AnimMap = { [name: string]: Anim };
-export type AnimSpecMap = { [name: string]: AnimSpec };
+export type AnimMap = Record<string, Anim>;
+export type AnimSpecMap = Record<string, AnimSpec>;
 export type Listener = (details: unknown) => void;
-export type ListenerMap = { [name: string]: Listener };
+export type ListenerMap = Record<string, Listener>;
 
 export default class AnimController extends Controller {
 	/** Current animation name */
-	a: string = '';
+	a = '';
 
 	/** Current animation */
 	ac?: Anim;
@@ -60,7 +60,7 @@ export default class AnimController extends Controller {
 	acf: Frame = { c: 0, hotspot: { x: 0, y: 0 }, r: 0, t: 0 };
 
 	/** Current frame index */
-	afi: number = 0;
+	afi = 0;
 
 	/** Current event */
 	ae?: string;
@@ -78,7 +78,7 @@ export default class AnimController extends Controller {
 	at: number;
 
 	/** Animation flags */
-	flags: { [name: string]: boolean };
+	flags: Record<string, boolean>;
 
 	/** Frame hotspot */
 	hotspot: PointXY;
@@ -119,11 +119,7 @@ export default class AnimController extends Controller {
 	 * @param {boolean} force always play
 	 * @param {ListenerMap} listeners event listener map
 	 */
-	play(
-		animation: string,
-		force: boolean = false,
-		listeners?: ListenerMap
-	): void {
+	play(animation: string, force = false, listeners?: ListenerMap): void {
 		if (this.a !== animation) {
 			if (
 				!force &&

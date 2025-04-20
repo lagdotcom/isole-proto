@@ -7,9 +7,9 @@
  */
 export default function makeElement(
 	parent: HTMLElement = document.body,
-	tag: string = 'div',
+	tag = 'div',
 	attributes: unknown = {},
-	events: { [name: string]: EventListener } = {}
+	events: Record<string, EventListener> = {}
 ) {
 	let element = document.createElement(tag);
 

@@ -122,7 +122,7 @@ export class GamepadInput implements InputDevice {
 	}
 }
 
-type InputMapping = { [name: string]: InputButton[] };
+type InputMapping = Record<string, InputButton[]>;
 export default class InputMapper {
 	devices: InputDevice[];
 	mapping: InputMapping;
@@ -157,7 +157,7 @@ export default class InputMapper {
 		this.map(jDown, InputButton.Pickup);
 	}
 
-	load(key: string = 'InputMapping') {
+	load(key = 'InputMapping') {
 		if (localStorage[key] !== undefined) {
 			const map: InputMapping = JSON.parse(localStorage[key]);
 			Object.entries(map).forEach(([key, buttons]) =>
@@ -166,7 +166,7 @@ export default class InputMapper {
 		} else this.default();
 	}
 
-	save(key: string = 'InputMapping') {
+	save(key = 'InputMapping') {
 		localStorage[key] = JSON.stringify(this.mapping);
 	}
 

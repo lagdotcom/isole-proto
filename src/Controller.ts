@@ -83,11 +83,7 @@ export default class Controller {
 	 * @param {number} xadd x offset
 	 * @param {number} yadd y offset
 	 */
-	draw(
-		ctx: CanvasRenderingContext2D,
-		xadd: number = 0,
-		yadd: number = 0
-	): void {
+	draw(ctx: CanvasRenderingContext2D, xadd = 0, yadd = 0): void {
 		const { w, c, h, r, flip, img, xo, yo } = this,
 			sx = w * c,
 			sy = h * r;

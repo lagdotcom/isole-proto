@@ -217,7 +217,7 @@ export function dirv(x: CoordAR, y: CoordAR): CoordAR {
 export function displace(
 	origin: CoordAR,
 	offsets: CoordXY[] = [],
-	flip: boolean = false
+	flip = false
 ): CoordAR {
 	const { a, r } = origin;
 	let x = 0,
@@ -243,7 +243,7 @@ export function fittest<T>(
 	objects: T[],
 	scorer: (object: T) => number
 ): T | null {
-	let bestScore: number = -Infinity,
+	let bestScore = -Infinity,
 		best: T | null = null;
 	objects.forEach(o => {
 		const score = scorer(o);
@@ -279,7 +279,7 @@ export function rndr(
  * @param {number} max maximum angle
  * @returns {number}
  */
-export function rnda(min: number = 0, max: number = π2): number {
+export function rnda(min = 0, max: number = π2): number {
 	return anglewrap(rndr(min, max, n => n));
 }
 
@@ -296,7 +296,7 @@ export const chance = (percentage: number) => () => rndr(0, 100) < percentage;
  * @param {number} start number to start from
  * @returns {number}
  */
-export function sum(items: number[], start: number = 0): number {
+export function sum(items: number[], start = 0): number {
 	items.forEach(i => {
 		start += i;
 	});
@@ -328,7 +328,7 @@ export function rndweight<T>(...weightings: [T, number][]): T {
  * @param {number} f fraction
  * @returns {number}
  */
-export function lerp(a: number, b: number, f: number = 0.03): number {
+export function lerp(a: number, b: number, f = 0.03): number {
 	return a * (1 - f) + b * f;
 }
 
@@ -428,7 +428,7 @@ export function drawCross(
 	style: string | CanvasGradient | CanvasPattern,
 	x: number,
 	y: number,
-	size: number = 4
+	size = 4
 ) {
 	c.strokeStyle = style;
 	c.beginPath();

@@ -456,7 +456,7 @@ export default class Editor
 		object: any,
 		label: string,
 		attribute: string,
-		choices: T[] | { [key: string]: T },
+		choices: T[] | Record<string, T>,
 		parser: (raw: string) => T = x => x as T
 	) {
 		const el = mel(

@@ -41,12 +41,13 @@ import greyboxMaterials from './material/greybox';
 import bluegrassObjects from './object/bluegrass';
 import Texture from './Texture';
 
-interface MaterialMap {
-	[name: string]: {
+type MaterialMap = Record<
+	string,
+	{
 		spawner?(parent: unknown): void;
 		texture(game: Game): Texture;
-	};
-}
+	}
+>;
 
 /**
  * Preload materials
@@ -66,9 +67,7 @@ function addMaterials(game: Game, materials: MaterialMap[]) {
 	});
 }
 
-interface ObjectMap {
-	[name: string]: (game: Game) => Controller;
-}
+type ObjectMap = Record<string, (game: Game) => Controller>;
 
 /**
  * Preload objects

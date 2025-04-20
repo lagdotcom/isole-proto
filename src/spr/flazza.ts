@@ -78,7 +78,7 @@ export default class FlazzaController extends AnimController {
 		});
 	}
 
-	_play(anim: string, force: boolean = false): void {
+	_play(anim: string, force = false): void {
 		return this.play(anim, force, this.map);
 	}
 

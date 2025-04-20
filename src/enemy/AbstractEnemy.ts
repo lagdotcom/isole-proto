@@ -41,7 +41,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		}
 	}
 
-	protected debug(data: { [name: string]: string }) {
+	protected debug(data: Record<string, string>) {
 		this.del.innerHTML = jbr(
 			`<b>${this.name}</b>`,
 			`stun: ${this.stuntimer}`,

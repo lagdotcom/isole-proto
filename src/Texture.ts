@@ -7,9 +7,7 @@ export default interface Texture {
 	tile(name: string): void;
 }
 
-export interface TileDataMap {
-	[name: string]: TileData;
-}
+export type TileDataMap = Record<string, TileData>;
 
 export interface TileData {
 	c: number;
