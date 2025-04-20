@@ -1,13 +1,5 @@
-export default interface Hitbox {
-	// Bottom
-	bot: Hitsize;
-
-	// Top
-	top: Hitsize;
-
-	// allow arbitrary extension
-	[field: string]: unknown;
-}
+type Hitbox<T extends string = 'top' | 'bot'> = Record<T, Hitsize>;
+export default Hitbox;
 
 export interface Hitsize {
 	// Radius

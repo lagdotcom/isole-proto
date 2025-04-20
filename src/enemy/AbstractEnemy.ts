@@ -1,5 +1,6 @@
 import Damageable from '../Damageable';
 import Enemy from '../Enemy';
+import { Pixels, Radians } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import mel from '../makeElement';
@@ -8,21 +9,21 @@ import { deg2rad, jbr } from '../tools';
 const gStunMultiplier = 200;
 
 export default abstract class AbstractEnemy implements Enemy {
-	a: number;
+	a: Radians;
 	alive: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
-	height: number;
+	height: Pixels;
 	isEnemy: true;
 	layer: number;
 	name: string;
-	r: number;
+	r: Pixels;
 	stunmultiplier: number;
 	stuntimer: number;
 	va: number;
 	vr: number;
-	width: number;
+	width: Pixels;
 
 	abstract draw(ctx: CanvasRenderingContext2D): void;
 	abstract getHitbox(): Hitbox;
@@ -32,7 +33,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		this.stuntimer = 0;
 
 		Object.assign(this, options);
-		this.a = deg2rad(this.a);
+		this.a = deg2rad(options.a ?? 0);
 
 		if (this.game.options.showDebug) {
 			this.del = mel(this.game.options.debugContainer, 'div', {
@@ -65,6 +66,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		return t;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	die(by: Damageable) {
 		if (this.del && this.game.options.debugContainer) {
 			this.game.options.debugContainer.removeChild(this.del);

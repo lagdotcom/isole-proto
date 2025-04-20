@@ -1,3 +1,4 @@
+import { KeyCode, PadCode } from './flavours';
 import {
 	jButton1,
 	jButton2,
@@ -47,10 +48,10 @@ const preventDefaultKeys = [
 ];
 
 export class KeyboardInput implements InputDevice {
-	keys: Set<string>;
+	keys: Set<KeyCode>;
 
 	constructor() {
-		this.keys = new Set<string>();
+		this.keys = new Set();
 		window.addEventListener('keydown', e => {
 			this.press(e.code);
 			if (preventDefaultKeys.includes(e.code)) e.preventDefault();
@@ -58,11 +59,11 @@ export class KeyboardInput implements InputDevice {
 		window.addEventListener('keyup', e => this.release(e.code));
 	}
 
-	press(k: string) {
+	press(k: KeyCode) {
 		this.keys.add(k);
 	}
 
-	release(k: string) {
+	release(k: KeyCode) {
 		this.keys.delete(k);
 	}
 
@@ -122,7 +123,9 @@ export class GamepadInput implements InputDevice {
 	}
 }
 
-type InputMapping = Record<string, InputButton[]>;
+type InputCode = KeyCode | PadCode;
+
+type InputMapping = Record<InputCode, InputButton[]>;
 export default class InputMapper {
 	devices: InputDevice[];
 	mapping: InputMapping;
@@ -170,12 +173,12 @@ export default class InputMapper {
 		localStorage[key] = JSON.stringify(this.mapping);
 	}
 
-	map(key: string, btn: InputButton) {
+	map(key: InputCode, btn: InputButton) {
 		if (this.mapping[key]) this.mapping[key].push(btn);
 		else this.mapping[key] = [btn];
 	}
 
-	press(key: string) {
+	press(key: InputCode) {
 		if (this.mapping[key])
 			this.mapping[key].forEach(b => this.pressed.add(b));
 	}

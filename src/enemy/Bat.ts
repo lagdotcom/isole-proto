@@ -14,6 +14,7 @@ import Channel from '../Channel';
 import { cAI, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import { dLeft, dRight, Facing } from '../dirs';
+import { ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
@@ -79,7 +80,7 @@ type BatSubstate = 'Normal' | 'Slow' | 'Fast' | 'Turn';
 
 interface BatInit {
 	a?: number;
-	img?: string;
+	img?: ResourceName;
 	r?: number;
 }
 

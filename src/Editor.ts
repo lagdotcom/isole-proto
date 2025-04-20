@@ -1,6 +1,6 @@
 import Cartographer from './Cartographer';
 import clearChildren from './clearChildren';
-import Decal, { normalPosition, staticPosition } from './component/Decal';
+import Decal, { DecalPosition } from './component/Decal';
 import Flat from './component/Flat';
 import Platform from './component/Platform';
 import Wall from './component/Wall';
@@ -48,7 +48,7 @@ import { roundwoods } from './worlds';
 let materials: string[];
 let objects: string[];
 const wallDirections = [1, -1];
-const objectPositions = [normalPosition, staticPosition];
+const objectPositions: DecalPosition[] = ['normal', 'static'];
 
 interface EditorInit {
 	data?: EditorData;

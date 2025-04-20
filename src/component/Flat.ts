@@ -1,6 +1,7 @@
 import { cWall } from '../colours';
 import Component from '../Component';
 import DrawnComponent from '../DrawnComponent';
+import { Degrees, Pixels, Radians, TextureName } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
@@ -16,10 +17,10 @@ export default class Flat implements DrawnComponent {
 	game: Game;
 	isFlat: true;
 	layer: number;
-	left: number;
+	left: Radians;
 	motion: number;
 	r: number;
-	right: number;
+	right: Radians;
 	scale: number;
 	sprite?: Texture;
 	width: number;
@@ -30,10 +31,10 @@ export default class Flat implements DrawnComponent {
 	 * Create a new Flat
 	 * @param {Game} game game instance
 	 * @param {number} height height
-	 * @param {number} angle angle
-	 * @param {number} width width
+	 * @param {Degrees} angle angle
+	 * @param {Degrees} width width
 	 * @param {number} motion motion
-	 * @param {string} texture texture name
+	 * @param {TextureName} texture texture name
 	 */
 	constructor(
 		game: Game,
@@ -45,10 +46,10 @@ export default class Flat implements DrawnComponent {
 			texture,
 		}: {
 			height: number;
-			angle: number;
-			width: number;
+			angle: Degrees;
+			width: Degrees;
 			motion?: number;
-			texture?: string;
+			texture?: TextureName;
 		}
 	) {
 		this.circle = width >= 360;

@@ -5,6 +5,7 @@ import CoordAR from '../CoordAR';
 import DrawnComponent from '../DrawnComponent';
 import Enemy from '../Enemy';
 import { eAnimationEnded, ePlayerHurt } from '../events';
+import { AnimName, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import HitboxXYWH from '../HitboxXYWH';
@@ -29,7 +30,7 @@ class Swing implements DrawnComponent {
 
 	constructor(
 		game: Game,
-		resource: string,
+		resource: ResourceName,
 		controllerGen: ControllerGen,
 		onhit: OnEnemyHit
 	) {
@@ -158,17 +159,17 @@ export default class GenericMelee implements Weapon {
 	game: Game;
 	sprite: AnimController;
 	controllerGen: ControllerGen;
-	swingResource: string;
+	swingResource: ResourceName;
 	onhit: OnEnemyHit;
-	anim: string;
+	anim: AnimName;
 
 	constructor(
 		game: Game,
 		controllerGen: ControllerGen,
-		resource: string,
-		swingResource: string,
+		resource: ResourceName,
+		swingResource: ResourceName,
 		cooldown: number,
-		anim: string,
+		anim: AnimName,
 		onhit: OnEnemyHit
 	) {
 		this.game = game;

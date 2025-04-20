@@ -1,13 +1,15 @@
-export const aStand = 'stand',
-	aFlip = 'flip',
-	aJFlip = 'jflip',
-	aDJFlip = 'djflip',
-	aWalk = 'walk',
-	aJump = 'jump',
-	aDoubleJump = 'djump',
-	aLand = 'land',
-	aThrow = 'throw',
-	aAxe = 'axe',
-	aHurt = 'hurt',
-	aStatus = 'status',
-	aDying = 'dying';
+import { AnimName } from './flavours';
+
+export const aStand: AnimName = 'stand',
+	aFlip: AnimName = 'flip',
+	aJFlip: AnimName = 'jflip',
+	aDJFlip: AnimName = 'djflip',
+	aWalk: AnimName = 'walk',
+	aJump: AnimName = 'jump',
+	aDoubleJump: AnimName = 'djump',
+	aLand: AnimName = 'land',
+	aThrow: AnimName = 'throw',
+	aAxe: AnimName = 'axe',
+	aHurt: AnimName = 'hurt',
+	aStatus: AnimName = 'status',
+	aDying: AnimName = 'dying';

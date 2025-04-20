@@ -73,7 +73,7 @@ export default class KrillnaController extends Controller {
 		this.yo = -32;
 	}
 
-	walk(t: number, dir: string): void {
+	walk(t: number, dir: 'L' | 'R' | 'U' | 'D'): void {
 		const { fliptwice } = this;
 
 		this.xo = xoffsets[dir];

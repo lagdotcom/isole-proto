@@ -1,5 +1,6 @@
 import Controller from '../Controller';
 import { Facing } from '../dirs';
+import { ResourceName } from '../flavours';
 import Game from '../Game';
 import Player from '../Player';
 import Buster from './Buster';
@@ -51,7 +52,7 @@ class BoosterController extends Controller {
 
 interface BoosterOptions {
 	dir?: Facing;
-	img?: string;
+	img?: ResourceName;
 }
 
 export default class Booster extends Buster {

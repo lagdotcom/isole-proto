@@ -7,6 +7,7 @@ import { cAI, cAIDark, cHurt } from '../colours';
 import { Facing } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
 import { eAnimationEnded } from '../events';
+import { AnimName, Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zSpark } from '../layers';
@@ -817,7 +818,7 @@ class MinatoadController extends AnimController {
 		this.parent = parent;
 	}
 
-	_play(anim: string, force = false): void {
+	_play(anim: AnimName, force = false): void {
 		return this.play(anim, force, this.parent);
 	}
 
@@ -868,10 +869,10 @@ class MinatoadController extends AnimController {
 }
 
 interface MinatoadOptions {
-	a?: number;
+	a?: Radians;
 	dir?: Facing;
-	img?: string;
-	r?: number;
+	img?: ResourceName;
+	r?: Pixels;
 }
 
 type MinatoadState =

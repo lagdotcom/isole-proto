@@ -11,6 +11,7 @@ NOTES: After the body slam recovery, the flying animation will begin playing aga
 import { cAI, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import { dLeft, Facing } from '../dirs';
+import { Pixels, ResourceName } from '../flavours';
 import Game from '../Game';
 import { Hitsize } from '../Hitbox';
 import { zFlying } from '../layers';
@@ -44,8 +45,8 @@ const sProwling = 'prowling',
 type FlazzaState = 'prowling' | 'flop' | 'drop' | 'slam' | 'recovery';
 
 interface FlazzaInit {
-	img?: string;
-	r?: number;
+	img?: ResourceName;
+	r?: Pixels;
 }
 
 export default class Flazza extends AbstractEnemy {

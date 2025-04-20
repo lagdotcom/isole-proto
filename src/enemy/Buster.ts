@@ -1,6 +1,7 @@
 import { cAI, cAIDark, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
+import { Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import { Hitsize } from '../Hitbox';
 import { zEnemy } from '../layers';
@@ -53,15 +54,15 @@ interface BusterController {
 }
 
 interface BusterInit {
-	a?: number;
+	a?: Radians;
 	damage?: number;
 	health?: number;
-	height?: number;
-	img?: string;
+	height?: Pixels;
+	img?: ResourceName;
 	jumpfatigue?: number;
-	r?: number;
+	r?: Pixels;
 	sprite?: BusterController;
-	width?: number;
+	width?: Pixels;
 }
 
 export default class Buster extends AbstractEnemy {

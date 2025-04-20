@@ -1,6 +1,7 @@
 import Controller, { ControllerInit } from './Controller';
 import PointXY from './CoordXY';
 import { eAnimationEnded } from './events';
+import { AnimEvent, AnimName } from './flavours';
 import HitboxXYWH from './HitboxXYWH';
 
 export interface AnimInit extends ControllerInit {
@@ -28,7 +29,7 @@ export interface Anim {
 
 export interface FrameSpec {
 	c: number;
-	event?: string;
+	event?: AnimEvent;
 	hitbox?: HitboxXYWH;
 	hotspot?: PointXY;
 	r: number;
@@ -37,21 +38,21 @@ export interface FrameSpec {
 
 export interface Frame {
 	c: number;
-	event?: string;
+	event?: AnimEvent;
 	hitbox?: HitboxXYWH;
 	hotspot: PointXY;
 	r: number;
 	t: number;
 }
 
-export type AnimMap = Record<string, Anim>;
-export type AnimSpecMap = Record<string, AnimSpec>;
+export type AnimMap = Record<AnimName, Anim>;
+export type AnimSpecMap = Record<AnimName, AnimSpec>;
 export type Listener = (details: unknown) => void;
-export type ListenerMap = Record<string, Listener>;
+export type ListenerMap = Record<AnimEvent, Listener>;
 
 export default class AnimController extends Controller {
 	/** Current animation name */
-	a = '';
+	a: AnimName = '';
 
 	/** Current animation */
 	ac?: Anim;
@@ -63,7 +64,7 @@ export default class AnimController extends Controller {
 	afi = 0;
 
 	/** Current event */
-	ae?: string;
+	ae?: AnimEvent;
 
 	/** Current listener map */
 	al: ListenerMap;
@@ -72,7 +73,7 @@ export default class AnimController extends Controller {
 	animations: AnimMap;
 
 	/** Animation name to return to after pre-empt */
-	ar?: string;
+	ar?: AnimName;
 
 	/** Animation timer */
 	at: number;
@@ -115,11 +116,11 @@ export default class AnimController extends Controller {
 
 	/**
 	 * Play an animation
-	 * @param {string} animation name
+	 * @param {AnimName} animation name
 	 * @param {boolean} force always play
 	 * @param {ListenerMap} listeners event listener map
 	 */
-	play(animation: string, force = false, listeners?: ListenerMap): void {
+	play(animation: AnimName, force = false, listeners?: ListenerMap): void {
 		if (this.a !== animation) {
 			if (
 				!force &&
@@ -190,10 +191,10 @@ export default class AnimController extends Controller {
 
 	/**
 	 * Fire an event
-	 * @param {string} e event name
+	 * @param {AnimEvent} e event name
 	 * @param {unknown} details event details
 	 */
-	dispatch(e: string, details: unknown = null): void {
+	dispatch(e: AnimEvent, details: unknown = null): void {
 		this.al[e]?.(details);
 		this[e]?.(details);
 	}

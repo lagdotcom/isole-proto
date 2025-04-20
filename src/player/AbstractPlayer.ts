@@ -6,6 +6,7 @@ import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
 import Enemy from '../Enemy';
 import { ePlayerDied, ePlayerDying, ePlayerHurt } from '../events';
+import { Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import { Hitsize } from '../Hitbox';
 import { InputButton } from '../InputMapper';
@@ -49,10 +50,10 @@ const gJumpAffectStrength = 0.15,
 	gJumpTimer = 8;
 
 export default abstract class AbstractPlayer implements Player {
-	a: number;
+	a: Radians;
 	alive: boolean;
 	body: Channel;
-	deadSound: string;
+	deadSound: ResourceName;
 	del?: HTMLElement;
 	facing: Facing;
 	game: Game;
@@ -65,11 +66,11 @@ export default abstract class AbstractPlayer implements Player {
 	jumplg: boolean;
 	jumpt: number;
 	health: number;
-	hurtSound: string;
+	hurtSound: ResourceName;
 	layer: number;
 	name: string;
 	pickupdebounce: boolean;
-	r: number;
+	r: Pixels;
 	removecontrol: boolean;
 	sprite: PlayerController;
 	steph: number;
@@ -107,7 +108,7 @@ export default abstract class AbstractPlayer implements Player {
 			options
 		);
 
-		this.a = deg2rad(this.a);
+		this.a = deg2rad(options.a ?? 0);
 
 		if (game.options.showDebug) {
 			this.del = mel(game.options.debugContainer, 'div', {

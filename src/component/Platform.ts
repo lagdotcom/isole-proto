@@ -1,4 +1,5 @@
 import DrawnComponent from '../DrawnComponent';
+import { Degrees, MaterialName, Radians } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
@@ -10,17 +11,17 @@ import Wall from './Wall';
 export interface PlatformInit {
 	h: number;
 	th: number;
-	a: number;
+	a: Degrees;
 	w: number;
 	motion?: number;
-	material: string;
+	material: MaterialName;
 	walls?: boolean;
 	ceiling?: boolean;
 }
 
 /** Full platform */
 export default class Platform implements DrawnComponent {
-	a: number;
+	a: Radians;
 	bottom: number;
 	ceiling?: Flat;
 	circle: boolean;

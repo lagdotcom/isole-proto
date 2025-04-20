@@ -2,6 +2,7 @@ import { cHurt } from '../colours';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
 import { dDown, dLeft, dRight, dUp } from '../dirs';
+import { Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zEnemy } from '../layers';
@@ -30,9 +31,9 @@ const gFrameMotion = [0.2, 0.6, 0.8, 1.4, 0.8, 0.6],
 	gRadiusMult = 6;
 
 interface KrillnaInit {
-	a?: number;
-	img?: string;
-	r?: number;
+	a?: Radians;
+	img?: ResourceName;
+	r?: Pixels;
 	speed?: number;
 }
 

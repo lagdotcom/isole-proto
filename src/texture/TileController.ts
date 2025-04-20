@@ -1,10 +1,11 @@
 import Controller from '../Controller';
+import { TileName } from '../flavours';
 import Texture, { TileDataMap } from '../Texture';
 
 export default class TileController extends Controller implements Texture {
 	count: number;
 	tiles: TileDataMap;
-	tname: string;
+	tname: TileName;
 
 	constructor(img: CanvasImageSource, tiles: TileDataMap, options = {}) {
 		super(
@@ -22,7 +23,7 @@ export default class TileController extends Controller implements Texture {
 		this.tiles = tiles;
 	}
 
-	tile(n: string): void {
+	tile(n: TileName): void {
 		const t = this.tiles[n];
 		if (t) {
 			this.c = t.c;

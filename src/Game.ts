@@ -13,6 +13,14 @@ import DrawnComponent from './DrawnComponent';
 import emptyElement from './emptyElement';
 import Enemy from './Enemy';
 import { eGameReady, eLevelEntered, eMapEntered, eShopEntered } from './events';
+import {
+	MaterialName,
+	ObjectName,
+	Pixels,
+	ResourceName,
+	TextureName,
+	UrlString,
+} from './flavours';
 import InputMapper, { InputButton } from './InputMapper';
 import { zBeforeUI } from './layers';
 import mel from './makeElement';
@@ -46,7 +54,7 @@ export interface ShopGenerator {
 
 interface GameInit {
 	debugContainer?: HTMLElement;
-	height: number;
+	height: Pixels;
 	maxScale?: number;
 	minScale?: number;
 	vertScale?: number;
@@ -56,7 +64,7 @@ interface GameInit {
 	showFps?: boolean;
 	showHitboxes?: boolean;
 	smoothing?: boolean;
-	width: number;
+	width: Pixels;
 }
 
 type ResourceLoader<T> = (url: string, callback: () => void) => T;
@@ -83,8 +91,8 @@ export default class Game {
 	ceilings: Flat[];
 	components: Component[];
 	context: CanvasRenderingContext2D;
-	cx: number;
-	cy: number;
+	cx: Pixels;
+	cy: Pixels;
 	decals: Decal[];
 	drawn: DrawnComponent[];
 	element: HTMLCanvasElement;
@@ -97,20 +105,20 @@ export default class Game {
 	loaded: number;
 	loading: number;
 	mapView: MapView;
-	materials: Record<string, Material>;
+	materials: Record<MaterialName, Material>;
 	mode: GameMode;
 	nodes: MapNode[];
-	objects: Record<string, Controller>;
+	objects: Record<ObjectName, Controller>;
 	options: GameInit;
 	pickups: Pickup[];
 	platforms: Platform[];
 	player: Player;
 	redraw: boolean;
-	resources: Record<string, any>;
+	resources: Record<ResourceName, any>;
 	running: boolean;
 	runningRaf: number;
 	shopView: ShopView;
-	textures: Record<string, Texture>;
+	textures: Record<TextureName, Texture>;
 	time: number;
 	walls: Wall[];
 	wallsInMotion: boolean;
@@ -174,13 +182,17 @@ export default class Game {
 
 	/**
 	 * Require a resource
-	 * @param {string} key resource name
+	 * @param {ResourceName} name resource name
 	 * @param {ResourceLoader} typ resource loader
 	 * @param {string} src source URL
 	 */
-	require<T>(key: string, typ: ResourceLoader<T>, src: string): void {
+	require<T>(
+		name: ResourceName,
+		typ: ResourceLoader<T>,
+		src: UrlString
+	): void {
 		this.loading++;
-		this.resources[key] = typ(src, () => this.resourceLoaded());
+		this.resources[name] = typ(src, () => this.resourceLoaded());
 	}
 
 	/**
@@ -324,7 +336,7 @@ export default class Game {
 	 * Create the canvas
 	 * @param {HTMLElement} parent parent element
 	 */
-	makeCanvas(parent: HTMLElement | undefined): HTMLCanvasElement {
+	makeCanvas(parent?: HTMLElement): HTMLCanvasElement {
 		const { width, height } = this.options;
 		return mel(parent, 'canvas', { width, height }) as HTMLCanvasElement;
 	}

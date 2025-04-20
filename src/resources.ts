@@ -34,6 +34,7 @@ import deathSnd from '../media/sfx/Player_Death.wav';
 import jacquesHurtSnd from '../media/sfx/Player_Hurt_Jacques.wav';
 import woodyHurtSnd from '../media/sfx/Player_Hurt_Woody.wav';
 import Controller from './Controller';
+import { MaterialName, ObjectName, UrlString } from './flavours';
 import Game from './Game';
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
@@ -42,7 +43,7 @@ import bluegrassObjects from './object/bluegrass';
 import Texture from './Texture';
 
 type MaterialMap = Record<
-	string,
+	MaterialName,
 	{
 		spawner?(parent: unknown): void;
 		texture(game: Game): Texture;
@@ -68,7 +69,7 @@ function addMaterials(game: Game, materials: MaterialMap[]) {
 	});
 }
 
-type ObjectMap = Record<string, (game: Game) => Controller>;
+type ObjectMap = Record<ObjectName, (game: Game) => Controller>;
 
 /**
  * Preload objects
@@ -85,11 +86,11 @@ function addObjects(game: Game, objects: ObjectMap[]) {
 
 /**
  * Load an image resource
- * @param {string} fn filename
+ * @param {UrlString} fn filename
  * @param {(Event) => void} onload callback
  * @returns {HTMLImageElement} image element
  */
-function image(fn: string, onload: (e: Event) => void): HTMLImageElement {
+function image(fn: UrlString, onload: (e: Event) => void): HTMLImageElement {
 	const el = document.createElement('img');
 	el.addEventListener('load', onload);
 	el.src = fn;
@@ -107,11 +108,11 @@ const MediaErrors = [
 
 /**
  * Load an image resource
- * @param {string} fn filename
+ * @param {UrlString} fn filename
  * @param {(Event) => void} onload callback
  * @returns {HTMLAudioElement} audio element
  */
-function sound(fn: string, onload: (e: Event) => void): HTMLAudioElement {
+function sound(fn: UrlString, onload: (e: Event) => void): HTMLAudioElement {
 	const el = new Audio(fn);
 	el.addEventListener('canplaythrough', onload);
 	el.addEventListener('error', e => {

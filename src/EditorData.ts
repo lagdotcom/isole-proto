@@ -1,5 +1,6 @@
 import CoordAR from './CoordAR';
 import { Facing } from './dirs';
+import { MaterialName, ObjectName, TextureName } from './flavours';
 
 export default interface EditorData {
 	platforms?: EditorPlatform[];
@@ -20,13 +21,13 @@ export interface EditorEnemy extends CoordAR {
 export interface EditorFloor {
 	a: number;
 	h: number;
-	material: string;
+	material: TextureName; // TODO lol
 	motion?: number;
 	w: number;
 }
 
 export interface EditorObject extends CoordAR {
-	object: string;
+	object: ObjectName;
 }
 
 export interface EditorPlatform {
@@ -35,7 +36,7 @@ export interface EditorPlatform {
 	a: number;
 	th: number;
 	motion?: number;
-	material: string;
+	material: MaterialName;
 	ceiling?: boolean;
 	walls?: boolean;
 }

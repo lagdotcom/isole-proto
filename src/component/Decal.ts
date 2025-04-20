@@ -2,21 +2,21 @@ import { cIgnore } from '../colours';
 import Component from '../Component';
 import Controller from '../Controller';
 import PointAR from '../CoordAR';
+import { ObjectName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zBackground } from '../layers';
 import { gTimeScale } from '../nums';
 import { anglewrap, cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
 
-export const normalPosition = 'normal';
-export const staticPosition = 'static';
+export type DecalPosition = 'normal' | 'static';
 
 interface DecalInit extends PointAR {
 	layer?: number;
 	motion?: number;
-	object: string;
+	object: ObjectName;
 	parallax?: number;
-	position?: string;
+	position?: DecalPosition;
 }
 
 export default class Decal implements Component {
@@ -27,7 +27,7 @@ export default class Decal implements Component {
 	layer: number;
 	motion: number;
 	parallax: number;
-	position: string;
+	position: DecalPosition;
 	r: number;
 	sprite: Controller;
 	x: number;
@@ -43,7 +43,7 @@ export default class Decal implements Component {
 			r = 0,
 			motion = 0,
 			parallax = 0,
-			position = normalPosition,
+			position = 'normal',
 		}: DecalInit
 	) {
 		const sprite = game.objects[object];
@@ -62,7 +62,7 @@ export default class Decal implements Component {
 		this.x = a;
 		this.y = r;
 
-		if (this.position === staticPosition) {
+		if (this.position === 'static') {
 			this.update = undefined;
 			this.draw = this.drawStatic;
 			this.drawHitbox = undefined;

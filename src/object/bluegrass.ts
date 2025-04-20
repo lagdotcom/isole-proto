@@ -1,8 +1,9 @@
+import { ResourceName } from '../flavours';
 import Game from '../Game';
 import DecalController from './DecalController';
 
 const decal =
-	(resource: string, x: number, y: number, w: number, h: number) =>
+	(resource: ResourceName, x: number, y: number, w: number, h: number) =>
 	(game: Game, options?: any) =>
 		new DecalController(game.resources[resource], {
 			x,

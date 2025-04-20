@@ -1,3 +1,4 @@
+import { ResourceName } from './flavours';
 import Game from './Game';
 
 /** Audio channel */
@@ -17,9 +18,9 @@ export default class Channel {
 
 	/**
 	 * Play a sound on the channel
-	 * @param {string} name resource name
+	 * @param {ResourceName} name resource name
 	 */
-	play(name: string): void {
+	play(name: ResourceName): void {
 		const snd = this.g.resources[name];
 		if (!snd) {
 			console.log('resource not loaded:', name);

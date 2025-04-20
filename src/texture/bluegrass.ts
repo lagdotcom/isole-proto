@@ -1,8 +1,11 @@
+import { ResourceName } from '../flavours';
+import Game from '../Game';
 import { TileDataMap } from '../Texture';
 import TileController from './TileController';
 
-const tcm = (resource: string, tiles: TileDataMap, options?) => game =>
-	new TileController(game.resources[resource], tiles, options);
+const tcm =
+	(resource: ResourceName, tiles: TileDataMap, options?) => (game: Game) =>
+		new TileController(game.resources[resource], tiles, options);
 
 const bluegrass = tcm('tile.bluegrass', {
 	tl: { c: 1, r: 5 },

@@ -15,6 +15,7 @@ import AnimController, {
 	Listener,
 	ListenerMap,
 } from '../AnimController';
+import { AnimName } from '../flavours';
 
 const aMove = 'move',
 	aPunch = 'punch',
@@ -118,7 +119,7 @@ export default class BatController extends AnimController {
 		});
 	}
 
-	_play(anim: string, force = false): void {
+	_play(anim: AnimName, force = false): void {
 		return this.play(anim, force, this.map);
 	}
 

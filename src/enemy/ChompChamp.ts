@@ -2,6 +2,7 @@ import AnimController, { Listener, ListenerMap } from '../AnimController';
 import { cAI, cHurt } from '../colours';
 import Enemy from '../Enemy';
 import { eAnimationEnded } from '../events';
+import { AnimName, Degrees, Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
@@ -17,16 +18,16 @@ import {
 	πHalf,
 } from '../tools';
 
-const aIdle = 'idle',
-	aClose = 'close',
-	aOpen = 'open',
-	aStruggle = 'struggle';
+const aIdle: AnimName = 'idle',
+	aClose: AnimName = 'close',
+	aOpen: AnimName = 'open',
+	aStruggle: AnimName = 'struggle';
 
 export const eCatch = 'catch',
 	eRelease = 'release';
 
 interface ChompChampSprite {
-	a: string;
+	a: AnimName;
 	at: number;
 	idle(t: number): void;
 	close(t: number): void;
@@ -36,9 +37,9 @@ interface ChompChampSprite {
 }
 
 interface ChompChampInit {
-	a?: number;
-	img?: string;
-	r?: number;
+	a?: Degrees;
+	img?: ResourceName;
+	r?: Pixels;
 	sprite?: ChompChampSprite;
 }
 

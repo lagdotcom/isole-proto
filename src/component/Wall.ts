@@ -1,5 +1,6 @@
 import { cWall } from '../colours';
 import DrawnComponent from '../DrawnComponent';
+import { TextureName } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale, gWallGap } from '../nums';
@@ -38,7 +39,7 @@ export default class Wall implements DrawnComponent {
 		angle: number,
 		direction: 1 | -1,
 		motion = 0,
-		texture?: string
+		texture?: TextureName
 	) {
 		const a = anglewrap(deg2rad(angle)),
 			top = t - gWallGap,

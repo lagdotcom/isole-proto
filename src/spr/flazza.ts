@@ -9,6 +9,7 @@ NOTES: After the body slam recovery, the flying animation will begin playing aga
 */
 
 import AnimController, { Listener, ListenerMap } from '../AnimController';
+import { AnimName } from '../flavours';
 
 const aMove = 'move',
 	aFlop = 'flop',
@@ -78,7 +79,7 @@ export default class FlazzaController extends AnimController {
 		});
 	}
 
-	_play(anim: string, force = false): void {
+	_play(anim: AnimName, force = false): void {
 		return this.play(anim, force, this.map);
 	}
 

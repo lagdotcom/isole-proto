@@ -1,9 +1,9 @@
 declare module '*.png' {
-	const url: string;
+	const url: import('./flavours').UrlString;
 	export default url;
 }
 
 declare module '*.wav' {
-	const url: string;
+	const url: import('./flavours').UrlString;
 	export default url;
 }

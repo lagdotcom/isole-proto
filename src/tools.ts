@@ -2,6 +2,7 @@ import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
 import Damageable from './Damageable';
 import { eEnemyDied } from './events';
+import { Degrees, Radians } from './flavours';
 import Hitbox, { Hitsize } from './Hitbox';
 import { gHitboxScale } from './nums';
 
@@ -95,7 +96,7 @@ export function unscalew(ws: number, r: number): number {
  * @param {number} a angle in degrees
  * @return {number} angle in radians
  */
-export function deg2rad(a: number): number {
+export function deg2rad(a: Degrees): Radians {
 	return (π2 * a) / 360;
 }
 
@@ -312,8 +313,7 @@ export function rndweight<T>(...weightings: [T, number][]): T {
 	const total = sum(weightings.map(([, weight]) => weight));
 	const roll = rndr(0, total);
 	let accumulator = 0;
-	for (let i = 0; i < weightings.length; i++) {
-		const [choice, weight] = weightings[i];
+	for (const [choice, weight] of weightings) {
 		if (roll < accumulator + weight) return choice;
 		accumulator += weight;
 	}

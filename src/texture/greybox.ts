@@ -1,7 +1,8 @@
+import { ResourceName } from '../flavours';
 import { TileDataMap } from '../Texture';
 import TileController from './TileController';
 
-const tcm = (resource: string, tiles: TileDataMap) => game =>
+const tcm = (resource: ResourceName, tiles: TileDataMap) => game =>
 	new TileController(game.resources[resource], tiles);
 
 const solid = tcm('tile.greybox', {
