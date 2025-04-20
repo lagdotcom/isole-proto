@@ -1,7 +1,14 @@
 import { cWall } from '../colours';
 import Component from '../Component';
 import DrawnComponent from '../DrawnComponent';
-import { Degrees, Pixels, Radians, TextureName } from '../flavours';
+import {
+	Degrees,
+	DisplayLayer,
+	Milliseconds,
+	Pixels,
+	Radians,
+	TextureName,
+} from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
@@ -11,26 +18,26 @@ import Wall from './Wall';
 
 /** Floor or Ceiling */
 export default class Flat implements DrawnComponent {
-	a: number;
+	a: Radians;
 	attachments: Component[];
 	circle: boolean;
 	game: Game;
 	isFlat: true;
-	layer: number;
+	layer: DisplayLayer;
 	left: Radians;
-	motion: number;
-	r: number;
+	motion: Radians;
+	r: Pixels;
 	right: Radians;
 	scale: number;
 	sprite?: Texture;
-	width: number;
+	width: Radians;
 	wleft?: Wall;
 	wright?: Wall;
 
 	/**
 	 * Create a new Flat
 	 * @param {Game} game game instance
-	 * @param {number} height height
+	 * @param {Pixels} height height
 	 * @param {Degrees} angle angle
 	 * @param {Degrees} width width
 	 * @param {number} motion motion
@@ -45,7 +52,7 @@ export default class Flat implements DrawnComponent {
 			motion = 0,
 			texture,
 		}: {
-			height: number;
+			height: Pixels;
 			angle: Degrees;
 			width: Degrees;
 			motion?: number;
@@ -81,9 +88,9 @@ export default class Flat implements DrawnComponent {
 
 	/**
 	 * Update position
-	 * @param {number} time time
+	 * @param {Milliseconds} time time
 	 */
-	update(time: number): void {
+	update(time: Milliseconds): void {
 		if (this.motion) {
 			this.a = anglewrap(this.a + time * this.motion);
 			this.left = this.a - this.width;

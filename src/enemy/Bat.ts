@@ -14,7 +14,13 @@ import Channel from '../Channel';
 import { cAI, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import { dLeft, dRight, Facing } from '../dirs';
-import { ResourceName } from '../flavours';
+import {
+	Degrees,
+	Milliseconds,
+	Pixels,
+	Radians,
+	ResourceName,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
@@ -51,12 +57,12 @@ const gAttackFar = 160,
 	gLungeSpeed = 0.4,
 	gPullbackSpeed = 0.12,
 	gRoostChance = 0.001,
-	gSleepThreshold = 1000,
+	gSleepThreshold: Milliseconds = 1000,
 	gSlowSpeed = 0.08,
-	gSubstateChange = 2000,
+	gSubstateChange: Milliseconds = 2000,
 	gSubstateChance = 0.2,
 	gVerticalAcceleration = 0.0005,
-	gVerticalChange = 3000,
+	gVerticalChange: Milliseconds = 3000,
 	gVerticalChance = 0.1,
 	gVerticalNear = 50,
 	gVerticalSlowdown = 0.75,
@@ -79,27 +85,27 @@ const ssNormal = 'Normal',
 type BatSubstate = 'Normal' | 'Slow' | 'Fast' | 'Turn';
 
 interface BatInit {
-	a?: number;
+	a?: Degrees;
 	img?: ResourceName;
-	r?: number;
+	r?: Pixels;
 }
 
 export default class Bat extends AbstractEnemy {
 	channel: Channel;
 	dir: Facing;
-	maxradius: number;
-	minradius: number;
+	maxradius: Pixels;
+	minradius: Pixels;
 	roost: Flat | null;
-	roostangle?: number;
-	roostradius?: number;
-	sleepTimer: number;
+	roostangle?: Radians;
+	roostradius?: Pixels;
+	sleepTimer: Milliseconds;
 	sprite: controller;
 	state: BatState;
 	substate: BatSubstate;
-	substateTimer: number;
-	targetradius: number;
+	substateTimer: Milliseconds;
+	targetradius: Pixels;
 	tscale: number;
-	verticalTimer: number;
+	verticalTimer: Milliseconds;
 
 	/**
 	 * Create a new Bat
@@ -144,7 +150,7 @@ export default class Bat extends AbstractEnemy {
 		};
 	}
 
-	update(time: number): void {
+	update(time: Milliseconds): void {
 		if (!(time = this.dostun(time))) return;
 
 		if (!this.minradius) {
@@ -174,7 +180,7 @@ export default class Bat extends AbstractEnemy {
 		}
 	}
 
-	physics(time: number, va: number, vr: number): void {
+	physics(time: Milliseconds, va: number, vr: number): void {
 		const tscale = time / gTimeScale;
 
 		let { a, r } = this;
@@ -202,7 +208,7 @@ export default class Bat extends AbstractEnemy {
 		this.sprite.turn();
 	}
 
-	[sFlying + 'Update'](time: number): void {
+	[sFlying + 'Update'](time: Milliseconds): void {
 		this.sleepTimer += time;
 
 		if (this.canAttack()) {
@@ -222,7 +228,7 @@ export default class Bat extends AbstractEnemy {
 		this.sprite.move(time);
 	}
 
-	[sFlying + ssNormal + 'Update'](time: number): number {
+	[sFlying + ssNormal + 'Update'](time: Milliseconds): number {
 		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gNormalSpeed);
@@ -232,7 +238,7 @@ export default class Bat extends AbstractEnemy {
 		return va;
 	}
 
-	[sFlying + ssTurn + 'Update'](time: number): number {
+	[sFlying + ssTurn + 'Update'](time: Milliseconds): number {
 		let { va } = this;
 
 		va = lerp(va, 0);
@@ -246,7 +252,7 @@ export default class Bat extends AbstractEnemy {
 		return va;
 	}
 
-	[sFlying + ssFast + 'Update'](time: number): number {
+	[sFlying + ssFast + 'Update'](time: Milliseconds): number {
 		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gFastSpeed);
@@ -256,7 +262,7 @@ export default class Bat extends AbstractEnemy {
 		return va;
 	}
 
-	[sFlying + ssSlow + 'Update'](time: number): number {
+	[sFlying + ssSlow + 'Update'](time: Milliseconds): number {
 		let { dir, va } = this;
 
 		if (dir === dRight) va = lerp(va, gSlowSpeed);
@@ -266,7 +272,7 @@ export default class Bat extends AbstractEnemy {
 		return va;
 	}
 
-	flyingVerticalUpdate(time: number): number {
+	flyingVerticalUpdate(time: Milliseconds): number {
 		let { r, minradius, maxradius, targetradius, vr } = this;
 
 		const rdiff = targetradius - r;
@@ -286,7 +292,7 @@ export default class Bat extends AbstractEnemy {
 		return vr;
 	}
 
-	checkChangeSubstate(time: number): void {
+	checkChangeSubstate(time: Milliseconds): void {
 		if (this.substateTimer <= 0) {
 			if (rnd() * time < gSubstateChance) this.changeSubstate();
 		} else {
@@ -308,7 +314,7 @@ export default class Bat extends AbstractEnemy {
 		);
 	}
 
-	[sPunching + 'Update'](time: number): void {
+	[sPunching + 'Update'](time: Milliseconds): void {
 		this.physics(time, this.va, this.vr);
 		this.sprite.punch(time);
 	}
@@ -345,7 +351,7 @@ export default class Bat extends AbstractEnemy {
 		});
 	}
 
-	[sRoosting + 'Update'](time: number): void {
+	[sRoosting + 'Update'](time: Milliseconds): void {
 		if (!this.roostangle) {
 			this.roostangle = rnda(this.roost!.left, this.roost!.right);
 			this.roostradius = this.roost!.r - this.height;
@@ -387,10 +393,10 @@ export default class Bat extends AbstractEnemy {
 		return va;
 	}
 
-	roostingRadiusUpdate(time: number): number {
+	roostingRadiusUpdate(time: Milliseconds): number {
 		let { r, roostradius, vr } = this;
 
-		const rdiff = roostradius! - r;
+		const rdiff: Pixels = roostradius! - r;
 		if (rdiff < gZeroRadiusThreshold) {
 			this.r = roostradius!;
 			return 0;
@@ -402,7 +408,7 @@ export default class Bat extends AbstractEnemy {
 		return vr;
 	}
 
-	[sSleeping + 'Update'](time: number): void {
+	[sSleeping + 'Update'](time: Milliseconds): void {
 		this.sleepTimer += time;
 
 		if (this.canAttack() || this.canWake()) {
@@ -415,7 +421,7 @@ export default class Bat extends AbstractEnemy {
 		this.sprite.sleep(time);
 	}
 
-	[sWaking + 'Update'](time: number): void {
+	[sWaking + 'Update'](time: Milliseconds): void {
 		this.sprite.wake(time);
 	}
 
@@ -453,7 +459,7 @@ export default class Bat extends AbstractEnemy {
 		const { r, a, va, vr, width, height, tscale } = this;
 		const baw = scalew(width, r),
 			taw = scalew(width, r + height);
-		let amod: number,
+		let amod: Radians,
 			vbr = 0,
 			vtr = 0;
 
@@ -491,7 +497,7 @@ export default class Bat extends AbstractEnemy {
 		const left = dir === dLeft;
 		const aoffset = left ? -attackWidth : attackWidth;
 
-		let amod: number,
+		let amod: Radians,
 			vbr = 0;
 
 		if (tscale) amod = a + (va / r) * tscale * gWalkScale;

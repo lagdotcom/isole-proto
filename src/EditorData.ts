@@ -1,6 +1,12 @@
 import CoordAR from './CoordAR';
 import { Facing } from './dirs';
-import { MaterialName, ObjectName, TextureName } from './flavours';
+import {
+	Degrees,
+	MaterialName,
+	ObjectName,
+	Pixels,
+	TextureName,
+} from './flavours';
 
 export default interface EditorData {
 	platforms?: EditorPlatform[];
@@ -13,27 +19,27 @@ export default interface EditorData {
 	items?: EditorItem[];
 }
 
-export interface EditorEnemy extends CoordAR {
+export interface EditorEnemy extends CoordAR<Degrees> {
 	dir: Facing;
 	type: string;
 }
 
 export interface EditorFloor {
-	a: number;
-	h: number;
+	a: Degrees;
+	h: Pixels;
 	material: TextureName; // TODO lol
 	motion?: number;
-	w: number;
+	w: Degrees;
 }
 
-export interface EditorObject extends CoordAR {
+export interface EditorObject extends CoordAR<Degrees> {
 	object: ObjectName;
 }
 
 export interface EditorPlatform {
-	h: number;
-	w: number;
-	a: number;
+	h: Pixels;
+	w: Degrees;
+	a: Degrees;
 	th: number;
 	motion?: number;
 	material: MaterialName;
@@ -41,25 +47,25 @@ export interface EditorPlatform {
 	walls?: boolean;
 }
 
-export interface EditorPlayer extends CoordAR {
+export interface EditorPlayer extends CoordAR<Degrees> {
 	type: string;
 	item?: string;
 	weapon?: string;
 }
 
 export interface EditorWall {
-	top: number;
-	bottom: number;
-	a: number;
+	top: Pixels;
+	bottom: Pixels;
+	a: Degrees;
 	motion?: number;
 	dir: 1 | -1;
 	material: string;
 }
 
-export interface EditorWeapon extends CoordAR {
+export interface EditorWeapon extends CoordAR<Degrees> {
 	weapon: string;
 }
 
-export interface EditorItem extends CoordAR {
+export interface EditorItem extends CoordAR<Degrees> {
 	item: string;
 }

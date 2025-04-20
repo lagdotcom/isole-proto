@@ -1,3 +1,5 @@
+import { Milliseconds, Pixels } from './flavours';
+
 export const gTimeScale = 10,
 	gHitboxScale = Math.PI / 6,
 	gGroundWalk = 0.06,
@@ -6,8 +8,8 @@ export const gTimeScale = 10,
 	gGravityStrength = 0.2,
 	gWalkScale = 10,
 	gMaxVA = 0.3,
-	gMaxTimeStep = 1000 / 20.0,
+	gMaxTimeStep: Milliseconds = 1000 / 20.0,
 	gStandThreshold = 0.005,
-	gWallGap = 5,
+	gWallGap: Pixels = 5,
 	gWallBounce = -0.01,
 	gPadAxisThreshold = 0.4;

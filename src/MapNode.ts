@@ -1,3 +1,5 @@
+import { Pixels } from './flavours';
+
 /*
 MAP LEGEND:
 - SKULL - Normal enemy room, a few waves of enemies
@@ -47,6 +49,6 @@ export default interface MapNode {
 	hidden?: boolean;
 	type: NodeType;
 	visited?: boolean;
-	x: number;
-	y: number;
+	x: Pixels;
+	y: Pixels;
 }

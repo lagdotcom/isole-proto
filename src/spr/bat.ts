@@ -15,7 +15,7 @@ import AnimController, {
 	Listener,
 	ListenerMap,
 } from '../AnimController';
-import { AnimName } from '../flavours';
+import { AnimName, Milliseconds } from '../flavours';
 
 const aMove = 'move',
 	aPunch = 'punch',
@@ -123,22 +123,22 @@ export default class BatController extends AnimController {
 		return this.play(anim, force, this.map);
 	}
 
-	move(t: number): void {
+	move(t: Milliseconds): void {
 		this.play(aMove);
 		this.next(t);
 	}
 
-	punch(t: number): void {
+	punch(t: Milliseconds): void {
 		this._play(aPunch);
 		this.next(t);
 	}
 
-	sleep(t: number): void {
+	sleep(t: Milliseconds): void {
 		this.play(aSleep);
 		this.next(t);
 	}
 
-	wake(t: number): void {
+	wake(t: Milliseconds): void {
 		this._play(aWake);
 		this.next(t);
 	}

@@ -1,4 +1,5 @@
 import DrawnComponent from '../DrawnComponent';
+import { DisplayLayer, Milliseconds } from '../flavours';
 import Game from '../Game';
 import { InputButton } from '../InputMapper';
 import Item from '../Item';
@@ -13,7 +14,7 @@ export default class Inventory implements DrawnComponent {
 	img: CanvasImageSource;
 	items: (Item | undefined)[];
 	keys: number;
-	layer: number;
+	layer: DisplayLayer;
 	money: number;
 	weapon?: Weapon;
 
@@ -64,7 +65,7 @@ export default class Inventory implements DrawnComponent {
 		return false;
 	}
 
-	update(t: number): void {
+	update(t: Milliseconds): void {
 		const { game, weapon } = this;
 		const ok = game.mode === 'level';
 

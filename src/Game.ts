@@ -14,7 +14,9 @@ import emptyElement from './emptyElement';
 import Enemy from './Enemy';
 import { eGameReady, eLevelEntered, eMapEntered, eShopEntered } from './events';
 import {
+	DisplayLayer,
 	MaterialName,
+	Milliseconds,
 	ObjectName,
 	Pixels,
 	ResourceName,
@@ -71,7 +73,7 @@ type ResourceLoader<T> = (url: string, callback: () => void) => T;
 
 class Unzoomer implements DrawnComponent {
 	game: Game;
-	layer: number;
+	layer: DisplayLayer;
 	constructor(game: Game) {
 		this.game = game;
 		this.layer = zBeforeUI;
@@ -119,7 +121,7 @@ export default class Game {
 	runningRaf: number;
 	shopView: ShopView;
 	textures: Record<TextureName, Texture>;
-	time: number;
+	time: Milliseconds;
 	walls: Wall[];
 	wallsInMotion: boolean;
 	unzoomer: DrawnComponent;
@@ -378,10 +380,10 @@ export default class Game {
 
 	/**
 	 * Render the next frame
-	 * @param {number} t time
+	 * @param {Milliseconds} t time
 	 */
-	next(t: number): void {
-		const step = min(t - this.time, gMaxTimeStep);
+	next(t: Milliseconds): void {
+		const step: Milliseconds = min(t - this.time, gMaxTimeStep);
 		this.time = t;
 
 		switch (this.mode) {
@@ -401,9 +403,9 @@ export default class Game {
 
 	/**
 	 * Render the next frame, in Level mode
-	 * @param {number} step time to process
+	 * @param {Milliseconds} step time to process
 	 */
-	showGameScreen(step: number) {
+	showGameScreen(step: Milliseconds) {
 		const { width, height, showFps, showHitboxes } = this.options;
 		const c = this.context;
 
@@ -411,7 +413,7 @@ export default class Game {
 		c.fillRect(0, 0, width, height);
 
 		this.keys = this.input.poll();
-		this.components.forEach(co => co.update && co.update(step));
+		this.components.forEach(co => co.update?.(step));
 
 		if (this.redraw) {
 			this.redraw = false;
@@ -427,7 +429,7 @@ export default class Game {
 			c.fill();
 
 			this.zoomer.draw(c);
-			this.drawn.forEach(co => co.drawHitbox && co.drawHitbox(c));
+			this.drawn.forEach(co => co.drawHitbox?.(c));
 			this.zoomer.reset();
 		}
 

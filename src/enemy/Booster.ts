@@ -1,6 +1,6 @@
 import Controller from '../Controller';
 import { Facing } from '../dirs';
-import { ResourceName } from '../flavours';
+import { Milliseconds, Pixels, ResourceName } from '../flavours';
 import Game from '../Game';
 import Player from '../Player';
 import Buster from './Buster';
@@ -16,10 +16,10 @@ class BoosterController extends Controller {
 		});
 	}
 
-	idle(t: number) {}
-	near(t: number) {}
+	idle(t: Milliseconds) {}
+	near(t: Milliseconds) {}
 
-	jump(t: number) {
+	jump(t: Milliseconds) {
 		if (this.show('jump', 0, 0)) {
 			this.timer += t;
 			if (this.timer >= 75 && this.r < 1) {
@@ -29,7 +29,7 @@ class BoosterController extends Controller {
 		}
 	}
 
-	rise(t: number) {
+	rise(t: Milliseconds) {
 		if (this.show('rise', 0, 2)) {
 			this.timer += t;
 			if (this.timer >= 75 && this.r < 3) {
@@ -39,7 +39,7 @@ class BoosterController extends Controller {
 		}
 	}
 
-	fall(t: number) {
+	fall(t: Milliseconds) {
 		if (this.show('fall', 0, 4)) {
 			this.timer += t;
 			if (this.timer >= 75 && this.r < 7) {
@@ -71,7 +71,7 @@ export default class Booster extends Buster {
 		this.dir = dir;
 	}
 
-	canAttack(player: Player, playerDist: number) {
+	canAttack(player: Player, playerDist: Pixels) {
 		return true;
 	}
 

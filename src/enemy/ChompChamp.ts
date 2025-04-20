@@ -2,7 +2,15 @@ import AnimController, { Listener, ListenerMap } from '../AnimController';
 import { cAI, cHurt } from '../colours';
 import Enemy from '../Enemy';
 import { eAnimationEnded } from '../events';
-import { AnimName, Degrees, Pixels, Radians, ResourceName } from '../flavours';
+import {
+	AnimName,
+	Degrees,
+	DisplayLayer,
+	Milliseconds,
+	Pixels,
+	Radians,
+	ResourceName,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
@@ -28,11 +36,11 @@ export const eCatch = 'catch',
 
 interface ChompChampSprite {
 	a: AnimName;
-	at: number;
-	idle(t: number): void;
-	close(t: number): void;
-	open(t: number): void;
-	struggle(t: number): void;
+	at: Milliseconds;
+	idle(t: Milliseconds): void;
+	close(t: Milliseconds): void;
+	open(t: Milliseconds): void;
+	struggle(t: Milliseconds): void;
 	draw(c: CanvasRenderingContext2D): void;
 }
 
@@ -111,47 +119,47 @@ class ChompChampController extends AnimController implements ChompChampSprite {
 		this.parent = parent;
 	}
 
-	_play(anim: string, force = false): void {
+	_play(anim: AnimName, force = false): void {
 		return this.play(anim, force, this.parent);
 	}
 
-	idle(t: number) {
+	idle(t: Milliseconds) {
 		this.play(aIdle);
 		this.next(t);
 	}
 
-	close(t: number) {
+	close(t: Milliseconds) {
 		this._play(aClose);
 		this.next(t);
 	}
 
-	open(t: number) {
+	open(t: Milliseconds) {
 		this._play(aOpen);
 		this.next(t);
 	}
 
-	struggle(t: number) {
+	struggle(t: Milliseconds) {
 		this._play(aStruggle);
 		this.next(t);
 	}
 }
 
 export default class ChompChamp implements Enemy {
-	a: number;
+	a: Radians;
 	alive: true;
-	attackWidth: number;
+	attackWidth: Pixels;
 	del: HTMLElement;
 	game: Game;
 	health: number;
-	height: number;
+	height: Pixels;
 	isEnemy: true;
-	layer: number;
+	layer: DisplayLayer;
 	name: string;
-	r: number;
+	r: Pixels;
 	sprite: ChompChampSprite;
 	state: string;
 	va: number;
-	width: number;
+	width: Pixels;
 
 	constructor(
 		game: Game,
@@ -188,7 +196,7 @@ export default class ChompChamp implements Enemy {
 		}
 	}
 
-	update(time: number) {
+	update(time: Milliseconds) {
 		switch (this.state) {
 			case aIdle: {
 				const a = this.getAttackHitbox();

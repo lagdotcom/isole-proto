@@ -2,7 +2,13 @@ import { cIgnore } from '../colours';
 import Component from '../Component';
 import Controller from '../Controller';
 import PointAR from '../CoordAR';
-import { ObjectName } from '../flavours';
+import {
+	Degrees,
+	DisplayLayer,
+	ObjectName,
+	Pixels,
+	Radians,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zBackground } from '../layers';
@@ -11,8 +17,8 @@ import { anglewrap, cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
 
 export type DecalPosition = 'normal' | 'static';
 
-interface DecalInit extends PointAR {
-	layer?: number;
+interface DecalInit extends PointAR<Degrees> {
+	layer?: DisplayLayer;
 	motion?: number;
 	object: ObjectName;
 	parallax?: number;
@@ -20,19 +26,19 @@ interface DecalInit extends PointAR {
 }
 
 export default class Decal implements Component {
-	a: number;
+	a: Radians;
 	game: Game;
-	height: number;
+	height: Pixels;
 	isDecal: true;
 	layer: number;
 	motion: number;
 	parallax: number;
 	position: DecalPosition;
-	r: number;
+	r: Pixels;
 	sprite: Controller;
-	x: number;
-	width: number;
-	y: number;
+	x: Pixels;
+	width: Pixels;
+	y: Pixels;
 
 	constructor(
 		game: Game,
@@ -59,7 +65,7 @@ export default class Decal implements Component {
 		this.sprite = sprite;
 		this.width = sprite.w;
 		this.height = sprite.h;
-		this.x = a;
+		this.x = a as Pixels;
 		this.y = r;
 
 		if (this.position === 'static') {

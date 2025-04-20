@@ -1,7 +1,12 @@
-export default interface CoordAR {
+import { Pixels, Radians } from './flavours';
+
+export default interface CoordAR<
+	A extends number = Radians,
+	R extends number = Pixels,
+> {
 	/** Angle */
-	a: number;
+	a: A;
 
 	/** Radius */
-	r: number;
+	r: R;
 }

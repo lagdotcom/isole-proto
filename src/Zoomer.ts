@@ -1,11 +1,12 @@
 import DrawnComponent from './DrawnComponent';
+import { DisplayLayer } from './flavours';
 import Game from './Game';
 import { zFirst } from './layers';
 import { cart } from './tools';
 
 export default class Zoomer implements DrawnComponent {
 	game: Game;
-	layer: number;
+	layer: DisplayLayer;
 	max: number;
 	min: number;
 	px: number;

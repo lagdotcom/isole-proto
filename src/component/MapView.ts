@@ -1,6 +1,7 @@
 import Controller from '../Controller';
 import DrawnComponent from '../DrawnComponent';
 import { eLevelEnter } from '../events';
+import { DisplayLayer, Pixels } from '../flavours';
 import Game from '../Game';
 import { InputButton } from '../InputMapper';
 import { zUI } from '../layers';
@@ -15,10 +16,10 @@ export default class MapView implements DrawnComponent {
 	debounced: InputButton;
 	game: Game;
 	icon: Controller;
-	layer: number;
+	layer: DisplayLayer;
 	selected: number;
-	x: number;
-	y: number;
+	x: Pixels;
+	y: Pixels;
 
 	constructor(game: Game) {
 		this.game = game;
@@ -42,7 +43,7 @@ export default class MapView implements DrawnComponent {
 		});
 	}
 
-	update(t: number) {
+	update() {
 		const { game, selected } = this;
 
 		const key = this.debounce(
@@ -97,9 +98,7 @@ export default class MapView implements DrawnComponent {
 		let pressed = InputButton.None;
 		let found = false;
 
-		for (let i = 0; i < buttons.length; i++) {
-			const b = buttons[i];
-
+		for (const b of buttons) {
 			if (this.game.keys.has(b)) {
 				found = true;
 				if (this.debounced !== b) {
@@ -115,10 +114,10 @@ export default class MapView implements DrawnComponent {
 		return pressed;
 	}
 
-	cycle(n: number) {
+	cycle(delta: number) {
 		const options = this.game.nodes[this.current].connections;
 		const index = options.indexOf(this.selected);
-		let newi = index + n;
+		let newi = index + delta;
 
 		if (newi < 0) newi += options.length;
 		if (newi >= options.length) newi -= options.length;

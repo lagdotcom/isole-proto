@@ -1,6 +1,6 @@
 import Damageable from '../Damageable';
 import Enemy from '../Enemy';
-import { Pixels, Radians } from '../flavours';
+import { DisplayLayer, Milliseconds, Pixels, Radians } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import mel from '../makeElement';
@@ -16,11 +16,11 @@ export default abstract class AbstractEnemy implements Enemy {
 	health: number;
 	height: Pixels;
 	isEnemy: true;
-	layer: number;
+	layer: DisplayLayer;
 	name: string;
 	r: Pixels;
 	stunmultiplier: number;
-	stuntimer: number;
+	stuntimer: Milliseconds;
 	va: number;
 	vr: number;
 	width: Pixels;
@@ -54,7 +54,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		this.stuntimer = amount * this.stunmultiplier;
 	}
 
-	dostun(t: number) {
+	dostun(t: Milliseconds) {
 		if (this.stuntimer) {
 			this.stuntimer -= t;
 			if (this.stuntimer < 0) {

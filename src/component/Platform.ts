@@ -1,5 +1,12 @@
 import DrawnComponent from '../DrawnComponent';
-import { Degrees, MaterialName, Radians } from '../flavours';
+import {
+	Degrees,
+	DisplayLayer,
+	MaterialName,
+	Milliseconds,
+	Pixels,
+	Radians,
+} from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
@@ -9,10 +16,10 @@ import Flat from './Flat';
 import Wall from './Wall';
 
 export interface PlatformInit {
-	h: number;
-	th: number;
+	h: Pixels;
+	th: Pixels;
 	a: Degrees;
-	w: number;
+	w: Degrees;
 	motion?: number;
 	material: MaterialName;
 	walls?: boolean;
@@ -22,20 +29,20 @@ export interface PlatformInit {
 /** Full platform */
 export default class Platform implements DrawnComponent {
 	a: Radians;
-	bottom: number;
+	bottom: Pixels;
 	ceiling?: Flat;
 	circle: boolean;
 	floor: Flat;
 	game: Game;
-	layer: number;
-	left: number;
+	layer: DisplayLayer;
+	left: Radians;
 	motion: number;
-	r: number;
-	right: number;
+	r: Pixels;
+	right: Radians;
 	scale: number;
 	sprite: Texture;
-	thickness: number;
-	width: number;
+	thickness: Pixels;
+	width: Radians;
 	wleft?: Wall;
 	wright?: Wall;
 
@@ -109,9 +116,9 @@ export default class Platform implements DrawnComponent {
 
 	/**
 	 * Update position
-	 * @param {number} time time
+	 * @param {Milliseconds} time time
 	 */
-	update(time: number): void {
+	update(time: Milliseconds): void {
 		if (this.motion) {
 			this.a = anglewrap(this.a + time * this.motion);
 			this.left = this.a - this.width;
@@ -177,8 +184,8 @@ export default class Platform implements DrawnComponent {
 	 */
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		this.floor.drawHitbox(c);
-		if (this.ceiling) this.ceiling.drawHitbox(c);
-		if (this.wleft) this.wleft.drawHitbox(c);
-		if (this.wright) this.wright.drawHitbox(c);
+		this.ceiling?.drawHitbox(c);
+		this.wleft?.drawHitbox(c);
+		this.wright?.drawHitbox(c);
 	}
 }

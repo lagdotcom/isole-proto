@@ -1,7 +1,9 @@
-export default interface CoordXY {
+import { Pixels } from './flavours';
+
+export default interface CoordXY<T extends number = Pixels> {
 	/** X Coordinate */
-	x: number;
+	x: T;
 
 	/** Y Coordinate */
-	y: number;
+	y: T;
 }

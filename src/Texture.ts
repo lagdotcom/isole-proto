@@ -1,8 +1,8 @@
-import { TileName } from './flavours';
+import { Pixels, SpriteColumn, SpriteRow, TileName } from './flavours';
 
 export default interface Texture {
-	h: number;
-	w: number;
+	h: Pixels;
+	w: Pixels;
 
 	draw(context: CanvasRenderingContext2D): void;
 	reset(): void;
@@ -12,7 +12,7 @@ export default interface Texture {
 export type TileDataMap = Record<TileName, TileData>;
 
 export interface TileData {
-	c: number;
+	c: SpriteColumn;
 	cycle?: number;
-	r: number;
+	r: SpriteRow;
 }

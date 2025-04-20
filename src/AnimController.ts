@@ -1,7 +1,15 @@
 import Controller, { ControllerInit } from './Controller';
 import PointXY from './CoordXY';
 import { eAnimationEnded } from './events';
-import { AnimEvent, AnimName } from './flavours';
+import {
+	AnimEvent,
+	AnimName,
+	AnimPriority,
+	FrameIndex,
+	Milliseconds,
+	SpriteColumn,
+	SpriteRow,
+} from './flavours';
 import HitboxXYWH from './HitboxXYWH';
 
 export interface AnimInit extends ControllerInit {
@@ -13,36 +21,36 @@ export interface AnimSpec {
 	flags?: Record<string, boolean>;
 	frames: FrameSpec[];
 	loop?: boolean;
-	loopTo?: number;
-	priority?: number;
+	loopTo?: FrameIndex;
+	priority?: AnimPriority;
 }
 
 export interface Anim {
 	extend: boolean;
 	flags: Record<string, boolean>;
 	frames: Frame[];
-	last: number;
+	last: FrameIndex;
 	loop: boolean;
-	loopTo: number;
-	priority: number;
+	loopTo: FrameIndex;
+	priority: AnimPriority;
 }
 
 export interface FrameSpec {
-	c: number;
+	c: SpriteColumn;
 	event?: AnimEvent;
 	hitbox?: HitboxXYWH;
 	hotspot?: PointXY;
-	r: number;
-	t: number;
+	r: SpriteRow;
+	t: Milliseconds;
 }
 
 export interface Frame {
-	c: number;
+	c: SpriteColumn;
 	event?: AnimEvent;
 	hitbox?: HitboxXYWH;
 	hotspot: PointXY;
-	r: number;
-	t: number;
+	r: SpriteRow;
+	t: Milliseconds;
 }
 
 export type AnimMap = Record<AnimName, Anim>;
@@ -61,7 +69,7 @@ export default class AnimController extends Controller {
 	acf: Frame = { c: 0, hotspot: { x: 0, y: 0 }, r: 0, t: 0 };
 
 	/** Current frame index */
-	afi = 0;
+	afi: FrameIndex = 0;
 
 	/** Current event */
 	ae?: AnimEvent;
@@ -76,7 +84,7 @@ export default class AnimController extends Controller {
 	ar?: AnimName;
 
 	/** Animation timer */
-	at: number;
+	at: Milliseconds;
 
 	/** Animation flags */
 	flags: Record<string, boolean>;
@@ -143,9 +151,9 @@ export default class AnimController extends Controller {
 
 	/**
 	 * Continue the current animation
-	 * @param {number} t time
+	 * @param {Milliseconds} t time
 	 */
-	next(t: number): void {
+	next(t: Milliseconds): void {
 		const { a, ac, acf, ae, afi, ar } = this;
 		if (!ac) return;
 
@@ -174,9 +182,9 @@ export default class AnimController extends Controller {
 
 	/**
 	 * Change current frame
-	 * @param {number} n frame index
+	 * @param {FrameIndex} n frame index
 	 */
-	frame(n: number): void {
+	frame(n: FrameIndex): void {
 		if (!this.ac) return;
 
 		this.afi = n;

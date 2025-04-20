@@ -1,9 +1,9 @@
 import { cAI, cAIDark, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
-import { Pixels, Radians, ResourceName } from '../flavours';
+import { Milliseconds, Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
-import { Hitsize } from '../Hitbox';
+import Hitbox, { Hitsize } from '../Hitbox';
 import { zEnemy } from '../layers';
 import {
 	gGravityStrength,
@@ -35,8 +35,8 @@ const gJumpFatigue = 150,
 	gJumpSide = 0.4,
 	gJumpStartup = 15,
 	gJumpStrength = 4,
-	gAttackWidth = 250,
-	gNearWidth = 500;
+	gAttackWidth: Pixels = 250,
+	gNearWidth: Pixels = 500;
 
 const sIdle = 'idle',
 	sPreJump = 'prejump',
@@ -46,11 +46,11 @@ type BusterState = 'idle' | 'prejump' | 'jumping' | 'waiting';
 
 interface BusterController {
 	draw(c: CanvasRenderingContext2D): void;
-	fall(t: number): void;
-	idle(t: number): void;
-	jump(t: number): void;
-	near(t: number): void;
-	rise(t: number): void;
+	fall(t: Milliseconds): void;
+	idle(t: Milliseconds): void;
+	jump(t: Milliseconds): void;
+	near(t: Milliseconds): void;
+	rise(t: Milliseconds): void;
 }
 
 interface BusterInit {
@@ -113,7 +113,7 @@ export default class Buster extends AbstractEnemy {
 		});
 	}
 
-	update(time: number): void {
+	update(time: Milliseconds): void {
 		if (!(time = this.dostun(time))) return;
 
 		let { a, r, va, vr, vfa, game, sprite, state } = this;
@@ -257,7 +257,7 @@ export default class Buster extends AbstractEnemy {
 		}
 	}
 
-	canAttack(player: Player, playerDist: number) {
+	canAttack(player: Player, playerDist: Pixels) {
 		return player.alive && playerDist - player.w <= gAttackWidth;
 	}
 
@@ -268,7 +268,7 @@ export default class Buster extends AbstractEnemy {
 	draw(c: CanvasRenderingContext2D): void {
 		const { a, r, game, sprite } = this;
 		const { cx, cy } = game;
-		const normal = a + πHalf;
+		const normal: Radians = a + πHalf;
 
 		const { x, y } = cart(a, r);
 
@@ -298,9 +298,9 @@ export default class Buster extends AbstractEnemy {
 			taw = scalew(width, r + height),
 			aaw = scalew(gAttackWidth, r),
 			naw = scalew(gNearWidth, r);
-		let amod: number,
-			vbr = 0,
-			vtr = 0;
+		let amod: Radians,
+			vbr: Pixels = 0,
+			vtr: Pixels = 0;
 
 		if (tscale) amod = a + (va / r) * tscale * gWalkScale;
 		else amod = a;

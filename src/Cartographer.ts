@@ -1,5 +1,6 @@
 import Delaunay from 'delaunay-fast';
 
+import { Pixels } from './flavours';
 import MapNode, { NodeType } from './MapNode';
 import IfInDoubtFight from './mutator/IfInDoubtFight';
 import LockedTreasure from './mutator/LockedTreasure';
@@ -7,11 +8,11 @@ import NeedAShop from './mutator/NeedAShop';
 import { rndr } from './tools';
 
 const stageCount = [10, 12, 14];
-const stageGap = [120, 100, 85];
-const offsets = [[0], [-60, 60], [-100, 0, 100]];
+const stageGap: Pixels[] = [120, 100, 85];
+const offsets: Pixels[][] = [[0], [-60, 60], [-100, 0, 100]];
 
-const maxwiggle = 20;
-const wiggle = () => rndr(-maxwiggle, maxwiggle);
+const maxwiggle: Pixels = 20;
+const wiggle = (): Pixels => rndr(-maxwiggle, maxwiggle);
 
 export interface GameState {
 	floor: number;

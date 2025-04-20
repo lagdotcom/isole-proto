@@ -1,4 +1,5 @@
 import DrawnComponent from '../DrawnComponent';
+import { DisplayLayer, Pixels } from '../flavours';
 import Game from '../Game';
 import Item from '../Item';
 import { ItemConstructor } from '../item/ItemObject';
@@ -24,11 +25,11 @@ type Offer = ItemOffer | WeaponOffer;
 export default class ShopView implements DrawnComponent {
 	bg: HTMLImageElement;
 	game: Game;
-	layer: number;
+	layer: DisplayLayer;
 	offers: Offer[];
-	xmid: number;
-	xoff: number;
-	yoff: number;
+	xmid: Pixels;
+	xoff: Pixels;
+	yoff: Pixels;
 
 	constructor(game: Game) {
 		this.bg = game.resources['shop.bg'];

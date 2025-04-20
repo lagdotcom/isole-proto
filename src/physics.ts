@@ -1,5 +1,6 @@
 import Flat from './component/Flat';
 import Wall from './component/Wall';
+import { Milliseconds, Pixels, Radians } from './flavours';
 import Game from './Game';
 import Hitbox from './Hitbox';
 import {
@@ -12,20 +13,20 @@ import {
 import { angledist, anglewrap, first, π } from './tools';
 
 interface PhysicsObject {
-	a: number;
+	a: Radians;
 	game: Game;
 	getHitbox(): Hitbox;
 	ignoreCeilings?: boolean;
 	ignoreFloors?: boolean;
 	ignoreGravity?: boolean;
 	ignoreWalls?: boolean;
-	r: number;
+	r: Pixels;
 	va: number;
 	vfa: number;
 	vr: number;
 }
 
-export default function physics(obj: PhysicsObject, time: number) {
+export default function physics(obj: PhysicsObject, time: Milliseconds) {
 	let {
 		a,
 		game,

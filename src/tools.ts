@@ -2,20 +2,20 @@ import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
 import Damageable from './Damageable';
 import { eEnemyDied } from './events';
-import { Degrees, Radians } from './flavours';
+import { Degrees, Pixels, Radians } from './flavours';
 import Hitbox, { Hitsize } from './Hitbox';
 import { gHitboxScale } from './nums';
 
-export const π = Math.PI,
-	π2 = π * 2,
-	πHalf = π / 2;
+export const π: Radians = Math.PI,
+	π2: Radians = π * 2,
+	πHalf: Radians = π / 2;
 
 /**
  * Wrap an angle over 2π
- * @param {number} a angle
- * @returns {number} wrapped angle
+ * @param {Radians} a angle
+ * @returns {Radians} wrapped angle
  */
-export function anglewrap(a: number): number {
+export function anglewrap(a: Radians): Radians {
 	a = a % π2;
 	if (a < 0) a += π2;
 	return a;
@@ -23,20 +23,20 @@ export function anglewrap(a: number): number {
 
 /**
  * Determine whether an angle is to the right of another angle.
- * @param {number} a first angle
- * @param {number} b second angle
+ * @param {Radians} a first angle
+ * @param {Radians} b second angle
  */
-export function isRightOf(a: number, b: number): boolean {
+export function isRightOf(a: Radians, b: Radians): boolean {
 	return anglewrap(a - b) > π;
 }
 
 /**
  * Find the distance between two angles
- * @param {number} a first angle
- * @param {number} b second angle
- * @returns {number} angle distance
+ * @param {Radians} a first angle
+ * @param {Radians} b second angle
+ * @returns {Radians} angle distance
  */
-export function angledist(a: number, b: number): number {
+export function angledist(a: Radians, b: Radians): Radians {
 	let d = a - b;
 	if (d > π) d -= π2;
 	else if (d < -π) d += π2;
@@ -60,41 +60,41 @@ export function jbr(...args: string[]): string {
 
 /**
  * Convert polar to cartesian
- * @param {number} a angle
- * @param {number} r radius
+ * @param {Radians} a angle
+ * @param {Pixels} r radius
  * @return {CoordXY}
  */
-export function cart(a: number, r: number): CoordXY {
+export function cart<T extends number>(a: Radians, r: T): CoordXY<T> {
 	return {
-		x: Math.cos(a) * r,
-		y: Math.sin(a) * r,
+		x: (Math.cos(a) * r) as T,
+		y: (Math.sin(a) * r) as T,
 	};
 }
 
 /**
  * Scale a width according to its radius
- * @param {number} w width
- * @param {number} r radius
- * @returns {number} scaled width
+ * @param {Pixels} w width
+ * @param {Pixels} r radius
+ * @returns {Radians} scaled width
  */
-export function scalew(w: number, r: number): number {
+export function scalew(w: Pixels, r: Pixels): Radians {
 	return (w / r) * gHitboxScale;
 }
 
 /**
  * Unscale a width according to its radius
- * @param {number} ws scaled width
- * @param {number} r radius
- * @returns {number} width
+ * @param {Pixels} ws scaled width
+ * @param {Pixels} r radius
+ * @returns {Pixels} width
  */
-export function unscalew(ws: number, r: number): number {
+export function unscalew(ws: Radians, r: Pixels): Pixels {
 	return (ws / gHitboxScale) * r;
 }
 
 /**
  * Convert degrees to radians
- * @param {number} a angle in degrees
- * @return {number} angle in radians
+ * @param {Degrees} a angle in degrees
+ * @return {Radians} angle in radians
  */
 export function deg2rad(a: Degrees): Radians {
 	return (π2 * a) / 360;
@@ -221,8 +221,8 @@ export function displace(
 	flip = false
 ): CoordAR {
 	const { a, r } = origin;
-	let x = 0,
-		y = 0;
+	let x: Pixels = 0,
+		y: Pixels = 0;
 
 	offsets.forEach(h => {
 		x += h.x;
@@ -345,16 +345,16 @@ export function choose<T>(a: T[]): T {
  * Draw a ...wedge?
  * @param {CanvasRenderingContext2D} c canvas context
  * @param {string | CanvasGradient | CanvasPattern} style line style
- * @param {number} x center x
- * @param {number} y center y
+ * @param {Pixels} x center x
+ * @param {Pixels} y center y
  * @param {Hitsize} b bottom hitsize
  * @param {Hitsize} t top hitsize
  */
 export function drawWedge(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
-	x: number,
-	y: number,
+	x: Pixels,
+	y: Pixels,
 	b: Hitsize,
 	t: Hitsize
 ) {
@@ -370,16 +370,16 @@ export function drawWedge(
  * Fill a ...wedge?
  * @param {CanvasRenderingContext2D} c canvas context
  * @param {string | CanvasGradient | CanvasPattern} style fill style
- * @param {number} x center x
- * @param {number} y center y
+ * @param {Pixels} x center x
+ * @param {Pixels} y center y
  * @param {Hitsize} b bottom hitsize
  * @param {Hitsize} t top hitsize
  */
 export function fillWedge(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
-	x: number,
-	y: number,
+	x: Pixels,
+	y: Pixels,
 	b: Hitsize,
 	t: Hitsize
 ) {
@@ -394,20 +394,20 @@ export function fillWedge(
  * Draw an arc
  * @param {CanvasRenderingContext2D} c canvas context
  * @param {string | CanvasGradient | CanvasPattern} style line style
- * @param {number} x center x
- * @param {number} y center y
- * @param {number} r radius
- * @param {number} a angle
- * @param {number} width width
+ * @param {Pixels} x center x
+ * @param {Pixels} y center y
+ * @param {Pixels} r radius
+ * @param {Radians} a angle
+ * @param {Radians} width width
  */
 export function drawArc(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
-	x: number,
-	y: number,
-	r: number,
-	a: number,
-	width: number
+	x: Pixels,
+	y: Pixels,
+	r: Pixels,
+	a: Radians,
+	width: Radians
 ) {
 	c.strokeStyle = style;
 	c.beginPath();
@@ -419,16 +419,16 @@ export function drawArc(
  * Draw a cross
  * @param {CanvasRenderingContext2D} c canvas context
  * @param {string | CanvasGradient | CanvasPattern} style line style
- * @param {number} x center x
- * @param {number} y center y
- * @param {number} size cross size
+ * @param {Pixels} x center x
+ * @param {Pixels} y center y
+ * @param {Pixels} size cross size
  */
 export function drawCross(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
-	x: number,
-	y: number,
-	size = 4
+	x: Pixels,
+	y: Pixels,
+	size: Pixels = 4
 ) {
 	c.strokeStyle = style;
 	c.beginPath();

@@ -1,13 +1,22 @@
-type Hitbox<T extends string = 'top' | 'bot'> = Record<T, Hitsize>;
+import { Pixels, Radians } from './flavours';
+
+type Hitbox<
+	Angle extends number = Radians,
+	Distance extends number = Pixels,
+	Fields extends string = 'top' | 'bot',
+> = Record<Fields, Hitsize<Angle, Distance>>;
 export default Hitbox;
 
-export interface Hitsize {
+export interface Hitsize<
+	Angle extends number = Radians,
+	Distance extends number = Pixels,
+> {
 	// Radius
-	r: number;
+	r: Distance;
 
 	// Angle (middle)
-	a: number;
+	a: Angle;
 
 	// Width (either side of middle)
-	width: number;
+	width: Angle;
 }

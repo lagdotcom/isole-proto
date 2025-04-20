@@ -1,6 +1,13 @@
 import { cWall } from '../colours';
 import DrawnComponent from '../DrawnComponent';
-import { TextureName } from '../flavours';
+import {
+	Degrees,
+	DisplayLayer,
+	Milliseconds,
+	Pixels,
+	Radians,
+	TextureName,
+} from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale, gWallGap } from '../nums';
@@ -9,41 +16,41 @@ import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
 import Flat from './Flat';
 
 export default class Wall implements DrawnComponent {
-	a: number;
-	b: number;
-	bottom: number;
+	a: Radians;
+	b: Pixels;
+	bottom: Pixels;
 	ceiling?: Flat;
 	direction: 1 | -1;
-	ex: number;
-	ey: number;
+	ex: Pixels;
+	ey: Pixels;
 	floor?: Flat;
 	game: Game;
 	isWall: true;
-	layer: number;
+	layer: DisplayLayer;
 	motion: number;
 	scale: number;
 	sprite: Texture;
-	sx: number;
-	sy: number;
-	r: number; // used for anglecollides()
-	t: number;
-	top: number;
-	width: number; // used for anglecollides()
+	sx: Pixels;
+	sy: Pixels;
+	r: Pixels; // used for anglecollides()
+	t: Pixels;
+	top: Pixels;
+	width: Radians; // used for anglecollides()
 
 	draw: (c: CanvasRenderingContext2D) => void;
 
 	constructor(
 		game: Game,
-		t: number,
-		b: number,
-		angle: number,
+		t: Pixels,
+		b: Pixels,
+		angle: Degrees,
 		direction: 1 | -1,
 		motion = 0,
 		texture?: TextureName
 	) {
 		const a = anglewrap(deg2rad(angle)),
-			top = t - gWallGap,
-			bottom = b + gWallGap;
+			top: Pixels = t - gWallGap,
+			bottom: Pixels = b + gWallGap;
 
 		Object.assign(this, {
 			isWall: true,
@@ -83,7 +90,7 @@ export default class Wall implements DrawnComponent {
 		this.ey = end.y;
 	}
 
-	update(time: number): void {
+	update(time: Milliseconds): void {
 		if (this.motion) {
 			this.a = anglewrap(this.a + time * this.motion);
 			this.updateXY();

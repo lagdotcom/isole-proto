@@ -1,28 +1,30 @@
+import { Milliseconds, Pixels, SpriteColumn, SpriteRow } from './flavours';
+
 export interface ControllerInit {
-	c?: number;
+	c?: SpriteColumn;
 	flip?: boolean;
-	h: number;
+	h: Pixels;
 	img: CanvasImageSource;
 	leftflip?: boolean;
-	r?: number;
-	w: number;
-	xo?: number;
-	yo?: number;
+	r?: SpriteRow;
+	w: Pixels;
+	xo?: Pixels;
+	yo?: Pixels;
 }
 
 /** Image Controller */
 export default class Controller {
-	c: number;
+	c: SpriteColumn;
 	flip: boolean;
-	h: number;
+	h: Pixels;
 	img: CanvasImageSource;
 	leftflip: boolean;
-	r: number;
+	r: SpriteRow;
 	state: string;
-	timer: number;
-	w: number;
-	xo: number;
-	yo: number;
+	timer: Milliseconds;
+	w: Pixels;
+	xo: Pixels;
+	yo: Pixels;
 
 	/**
 	 * Make a new Controller
@@ -61,11 +63,11 @@ export default class Controller {
 	/**
 	 * Play or continue an animation
 	 * @param {string} state name
-	 * @param {number} column sprite column
-	 * @param {number} row sprite row
+	 * @param {SpriteColumn} column sprite column
+	 * @param {SpriteRow} row sprite row
 	 * @returns {boolean} true if already playing that animation
 	 */
-	show(state: string, column: number, row: number): boolean {
+	show(state: string, column: SpriteColumn, row: SpriteRow): boolean {
 		if (this.state !== state) {
 			this.state = state;
 			this.c = column;
@@ -80,13 +82,17 @@ export default class Controller {
 	/**
 	 * Draw the image
 	 * @param {CanvasRenderingContext2D} ctx image context
-	 * @param {number} xadd x offset
-	 * @param {number} yadd y offset
+	 * @param {Pixels} xadd x offset
+	 * @param {Pixels} yadd y offset
 	 */
-	draw(ctx: CanvasRenderingContext2D, xadd = 0, yadd = 0): void {
+	draw(
+		ctx: CanvasRenderingContext2D,
+		xadd: Pixels = 0,
+		yadd: Pixels = 0
+	): void {
 		const { w, c, h, r, flip, img, xo, yo } = this,
-			sx = w * c,
-			sy = h * r;
+			sx: Pixels = w * c,
+			sy: Pixels = h * r;
 
 		if (flip) ctx.scale(-1, 1);
 		ctx.drawImage(img, sx, sy, w, h, xo + xadd, yo + yadd, w, h);
