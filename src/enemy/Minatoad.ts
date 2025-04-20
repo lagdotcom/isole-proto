@@ -910,18 +910,26 @@ export default class Minatoad extends AbstractEnemy {
 	vfa: number;
 	waittimer: number;
 
-	constructor(game: Game, options: MinatoadOptions = {}) {
+	constructor(
+		game: Game,
+		{
+			dir = 'L',
+			a = 0,
+			r = 250,
+			img = 'enemy.minatoad',
+		}: MinatoadOptions = {}
+	) {
 		super({
 			game,
 			bullets: 0,
 			width: 80,
 			height: 80,
 			name: 'Minatoad',
-			dir: options.dir || 'L',
+			dir,
 			last: 'idle',
 			state: 'idle',
-			a: options.a || 0,
-			r: options.r || 250,
+			a,
+			r,
 			va: 0,
 			vfa: 0,
 			vr: 0,
@@ -941,7 +949,7 @@ export default class Minatoad extends AbstractEnemy {
 				[eRefire]: this.onRefire.bind(this),
 				[eSpray]: this.onSpray.bind(this),
 			},
-			game.resources[options.img || 'enemy.minatoad']
+			game.resources[img]
 		);
 
 		this.reticle = new Reticle(this.game);

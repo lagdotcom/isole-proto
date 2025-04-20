@@ -11,7 +11,7 @@ const decal =
 			h,
 			xo: -w / 2,
 			yo: -h,
-			...(options || {}),
+			...(options ?? {}),
 		});
 
 export default {

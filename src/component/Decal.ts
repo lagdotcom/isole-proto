@@ -34,22 +34,33 @@ export default class Decal implements Component {
 	width: number;
 	y: number;
 
-	constructor(game: Game, options: DecalInit) {
-		const sprite = game.objects[options.object];
+	constructor(
+		game: Game,
+		{
+			object,
+			layer = zBackground,
+			a = 0,
+			r = 0,
+			motion = 0,
+			parallax = 0,
+			position = normalPosition,
+		}: DecalInit
+	) {
+		const sprite = game.objects[object];
 
 		this.isDecal = true;
-		this.layer = options.layer || zBackground;
+		this.layer = layer;
 		this.game = game;
-		this.r = options.r || 0;
-		this.a = anglewrap(deg2rad(options.a || 0));
-		this.motion = deg2rad((options.motion || 0) / 100);
-		this.parallax = (options.parallax || 0) / 10;
-		this.position = options.position || normalPosition;
+		this.r = r;
+		this.a = anglewrap(deg2rad(a));
+		this.motion = deg2rad(motion / 100);
+		this.parallax = parallax / 10;
+		this.position = position;
 		this.sprite = sprite;
 		this.width = sprite.w;
 		this.height = sprite.h;
-		this.x = options.a || 0;
-		this.y = options.r || 0;
+		this.x = a;
+		this.y = r;
 
 		if (this.position === staticPosition) {
 			this.update = undefined;

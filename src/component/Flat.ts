@@ -37,11 +37,19 @@ export default class Flat implements DrawnComponent {
 	 */
 	constructor(
 		game: Game,
-		height: number,
-		angle: number,
-		width: number,
-		motion?: number,
-		texture?: string
+		{
+			height,
+			angle,
+			width,
+			motion = 0,
+			texture,
+		}: {
+			height: number;
+			angle: number;
+			width: number;
+			motion?: number;
+			texture?: string;
+		}
 	) {
 		this.circle = width >= 360;
 
@@ -53,7 +61,7 @@ export default class Flat implements DrawnComponent {
 			r: height,
 			a: deg2rad(angle),
 			width: deg2rad(width) / 2,
-			motion: deg2rad((motion || 0) / 100),
+			motion: deg2rad(motion / 100),
 		});
 
 		this.left = this.a - this.width;
@@ -64,6 +72,7 @@ export default class Flat implements DrawnComponent {
 			this.scale = this.sprite.w / gHitboxScale;
 			game.materials[texture].spawner(this);
 		} else {
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			this.draw = () => {};
 			this.scale = 0;
 		}

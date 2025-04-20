@@ -106,7 +106,10 @@ export default class Bat extends AbstractEnemy {
 	 * @param {Game} game game instance
 	 * @param {BatInit} options options
 	 */
-	constructor(game: Game, options: BatInit = {}) {
+	constructor(
+		game: Game,
+		{ a = 0, r = 250, img = 'enemy.bat' }: BatInit = {}
+	) {
 		super({
 			channel: new Channel(game, 'Bat'),
 			isEnemy: true,
@@ -115,9 +118,9 @@ export default class Bat extends AbstractEnemy {
 			name: 'Bat',
 			width: 50,
 			height: 50,
-			a: options.a || 0,
-			r: options.r || 250,
-			rtop: options.r || 250,
+			a,
+			r,
+			rtop: r,
 			dir: dLeft,
 			va: 0,
 			vr: 0,
@@ -126,7 +129,7 @@ export default class Bat extends AbstractEnemy {
 			substate: ssNormal,
 			substateTimer: gSubstateChange,
 			verticalTimer: gVerticalChange,
-			sprite: new controller(game.resources[options.img || 'enemy.bat']),
+			sprite: new controller(game.resources[img]),
 			alive: true,
 			health: 2,
 			damage: 1,

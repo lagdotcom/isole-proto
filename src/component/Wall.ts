@@ -20,8 +20,8 @@ export default class Wall implements DrawnComponent {
 	isWall: true;
 	layer: number;
 	motion: number;
-	scale?: number;
-	sprite?: Texture;
+	scale: number;
+	sprite: Texture;
 	sx: number;
 	sy: number;
 	r: number; // used for anglecollides()
@@ -54,7 +54,7 @@ export default class Wall implements DrawnComponent {
 			b,
 			a,
 			direction,
-			motion: deg2rad(motion / 100 || 0),
+			motion: deg2rad(motion / 100),
 			r: b,
 			width: 0,
 		});
@@ -92,67 +92,67 @@ export default class Wall implements DrawnComponent {
 	drawLeft(c: CanvasRenderingContext2D): void {
 		const { a, t, b, game, scale, sprite } = this;
 		const { cx, cy } = game;
-		const step = sprite!.h;
+		const step = sprite.h;
 
 		let remaining = t - b,
 			r = t;
 
-		sprite!.tile('tr');
+		sprite.tile('tr');
 		while (remaining > 0) {
 			if (remaining < step) {
-				sprite!.tile('br');
+				sprite.tile('br');
 				r = b + step;
 			}
 
-			const offset = scalew(scale! / 2, r),
-				amod = a - scalew(scale!, r),
+			const offset = scalew(scale / 2, r),
+				amod = a - scalew(scale, r),
 				normal = amod + offset + πHalf,
 				{ x, y } = cart(amod, r);
 
 			c.translate(x + cx, y + cy);
 			c.rotate(normal);
 
-			sprite!.draw(c);
+			sprite.draw(c);
 
 			c.rotate(-normal);
 			c.translate(-x - cx, -y - cy);
 
 			remaining -= step;
 			r -= step;
-			sprite!.tile('mr');
+			sprite.tile('mr');
 		}
 	}
 
 	drawRight(c: CanvasRenderingContext2D): void {
 		const { a, t, b, game, scale, sprite } = this;
 		const { cx, cy } = game;
-		const step = sprite!.h;
+		const step = sprite.h;
 
 		let remaining = t - b,
 			r = t;
 
-		sprite!.tile('tl');
+		sprite.tile('tl');
 		while (remaining > 0) {
 			if (remaining < step) {
-				sprite!.tile('bl');
+				sprite.tile('bl');
 				r = b + step;
 			}
 
-			const offset = scalew(scale! / 2, r),
+			const offset = scalew(scale / 2, r),
 				normal = a + offset + πHalf,
 				{ x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);
 			c.rotate(normal);
 
-			sprite!.draw(c);
+			sprite.draw(c);
 
 			c.rotate(-normal);
 			c.translate(-x - cx, -y - cy);
 
 			remaining -= step;
 			r -= step;
-			sprite!.tile('ml');
+			sprite.tile('ml');
 		}
 	}
 

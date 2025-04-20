@@ -45,28 +45,34 @@ export default class Krillna extends AbstractEnemy {
 	tscale: number;
 	vfa: number;
 
-	constructor(game: Game, options: KrillnaInit = {}) {
+	constructor(
+		game: Game,
+		{
+			speed = gKrillnaSpeed,
+			a = πHalf,
+			r = 200,
+			img = 'enemy.krillna',
+		}: KrillnaInit = {}
+	) {
 		super({
 			isEnemy: true,
 			layer: zEnemy,
 			game,
 			name: 'Krillna',
 			dir: dRight,
-			speed: options.speed || gKrillnaSpeed,
+			speed,
 			last: {},
 			width: 40,
 			height: 28,
-			a: options.a || πHalf,
-			r: options.r || 200,
+			a,
+			r,
 			va: 0,
 			vr: 0,
 			vfa: 0,
 			vfr: 0,
 			tscale: 0,
 			movefn: (fr: number, n: number) => gFrameMotion[fr] * n,
-			sprite: new controller(
-				game.resources[options.img || 'enemy.krillna']
-			),
+			sprite: new controller(game.resources[img]),
 			alive: true,
 			health: 5,
 			damage: 1,
@@ -193,9 +199,9 @@ export default class Krillna extends AbstractEnemy {
 			if (
 				angledist(a, last.floor.right) < angledist(a, last.floor.left)
 			) {
-				wall = last.floor.wright || null;
+				wall = last.floor.wright ?? null;
 			} else {
-				wall = last.floor.wleft || null;
+				wall = last.floor.wleft ?? null;
 			}
 
 			if (wall) {
@@ -211,9 +217,9 @@ export default class Krillna extends AbstractEnemy {
 				angledist(a, last.ceiling.right) <
 				angledist(a, last.ceiling.left)
 			) {
-				wall = last.ceiling.wright || null;
+				wall = last.ceiling.wright ?? null;
 			} else {
-				wall = last.ceiling.wleft || null;
+				wall = last.ceiling.wleft ?? null;
 			}
 
 			if (wall) {

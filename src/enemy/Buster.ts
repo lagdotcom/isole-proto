@@ -74,30 +74,41 @@ export default class Buster extends AbstractEnemy {
 	tscale: number;
 	vfa: number;
 
-	constructor(game: Game, options: BusterInit = {}) {
+	constructor(
+		game: Game,
+		{
+			width = 52,
+			height = 30,
+			a = 0,
+			r = 250,
+			jumpfatigue = gJumpFatigue,
+			sprite,
+			img = 'enemy.buster',
+			health = 3,
+			damage = 1,
+		}: BusterInit = {}
+	) {
 		super({
 			isEnemy: true,
 			layer: zEnemy,
 			game,
 			name: 'Buster',
-			width: options.width || 52,
-			height: options.height || 30,
-			a: options.a || 0,
-			r: options.r || 250,
+			width,
+			height,
+			a,
+			r,
 			va: 0,
 			vr: 0,
 			vfa: 0,
 			vfr: 0,
 			fatigue: 0,
 			jumpdelay: 0,
-			jumpfatigue: options.jumpfatigue || gJumpFatigue,
+			jumpfatigue,
 			state: sIdle,
-			sprite:
-				options.sprite ||
-				new controller(game.resources[options.img || 'enemy.buster']),
+			sprite: sprite ?? new controller(game.resources[img]),
 			alive: true,
-			health: options.health || 3,
-			damage: options.damage || 1,
+			health,
+			damage,
 		});
 	}
 

@@ -51,10 +51,10 @@ window.addEventListener('load', () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	(window as any).E = editor;
 
-	addCheckbox('Show FPS', G.options.showFps || false, e => {
+	addCheckbox('Show FPS', G.options.showFps ?? false, e => {
 		G.options.showFps = (e.target as HTMLInputElement).checked;
 	});
-	addCheckbox('Show hitboxes', G.options.showHitboxes || false, e => {
+	addCheckbox('Show hitboxes', G.options.showHitboxes ?? false, e => {
 		G.options.showHitboxes = (e.target as HTMLInputElement).checked;
 	});
 	addCheckbox('Smoothing', G.context.imageSmoothingEnabled, e => {

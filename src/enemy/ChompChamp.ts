@@ -36,10 +36,10 @@ interface ChompChampSprite {
 }
 
 interface ChompChampInit {
-	a: number;
-	img: string;
-	r: number;
-	sprite: ChompChampSprite;
+	a?: number;
+	img?: string;
+	r?: number;
+	sprite?: ChompChampSprite;
 }
 
 interface ChompChampListenerMap extends ListenerMap {
@@ -152,7 +152,10 @@ export default class ChompChamp implements Enemy {
 	va: number;
 	width: number;
 
-	constructor(game: Game, init: Partial<ChompChampInit> = {}) {
+	constructor(
+		game: Game,
+		{ a = 0, r = 0, sprite, img = 'enemy.chompchamp' }: ChompChampInit = {}
+	) {
 		this.isEnemy = true;
 		this.name = 'Chomp Champ';
 		this.game = game;
@@ -162,17 +165,17 @@ export default class ChompChamp implements Enemy {
 		this.width = 80;
 		this.attackWidth = 80;
 		this.height = 40;
-		this.a = deg2rad(init.a || 0);
-		this.r = init.r || 0;
+		this.a = deg2rad(a);
+		this.r = r;
 		this.sprite =
-			init.sprite ||
+			sprite ??
 			new ChompChampController(
 				{
 					[eAnimationEnded]: this.onNext.bind(this),
 					[eCatch]: this.onCatch.bind(this),
 					[eRelease]: this.onRelease.bind(this),
 				},
-				game.resources[init.img || 'enemy.chompchamp']
+				game.resources[img]
 			);
 		this.state = aIdle;
 		this.va = 0;

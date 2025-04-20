@@ -43,7 +43,17 @@ export default class Platform implements DrawnComponent {
 	 * @param {PlatformInit} init options structure
 	 */
 	constructor(init: PlatformInit & { game: Game }) {
-		const { game, h, th, a, w, motion, material, walls, ceiling } = init;
+		const {
+			game,
+			h,
+			th,
+			a,
+			w,
+			motion = 0,
+			material,
+			walls,
+			ceiling,
+		} = init;
 
 		this.game = game;
 		this.layer = zStructure;
@@ -52,20 +62,25 @@ export default class Platform implements DrawnComponent {
 		this.bottom = h - th;
 		this.a = deg2rad(a);
 		this.width = deg2rad(w) / 2;
-		this.motion = deg2rad(motion || 0) / 100;
+		this.motion = deg2rad(motion) / 100;
 		this.circle = w >= 360;
 		this.left = this.a - this.width;
 		this.right = this.a + this.width;
 		this.sprite = game.textures[material];
 		this.scale = this.sprite.w / gHitboxScale;
 
-		this.floor = new Flat(game, h, a, w, motion);
+		this.floor = new Flat(game, { height: h, angle: a, width: w, motion });
 		this.floor.scale = this.scale;
 		game.materials[material].spawner(this.floor);
 		game.floors.push(this.floor);
 
 		if (ceiling) {
-			this.ceiling = new Flat(game, this.bottom, a, w, motion);
+			this.ceiling = new Flat(game, {
+				height: this.bottom,
+				angle: a,
+				width: w,
+				motion,
+			});
 			game.ceilings.push(this.ceiling);
 		}
 

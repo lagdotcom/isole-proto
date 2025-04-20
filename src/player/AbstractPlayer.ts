@@ -193,7 +193,7 @@ export default abstract class AbstractPlayer implements Player {
 			this.body.play('player.bop');
 		}
 		if (hitenemy && hurtenemy !== hitenemy) {
-			damage(this, hitenemy, hitenemy.damage || 1);
+			damage(this, hitenemy, hitenemy.damage ?? 1);
 		}
 
 		if (floor && jumpt <= 0) {

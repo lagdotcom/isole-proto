@@ -122,7 +122,16 @@ export default class Game {
 	 * @param {GameInit} options options
 	 */
 	constructor(options: GameInit) {
-		const { parent, width, height, smoothing } = options;
+		const {
+			parent,
+			width,
+			height,
+			smoothing = false,
+			minScale = 0.5,
+			maxScale = 1,
+			zoomScale = 550,
+			vertScale = 1.2,
+		} = options;
 
 		this.cx = width / 2;
 		this.cy = height / 2;
@@ -142,19 +151,19 @@ export default class Game {
 		this.next = this.next.bind(this);
 		this.start = this.start.bind(this);
 
-		this.element = this.makeCanvas(parent || document.body);
+		this.element = this.makeCanvas(parent);
 
 		const context = this.element.getContext('2d');
 		if (!context) throw Error('Could not initialize 2D context');
 
 		this.context = context;
-		this.context.imageSmoothingEnabled = smoothing || false;
+		this.context.imageSmoothingEnabled = smoothing;
 		this.zoomer = new Zoomer(
 			this,
-			options.minScale || 0.5,
-			options.maxScale || 1,
-			options.zoomScale || 550,
-			options.vertScale || 1.2
+			minScale,
+			maxScale,
+			zoomScale,
+			vertScale
 		);
 		this.unzoomer = new Unzoomer(this);
 		this.leaver = new LeaveTimer(this);
@@ -305,10 +314,9 @@ export default class Game {
 	 */
 	addAttachments(): void {
 		this.components.forEach(co => {
-			co.attachments &&
-				co.attachments.forEach(a => {
-					this.components.push(a);
-				});
+			co.attachments?.forEach(a => {
+				this.components.push(a);
+			});
 		});
 	}
 

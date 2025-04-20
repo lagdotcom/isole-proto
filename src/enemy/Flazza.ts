@@ -58,7 +58,10 @@ export default class Flazza extends AbstractEnemy {
 	state: FlazzaState;
 	tscale: number;
 
-	constructor(game: Game, options: FlazzaInit = {}) {
+	constructor(
+		game: Game,
+		{ r = 250, img = 'enemy.flazza' }: FlazzaInit = {}
+	) {
 		super({
 			isEnemy: true,
 			layer: zFlying,
@@ -67,8 +70,8 @@ export default class Flazza extends AbstractEnemy {
 			width: 45,
 			height: 45,
 			a: 0,
-			r: options.r || 250,
-			rtop: options.r || 250,
+			r,
+			rtop: r,
 			dir: dLeft,
 			speed: gSpeed,
 			dropSpeed: gDropSpeed,
@@ -76,9 +79,7 @@ export default class Flazza extends AbstractEnemy {
 			va: 0,
 			vr: 0,
 			state: sProwling,
-			sprite: new controller(
-				game.resources[options.img || 'enemy.flazza']
-			),
+			sprite: new controller(game.resources[img]),
 			alive: true,
 			health: 2,
 			damage: 1,

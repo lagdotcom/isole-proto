@@ -82,7 +82,7 @@ export default class Editor
 
 		this.game = game;
 		this.mode = LevelMode;
-		this.data = data || {
+		this.data = data ?? {
 			platforms: [
 				{
 					h: 340,
@@ -150,67 +150,65 @@ export default class Editor
 			items,
 		} = data;
 
-		platforms &&
-			platforms.forEach(p => {
-				game.platforms.push(new Platform({ game, ...p }));
-			});
+		platforms?.forEach(p => {
+			game.platforms.push(new Platform({ game, ...p }));
+		});
 
-		walls &&
-			walls.forEach(w => {
-				game.walls.push(
-					new Wall(
-						game,
-						w.top,
-						w.bottom,
-						w.a,
-						w.dir,
-						w.motion,
-						w.material
-					)
-				);
-			});
+		walls?.forEach(w => {
+			game.walls.push(
+				new Wall(
+					game,
+					w.top,
+					w.bottom,
+					w.a,
+					w.dir,
+					w.motion,
+					w.material
+				)
+			);
+		});
 
-		floors &&
-			floors.forEach(f => {
-				game.floors.push(
-					new Flat(game, f.h, f.a, f.w, f.motion, f.material)
-				);
-			});
+		floors?.forEach(f => {
+			game.floors.push(
+				new Flat(game, {
+					height: f.h,
+					angle: f.a,
+					width: f.w,
+					motion: f.motion,
+					texture: f.material,
+				})
+			);
+		});
 
-		objects &&
-			objects.forEach(o => {
-				game.decals.push(new Decal(game, o));
-			});
+		objects?.forEach(o => {
+			game.decals.push(new Decal(game, o));
+		});
 
-		enemies &&
-			enemies.forEach(e => {
-				// feels weird
-				if (e.type === 'chompChamp')
-					game.decals.push(this.makeEnemy(e));
-				else game.enemies.push(this.makeEnemy(e));
-			});
+		enemies?.forEach(e => {
+			// feels weird
+			if (e.type === 'chompChamp') game.decals.push(this.makeEnemy(e));
+			else game.enemies.push(this.makeEnemy(e));
+		});
 
-		weapons &&
-			weapons.forEach(w => {
-				game.pickups.push(
-					new WeaponObject(game, {
-						a: w.a,
-						r: w.r,
-						weapon: weaponTypes[w.weapon],
-					})
-				);
-			});
+		weapons?.forEach(w => {
+			game.pickups.push(
+				new WeaponObject(game, {
+					a: w.a,
+					r: w.r,
+					weapon: weaponTypes[w.weapon],
+				})
+			);
+		});
 
-		items &&
-			items.forEach(i => {
-				game.pickups.push(
-					new ItemObject(game, {
-						a: i.a,
-						r: i.r,
-						item: itemTypes[i.item],
-					})
-				);
-			});
+		items?.forEach(i => {
+			game.pickups.push(
+				new ItemObject(game, {
+					a: i.a,
+					r: i.r,
+					item: itemTypes[i.item],
+				})
+			);
+		});
 
 		game.player = this.makePlayer(player);
 
@@ -385,7 +383,7 @@ export default class Editor
 		this[name] = mel(container);
 
 		const sec = this.data[name];
-		sec && sec.forEach(o => this[maker](this[name], o));
+		if (sec) sec.forEach(o => this[maker](this[name], o));
 	}
 
 	makeNumInput(
@@ -401,7 +399,7 @@ export default class Editor
 				innerText: label,
 			}),
 			'input',
-			{ type: 'number', value: object[attribute] || 0 },
+			{ type: 'number', value: object[attribute] ?? 0 },
 			{
 				change: () => {
 					const f = filter(el.valueAsNumber);

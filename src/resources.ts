@@ -59,7 +59,8 @@ function addMaterials(game: Game, materials: MaterialMap[]) {
 		Object.keys(t).forEach(k => {
 			game.materials[k] = {
 				texture: t[k].texture(game),
-				spawner: t[k].spawner || (() => {}),
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				spawner: t[k].spawner ?? (() => {}),
 			};
 
 			game.textures[k] = game.materials[k].texture;

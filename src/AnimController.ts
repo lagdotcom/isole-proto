@@ -66,7 +66,7 @@ export default class AnimController extends Controller {
 	ae?: string;
 
 	/** Current listener map */
-	al?: ListenerMap;
+	al: ListenerMap;
 
 	/** Animation map */
 	animations: AnimMap;
@@ -134,8 +134,8 @@ export default class AnimController extends Controller {
 
 			const anim = this.animations[animation];
 			this.ac = anim;
-			this.al = listeners;
-			this.flags = anim.flags || {};
+			this.al = listeners ?? {};
+			this.flags = anim.flags ?? {};
 			this.frame(0);
 		}
 	}
@@ -194,7 +194,7 @@ export default class AnimController extends Controller {
 	 * @param {unknown} details event details
 	 */
 	dispatch(e: string, details: unknown = null): void {
-		if (this.al && this.al[e]) this.al[e](details);
-		if (this[e]) this[e](details);
+		this.al[e]?.(details);
+		this[e]?.(details);
 	}
 }

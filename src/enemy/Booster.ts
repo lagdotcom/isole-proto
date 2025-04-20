@@ -57,17 +57,17 @@ interface BoosterOptions {
 export default class Booster extends Buster {
 	dir: Facing;
 
-	constructor(game: Game, options: BoosterOptions = {}) {
+	constructor(
+		game: Game,
+		{ dir = 'L', img = 'enemy.booster' }: BoosterOptions = {}
+	) {
 		super(game, {
-			...options,
 			jumpfatigue: 1,
-			sprite: new BoosterController(
-				game.resources[options.img || 'enemy.booster']
-			),
+			sprite: new BoosterController(game.resources[img]),
 		});
 
 		this.name = 'Booster';
-		this.dir = options.dir || 'L';
+		this.dir = dir;
 	}
 
 	canAttack(player: Player, playerDist: number) {
