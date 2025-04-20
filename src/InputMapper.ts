@@ -38,12 +38,23 @@ interface InputDevice {
 	poll(mapper: InputMapper): void;
 }
 
+const preventDefaultKeys = [
+	'ArrowLeft',
+	'ArrowRight',
+	'ArrowUp',
+	'ArrowDown',
+	'Space',
+];
+
 export class KeyboardInput implements InputDevice {
 	keys: Set<string>;
 
 	constructor() {
 		this.keys = new Set<string>();
-		window.addEventListener('keydown', e => this.press(e.code));
+		window.addEventListener('keydown', e => {
+			this.press(e.code);
+			if (preventDefaultKeys.includes(e.code)) e.preventDefault();
+		});
 		window.addEventListener('keyup', e => this.release(e.code));
 	}
 

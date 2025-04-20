@@ -74,7 +74,7 @@ class Unzoomer implements DrawnComponent {
 	}
 }
 
-/** Neverseed */
+/** Everknot */
 export default class Game {
 	ceilings: Flat[];
 	components: Component[];
