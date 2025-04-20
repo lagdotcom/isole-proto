@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 const path = require('path');
 
 module.exports = env => ({
@@ -10,7 +12,7 @@ module.exports = env => ({
 	mode: env.production ? 'production' : 'development',
 	devtool: env.production ? 'source-map' : 'eval',
 	devServer: {
-		static: { directory: path.join(__dirname, 'public') },
+		static: { directory: path.join(__dirname, 'dist') },
 		compress: true,
 		open: true,
 	},
