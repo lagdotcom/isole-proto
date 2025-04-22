@@ -22,7 +22,7 @@ import {
 	deg2rad,
 	drawWedge,
 	jbr,
-	scalew,
+	scaleWidth,
 	πHalf,
 } from '../tools';
 
@@ -281,8 +281,8 @@ export default class ChompChamp implements Enemy {
 		const { r, a, attackWidth, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(attackWidth, br),
-			taw = scalew(attackWidth, tr);
+		const baw = scaleWidth(attackWidth, br),
+			taw = scaleWidth(attackWidth, tr);
 
 		return {
 			bot: {
@@ -302,8 +302,8 @@ export default class ChompChamp implements Enemy {
 		const { r, a, width, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(width, br),
-			taw = scalew(width, tr);
+		const baw = scaleWidth(width, br),
+			taw = scaleWidth(width, tr);
 
 		return {
 			bot: {
@@ -332,7 +332,7 @@ export default class ChompChamp implements Enemy {
 			player.vr = 0;
 			player.hidden = true;
 			player.invincible = true;
-			player.removecontrol = true;
+			player.removeControl = true;
 		}
 	}
 
@@ -343,7 +343,7 @@ export default class ChompChamp implements Enemy {
 		player.r = this.r;
 		player.hidden = false;
 		player.invincible = false;
-		player.removecontrol = false;
+		player.removeControl = false;
 		damage(player, this, 1);
 		player.va = 0;
 		player.vr = 8;

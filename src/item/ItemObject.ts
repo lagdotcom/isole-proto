@@ -4,7 +4,7 @@ import Hitbox from '../Hitbox';
 import Item from '../Item';
 import { zDecal } from '../layers';
 import { Pickup } from '../Pickup';
-import { cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
+import { cart, deg2rad, drawWedge, scaleWidth, πHalf } from '../tools';
 
 export type ItemConstructor = new (game: Game) => Item;
 interface ItemObjectInit {
@@ -75,12 +75,12 @@ export default class ItemObject implements Pickup {
 			bot: {
 				a,
 				r,
-				width: scalew(width, r),
+				width: scaleWidth(width, r),
 			},
 			top: {
 				a,
 				r: r + height,
-				width: scalew(width, r + height),
+				width: scaleWidth(width, r + height),
 			},
 		};
 	}

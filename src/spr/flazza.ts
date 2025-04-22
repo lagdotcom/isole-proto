@@ -75,7 +75,7 @@ export default class FlazzaController extends AnimController {
 			h: 120,
 			xo: -60,
 			yo: -90,
-			leftflip: false,
+			leftFlip: false,
 		});
 	}
 

@@ -10,6 +10,7 @@ export type AnimPriority = Flavour<number, 'AnimPriority'>;
 export type Degrees = Flavour<number, 'Degrees'>;
 export type DisplayLayer = Flavour<number, 'DisplayLayer'>;
 export type FrameIndex = Flavour<number, 'FrameIndex'>;
+export type GameEvent = Flavour<string, 'GameEvent'>;
 export type KeyCode = Flavour<string, 'KeyCode'>;
 export type MaterialName = Flavour<string, 'MaterialName'>;
 export type Milliseconds = Flavour<number, 'Milliseconds'>;

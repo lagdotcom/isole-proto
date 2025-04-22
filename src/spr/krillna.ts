@@ -1,5 +1,6 @@
 import Controller from '../Controller';
 import { dDown, dLeft, dRight, dUp } from '../dirs';
+import { Radians } from '../flavours';
 import { π, πHalf } from '../tools';
 
 // MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
@@ -13,21 +14,21 @@ const moveTimes = {
 	5: 7.5,
 };
 
-const xoffsets = {
+const offsetX = {
 	[dLeft]: -36,
 	[dRight]: -36,
 	[dUp]: -48,
 	[dDown]: -24,
 };
 
-type KrillnaStuck = 'ground' | 'ceiling' | 'wleft' | 'wright';
+type KrillnaStuck = 'ground' | 'ceiling' | 'walkLeft' | 'walkRight';
 
 export default class KrillnaController extends Controller {
-	walktimer: number;
-	walkmax: number;
-	normal: number;
+	walkTimer: number;
+	walkMax: number;
+	normal: Radians;
 	stuck?: KrillnaStuck;
-	fliptwice: boolean;
+	flipTwice: boolean;
 
 	constructor(img: CanvasImageSource) {
 		super({
@@ -37,10 +38,10 @@ export default class KrillnaController extends Controller {
 			xo: -36,
 			yo: -58,
 		});
-		this.walktimer = 0;
-		this.walkmax = 8;
+		this.walkTimer = 0;
+		this.walkMax = 8;
 		this.normal = 0;
-		this.fliptwice = false;
+		this.flipTwice = false;
 	}
 
 	air(): void {
@@ -50,18 +51,18 @@ export default class KrillnaController extends Controller {
 	ground(): void {
 		this.stuck = 'ground';
 		this.normal = 0;
-		this.fliptwice = false;
+		this.flipTwice = false;
 		this.yo = -58;
 	}
 
-	wleft(): void {
-		this.stuck = 'wleft';
+	walkLeft(): void {
+		this.stuck = 'walkLeft';
 		this.normal = -πHalf;
 		this.yo = -45;
 	}
 
-	wright(): void {
-		this.stuck = 'wright';
+	walkRight(): void {
+		this.stuck = 'walkRight';
 		this.normal = πHalf;
 		this.yo = -45;
 	}
@@ -69,21 +70,21 @@ export default class KrillnaController extends Controller {
 	ceiling(): void {
 		this.stuck = 'ceiling';
 		this.normal = π;
-		this.fliptwice = true;
+		this.flipTwice = true;
 		this.yo = -32;
 	}
 
 	walk(t: number, dir: 'L' | 'R' | 'U' | 'D'): void {
-		const { fliptwice } = this;
+		const { flipTwice } = this;
 
-		this.xo = xoffsets[dir];
+		this.xo = offsetX[dir];
 
 		if (dir === dRight) {
 			this.flip = true;
-			if (fliptwice) this.flip = !this.flip;
+			if (flipTwice) this.flip = !this.flip;
 		} else if (dir === dLeft) {
 			this.flip = false;
-			if (fliptwice) this.flip = !this.flip;
+			if (flipTwice) this.flip = !this.flip;
 		}
 
 		if (this.show('walk', 0, 0)) {

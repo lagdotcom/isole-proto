@@ -13,7 +13,7 @@ import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
 import Texture from '../Texture';
-import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
+import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Wall from './Wall';
 
 /** Floor or Ceiling */
@@ -31,8 +31,8 @@ export default class Flat implements DrawnComponent {
 	scale: number;
 	sprite?: Texture;
 	width: Radians;
-	wleft?: Wall;
-	wright?: Wall;
+	wallLeft?: Wall;
+	wallRight?: Wall;
 
 	/**
 	 * Create a new Flat
@@ -92,7 +92,7 @@ export default class Flat implements DrawnComponent {
 	 */
 	update(time: Milliseconds): void {
 		if (this.motion) {
-			this.a = anglewrap(this.a + time * this.motion);
+			this.a = wrapAngle(this.a + time * this.motion);
 			this.left = this.a - this.width;
 			this.right = this.a + this.width;
 		}
@@ -105,8 +105,8 @@ export default class Flat implements DrawnComponent {
 	draw(c: CanvasRenderingContext2D): void {
 		const { left, right, r, game, scale, sprite, width } = this;
 		const { cx, cy } = game;
-		const step = scalew(scale, r),
-			offset = scalew(scale / 2, r);
+		const step = scaleWidth(scale, r),
+			offset = scaleWidth(scale / 2, r);
 		let remaining = width * 2,
 			a = left;
 

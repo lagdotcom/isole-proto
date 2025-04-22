@@ -4,10 +4,10 @@ type Hitbox<
 	Angle extends number = Radians,
 	Distance extends number = Pixels,
 	Fields extends string = 'top' | 'bot',
-> = Record<Fields, Hitsize<Angle, Distance>>;
+> = Record<Fields, HitSize<Angle, Distance>>;
 export default Hitbox;
 
-export interface Hitsize<
+export interface HitSize<
 	Angle extends number = Radians,
 	Distance extends number = Pixels,
 > {

@@ -33,7 +33,7 @@ export default class Zoomer implements DrawnComponent {
 		this.game.context.setTransform(1, 0, 0, 1, 0, 0);
 	}
 
-	update(t: number) {
+	update() {
 		const { player } = this.game;
 		if (player.alive) {
 			const xy = cart(player.a, player.r);

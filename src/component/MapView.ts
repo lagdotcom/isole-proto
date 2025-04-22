@@ -1,6 +1,5 @@
 import Controller from '../Controller';
 import DrawnComponent from '../DrawnComponent';
-import { eLevelEnter } from '../events';
 import { DisplayLayer, Pixels } from '../flavours';
 import Game from '../Game';
 import { InputButton } from '../InputMapper';
@@ -11,7 +10,7 @@ const connection = '#444444',
 	highlighted = '#ff4444';
 
 export default class MapView implements DrawnComponent {
-	bossicon: Controller;
+	bossIcon: Controller;
 	current: number;
 	debounced: InputButton;
 	game: Game;
@@ -34,7 +33,7 @@ export default class MapView implements DrawnComponent {
 			xo: -24,
 			yo: -24,
 		});
-		this.bossicon = new Controller({
+		this.bossIcon = new Controller({
 			img: game.resources['ui.mapboss'],
 			w: 96,
 			h: 96,
@@ -55,7 +54,7 @@ export default class MapView implements DrawnComponent {
 		if (key === InputButton.Up) this.cycle(-1);
 		else if (key === InputButton.Down) this.cycle(1);
 		else if (key === InputButton.Swing) {
-			game.fire(eLevelEnter, { id: selected });
+			game.fire('level.enter', { id: selected });
 			this.current = selected;
 			game.nodes[selected].visited = true;
 		}
@@ -82,7 +81,7 @@ export default class MapView implements DrawnComponent {
 
 			let icon: Controller;
 			if (n.type === NodeType.Boss) {
-				icon = this.bossicon;
+				icon = this.bossIcon;
 			} else {
 				icon = this.icon;
 				const type = n.hidden && !n.visited ? NodeType.Unknown : n.type;
@@ -117,11 +116,11 @@ export default class MapView implements DrawnComponent {
 	cycle(delta: number) {
 		const options = this.game.nodes[this.current].connections;
 		const index = options.indexOf(this.selected);
-		let newi = index + delta;
+		let newIndex = index + delta;
 
-		if (newi < 0) newi += options.length;
-		if (newi >= options.length) newi -= options.length;
+		if (newIndex < 0) newIndex += options.length;
+		if (newIndex >= options.length) newIndex -= options.length;
 
-		this.selected = options[newi];
+		this.selected = options[newIndex];
 	}
 }

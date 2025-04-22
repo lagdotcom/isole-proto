@@ -1,13 +1,5 @@
-export const eAnimationEnded = 'onanimend',
-	eEnemyDied = 'died.enemy.isole',
-	eMapEnter = 'enter.map.isole',
-	eMapEntered = 'entered.map.isole',
-	eGameReady = 'ready.isole',
-	eLevelEnter = 'enter.level.isole',
-	eLevelEntered = 'entered.level.isole',
-	ePlayerDied = 'died.player.isole',
-	ePlayerDying = 'dying.player.isole',
-	ePlayerHurt = 'hurt.player.isole',
-	eShopEntered = 'entered.shop.isole',
-	eThrow = 'onthrow',
-	eSwing = 'onswing';
+import { AnimEvent } from './flavours';
+
+export const eAnimationEnded: AnimEvent = 'eAnimationEnded',
+	eThrow: AnimEvent = 'eThrow',
+	eSwing: AnimEvent = 'eSwing';

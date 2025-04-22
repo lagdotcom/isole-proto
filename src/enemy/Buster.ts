@@ -3,7 +3,7 @@ import Flat from '../component/Flat';
 import Wall from '../component/Wall';
 import { Milliseconds, Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
-import Hitbox, { Hitsize } from '../Hitbox';
+import Hitbox, { HitSize } from '../Hitbox';
 import { zEnemy } from '../layers';
 import {
 	gGravityStrength,
@@ -17,15 +17,15 @@ import {
 import Player from '../Player';
 import controller from '../spr/buster';
 import {
-	angledist,
-	anglewrap,
+	angleDistance,
 	cart,
 	drawArc,
 	drawWedge,
 	first,
 	isRightOf,
-	scalew,
-	unscalew,
+	scaleWidth,
+	unscaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -120,13 +120,13 @@ export default class Buster extends AbstractEnemy {
 		const { player, walls, ceilings, floors } = game,
 			tscale = time / gTimeScale;
 		const { bot, top } = this.getHitbox();
-		const playerDist = unscalew(angledist(a, player.a), r),
+		const playerDist = unscaleWidth(angleDistance(a, player.a), r),
 			near = player.alive && playerDist - player.w <= gNearWidth;
 
 		let floor: Flat | null = null;
 		if (vr <= 0) {
 			floor = first(floors, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -135,7 +135,7 @@ export default class Buster extends AbstractEnemy {
 		let ceiling: Flat | null = null;
 		if (vr > 0) {
 			ceiling = first(ceilings, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -231,7 +231,7 @@ export default class Buster extends AbstractEnemy {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 		this.state = state;
 
@@ -292,12 +292,12 @@ export default class Buster extends AbstractEnemy {
 		drawArc(c, cAIDark, cx, cy, n.r, n.a, n.width);
 	}
 
-	getHitbox(): { top: Hitsize; bot: Hitsize; a: Hitsize; n: Hitsize } {
+	getHitbox(): { top: HitSize; bot: HitSize; a: HitSize; n: HitSize } {
 		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height),
-			aaw = scalew(gAttackWidth, r),
-			naw = scalew(gNearWidth, r);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height),
+			aaw = scaleWidth(gAttackWidth, r),
+			naw = scaleWidth(gNearWidth, r);
 		let amod: Radians,
 			vbr: Pixels = 0,
 			vtr: Pixels = 0;

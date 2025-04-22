@@ -8,11 +8,11 @@ import Platform from './component/Platform';
 import ShopView from './component/ShopView';
 import Wall from './component/Wall';
 import Controller from './Controller';
+import Damageable from './Damageable';
 import dispatch from './dispatchEvent';
 import DrawnComponent from './DrawnComponent';
 import emptyElement from './emptyElement';
 import Enemy from './Enemy';
-import { eGameReady, eLevelEntered, eMapEntered, eShopEntered } from './events';
 import {
 	DisplayLayer,
 	MaterialName,
@@ -53,6 +53,20 @@ export interface MapGenerator {
 export interface ShopGenerator {
 	makeShop: (game: Game) => void;
 }
+
+export interface GameEvents {
+	'enemy.died': { attacker: Damageable; target: Damageable };
+	'game.ready': object;
+	'level.enter': { id: number };
+	'level.entered': object;
+	'map.enter': object;
+	'map.entered': object;
+	'player.died': object;
+	'player.dying': { by: Damageable };
+	'player.hurt': { by: Damageable; damage: number };
+	'shop.entered': object;
+}
+export type GameEventName = keyof GameEvents;
 
 interface GameInit {
 	debugContainer?: HTMLElement;
@@ -216,7 +230,7 @@ export default class Game {
 		this.mapView = new MapView(this);
 		this.shopView = new ShopView(this);
 
-		this.fire(eGameReady);
+		this.fire('game.ready', {});
 	}
 
 	/**
@@ -248,7 +262,7 @@ export default class Game {
 		gen.makeMap(this);
 		this.components = [this.inventory, this.mapView];
 		this.mode = MapMode;
-		this.fire(eMapEntered);
+		this.fire('map.entered', {});
 	}
 
 	/**
@@ -278,7 +292,7 @@ export default class Game {
 
 		this.mode = LevelMode;
 		this.addAttachments();
-		this.fire(eLevelEntered);
+		this.fire('level.entered', {});
 	}
 
 	/**
@@ -293,7 +307,7 @@ export default class Game {
 		this.components = [this.shopView, this.inventory];
 
 		this.mode = ShopMode;
-		this.fire(eShopEntered);
+		this.fire('shop.entered', {});
 	}
 
 	/**
@@ -301,7 +315,7 @@ export default class Game {
 	 * @param {string} event event name
 	 * @param {unknown} detail event details
 	 */
-	fire(event: string, detail?: unknown): void {
+	fire<T extends GameEventName>(event: T, detail: GameEvents[T]): void {
 		dispatch(this.element, event, detail);
 	}
 

@@ -1,8 +1,8 @@
 import Controller from '../Controller';
 
 export default class GCBDController extends Controller {
-	walktimer: number;
-	walkmax: number;
+	walkTimer: number;
+	walkMax: number;
 
 	constructor(img: CanvasImageSource) {
 		super({
@@ -14,8 +14,8 @@ export default class GCBDController extends Controller {
 			yo: -39,
 		});
 
-		this.walktimer = 0;
-		this.walkmax = 8;
+		this.walkTimer = 0;
+		this.walkMax = 8;
 	}
 
 	ground(): void {
@@ -27,9 +27,9 @@ export default class GCBDController extends Controller {
 	}
 
 	walk(t: number): void {
-		this.walktimer += t;
-		if (this.walktimer > this.walkmax) {
-			this.walktimer -= this.walkmax;
+		this.walkTimer += t;
+		if (this.walkTimer > this.walkMax) {
+			this.walkTimer -= this.walkMax;
 			this.r++;
 			if (this.r >= 8) this.r = 0;
 		}

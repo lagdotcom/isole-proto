@@ -18,15 +18,15 @@ import {
 } from '../nums';
 import Player from '../Player';
 import {
-	anglecollides,
-	angledist,
-	anglewrap,
+	angleCollides,
+	angleDistance,
 	cart,
 	collides,
 	displace,
 	drawWedge,
 	first,
-	scalew,
+	scaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -73,7 +73,7 @@ class BombController extends AnimController {
 			h: 60,
 			xo: -30,
 			yo: -45,
-			leftflip: false,
+			leftFlip: false,
 		});
 	}
 
@@ -140,7 +140,7 @@ class Bomb implements DrawnComponent {
 		let floor: Flat | null = null;
 		if (vr < 0) {
 			floor = first(floors, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
@@ -148,7 +148,7 @@ class Bomb implements DrawnComponent {
 		let wall: Wall | null = null;
 		wall = first(
 			walls,
-			w => top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+			w => top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
 		);
 
 		if (wall) {
@@ -176,7 +176,7 @@ class Bomb implements DrawnComponent {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 
 		this.timer = timer - time;
@@ -218,8 +218,8 @@ class Bomb implements DrawnComponent {
 
 	getHitbox(): Hitbox {
 		const { r, a, va, vr, w, h, tscale } = this;
-		const baw = scalew(w, r),
-			taw = scalew(w, r + h);
+		const baw = scaleWidth(w, r),
+			taw = scaleWidth(w, r + h);
 		let amod,
 			vbr = 0,
 			vtr = 0;

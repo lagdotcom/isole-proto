@@ -13,19 +13,19 @@ import Flat from '../component/Flat';
 import { dLeft, Facing } from '../dirs';
 import { Pixels, ResourceName } from '../flavours';
 import Game from '../Game';
-import { Hitsize } from '../Hitbox';
+import { HitSize } from '../Hitbox';
 import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
 import controller, { eDrop, eRecover } from '../spr/flazza';
 import {
-	anglecollides,
-	angledist,
-	anglewrap,
+	angleCollides,
+	angleDistance,
 	cart,
 	drawWedge,
 	first,
-	scalew,
-	unscalew,
+	scaleWidth,
+	unscaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -161,7 +161,7 @@ export default class Flazza extends AbstractEnemy {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 		this.state = state;
 
@@ -220,11 +220,11 @@ export default class Flazza extends AbstractEnemy {
 		drawWedge(c, cAI, cx, cy, a, top);
 	}
 
-	getHitbox(): { bot: Hitsize; top: Hitsize; a: Hitsize } {
+	getHitbox(): { bot: HitSize; top: HitSize; a: HitSize } {
 		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height),
-			aaw = scalew(gAttackWidth, r);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height),
+			aaw = scaleWidth(gAttackWidth, r);
 		let amod: number,
 			vbr = 0,
 			vtr = 0;
@@ -260,14 +260,14 @@ export default class Flazza extends AbstractEnemy {
 
 		return first(
 			game.floors,
-			f => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+			f => bot.r <= f.r && top.r >= f.r && angleCollides(top, f)
 		);
 	}
 
 	shouldAttack(target) {
 		const { a, r } = this;
 
-		const dist = unscalew(angledist(a, target.a), r);
+		const dist = unscaleWidth(angleDistance(a, target.a), r);
 		return target.health && dist - target.w <= gAttackWidth && r > target.r;
 	}
 

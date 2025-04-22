@@ -10,7 +10,7 @@ import {
 	gTimeScale,
 	gWalkScale,
 } from './nums';
-import { angledist, anglewrap, first, π } from './tools';
+import { angleDistance, first, wrapAngle, π } from './tools';
 
 interface PhysicsObject {
 	a: Radians;
@@ -27,13 +27,11 @@ interface PhysicsObject {
 }
 
 export default function physics(obj: PhysicsObject, time: Milliseconds) {
+	const { game, ignoreCeilings, ignoreFloors, ignoreGravity, ignoreWalls } =
+		this;
 	let {
 		a,
-		game,
-		ignoreCeilings,
-		ignoreFloors,
-		ignoreGravity,
-		ignoreWalls,
+
 		r,
 		va,
 		vfa,
@@ -46,7 +44,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 	let floor: Flat | null = null;
 	if (vr <= 0 && !ignoreFloors) {
 		floor = first(floors, f => {
-			const da = angledist(a, f.a);
+			const da = angleDistance(a, f.a);
 
 			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 		});
@@ -55,7 +53,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 	let ceiling: Flat | null = null;
 	if (vr > 0 && !ignoreCeilings) {
 		ceiling = first(ceilings, f => {
-			const da = angledist(a, f.a);
+			const da = angleDistance(a, f.a);
 
 			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 		});
@@ -103,7 +101,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		a += π;
 	}
 
-	obj.a = anglewrap(a);
+	obj.a = wrapAngle(a);
 	obj.r = r;
 
 	return { floor, ceiling, wall };

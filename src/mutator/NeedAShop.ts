@@ -1,6 +1,6 @@
 import { GameState, Mutator } from '../Cartographer';
 import MapNode, { NodeType } from '../MapNode';
-import { choose } from '../tools';
+import { randomItem } from '../tools';
 
 export default class NeedAShop implements Mutator {
 	applies(gs: GameState) {
@@ -21,7 +21,7 @@ export default class NeedAShop implements Mutator {
 		// TODO: this shuld cause a bigger error
 		if (!candidates.length) return false;
 
-		const shop = choose(candidates);
+		const shop = randomItem(candidates);
 		shop.type = NodeType.MoneySack;
 		return true;
 	}

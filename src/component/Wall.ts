@@ -12,7 +12,7 @@ import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale, gWallGap } from '../nums';
 import Texture from '../Texture';
-import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
+import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Flat from './Flat';
 
 export default class Wall implements DrawnComponent {
@@ -32,10 +32,10 @@ export default class Wall implements DrawnComponent {
 	sprite: Texture;
 	sx: Pixels;
 	sy: Pixels;
-	r: Pixels; // used for anglecollides()
+	r: Pixels; // used for angleCollides()
 	t: Pixels;
 	top: Pixels;
-	width: Radians; // used for anglecollides()
+	width: Radians; // used for angleCollides()
 
 	draw: (c: CanvasRenderingContext2D) => void;
 
@@ -48,7 +48,7 @@ export default class Wall implements DrawnComponent {
 		motion = 0,
 		texture?: TextureName
 	) {
-		const a = anglewrap(deg2rad(angle)),
+		const a = wrapAngle(deg2rad(angle)),
 			top: Pixels = t - gWallGap,
 			bottom: Pixels = b + gWallGap;
 
@@ -92,7 +92,7 @@ export default class Wall implements DrawnComponent {
 
 	update(time: Milliseconds): void {
 		if (this.motion) {
-			this.a = anglewrap(this.a + time * this.motion);
+			this.a = wrapAngle(this.a + time * this.motion);
 			this.updateXY();
 		}
 	}
@@ -112,9 +112,9 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scalew(scale / 2, r),
-				amod = a - scalew(scale, r),
-				normal = amod + offset + πHalf,
+			const offset = scaleWidth(scale / 2, r),
+				amod: Radians = a - scaleWidth(scale, r),
+				normal: Radians = amod + offset + πHalf,
 				{ x, y } = cart(amod, r);
 
 			c.translate(x + cx, y + cy);
@@ -146,8 +146,8 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scalew(scale / 2, r),
-				normal = a + offset + πHalf,
+			const offset = scaleWidth(scale / 2, r),
+				normal: Radians = a + offset + πHalf,
 				{ x, y } = cart(a, r);
 
 			c.translate(x + cx, y + cy);

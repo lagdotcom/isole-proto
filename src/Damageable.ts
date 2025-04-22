@@ -6,7 +6,7 @@ export default interface Damageable extends CoordAR, DrawnComponent {
 	health: number;
 	invincible?: boolean;
 
-	die?: (inflictor: Damageable) => void;
+	die?: (inflicter: Damageable) => void;
 	hit?: (victim: Damageable) => void;
-	hurt?: (inflictor: Damageable, amount: number) => void;
+	hurt?: (inflicter: Damageable, amount: number) => void;
 }

@@ -115,7 +115,7 @@ export default class BatController extends AnimController {
 			h: 200,
 			xo: -130,
 			yo: -140,
-			leftflip: false,
+			leftFlip: false,
 		});
 	}
 

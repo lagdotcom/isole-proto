@@ -1,9 +1,8 @@
 import CoordAR from './CoordAR';
 import CoordXY from './CoordXY';
 import Damageable from './Damageable';
-import { eEnemyDied } from './events';
 import { Degrees, Pixels, Radians } from './flavours';
-import Hitbox, { Hitsize } from './Hitbox';
+import Hitbox, { HitSize } from './Hitbox';
 import { gHitboxScale } from './nums';
 
 export const π: Radians = Math.PI,
@@ -15,7 +14,7 @@ export const π: Radians = Math.PI,
  * @param {Radians} a angle
  * @returns {Radians} wrapped angle
  */
-export function anglewrap(a: Radians): Radians {
+export function wrapAngle(a: Radians): Radians {
 	a = a % π2;
 	if (a < 0) a += π2;
 	return a;
@@ -27,7 +26,7 @@ export function anglewrap(a: Radians): Radians {
  * @param {Radians} b second angle
  */
 export function isRightOf(a: Radians, b: Radians): boolean {
-	return anglewrap(a - b) > π;
+	return wrapAngle(a - b) > π;
 }
 
 /**
@@ -36,7 +35,7 @@ export function isRightOf(a: Radians, b: Radians): boolean {
  * @param {Radians} b second angle
  * @returns {Radians} angle distance
  */
-export function angledist(a: Radians, b: Radians): Radians {
+export function angleDistance(a: Radians, b: Radians): Radians {
 	let d = a - b;
 	if (d > π) d -= π2;
 	else if (d < -π) d += π2;
@@ -77,7 +76,7 @@ export function cart<T extends number>(a: Radians, r: T): CoordXY<T> {
  * @param {Pixels} r radius
  * @returns {Radians} scaled width
  */
-export function scalew(w: Pixels, r: Pixels): Radians {
+export function scaleWidth(w: Pixels, r: Pixels): Radians {
 	return (w / r) * gHitboxScale;
 }
 
@@ -87,7 +86,7 @@ export function scalew(w: Pixels, r: Pixels): Radians {
  * @param {Pixels} r radius
  * @returns {Pixels} width
  */
-export function unscalew(ws: Radians, r: Pixels): Pixels {
+export function unscaleWidth(ws: Radians, r: Pixels): Pixels {
 	return (ws / gHitboxScale) * r;
 }
 
@@ -139,8 +138,8 @@ export function first<T>(
  * @param a first hitsize
  * @param b second hitsize
  */
-export function anglecollides(a: Hitsize, b: Hitsize): boolean {
-	const ad = angledist(a.a, b.a);
+export function angleCollides(a: HitSize, b: HitSize): boolean {
+	const ad = angleDistance(a.a, b.a);
 	return ad < a.width + b.width;
 }
 
@@ -153,7 +152,7 @@ export function anglecollides(a: Hitsize, b: Hitsize): boolean {
 export function collides(a: Hitbox, b: Hitbox): boolean {
 	// TODO: should this also check .t.a?
 	return (
-		a.bot.r <= b.top.r && a.top.r >= b.bot.r && anglecollides(a.bot, b.bot)
+		a.bot.r <= b.top.r && a.top.r >= b.bot.r && angleCollides(a.bot, b.bot)
 	);
 }
 
@@ -180,7 +179,7 @@ export function damage(
 			if (target.die) target.die(attacker);
 			else game.remove(target);
 
-			if (target.isEnemy) game.fire(eEnemyDied, { attacker, target });
+			if (target.isEnemy) game.fire('enemy.died', { attacker, target });
 		}
 	} else {
 		if (target.hurt) target.hurt(attacker, n);
@@ -198,7 +197,7 @@ export function damage(
  * @param {CoordAR} y second coord
  * @returns {CoordAR} vector
  */
-export function dirv(x: CoordAR, y: CoordAR): CoordAR {
+export function getDirectionVector(x: CoordAR, y: CoordAR): CoordAR {
 	const rd = x.r - y.r;
 	const ad = x.a - y.a;
 	const t = Math.abs(rd + ad);
@@ -231,7 +230,7 @@ export function displace(
 
 	if (flip) x = 0 - x;
 
-	return { a: a + scalew(x, r + y), r: r + y };
+	return { a: a + scaleWidth(x, r + y), r: r + y };
 }
 
 /**
@@ -266,7 +265,7 @@ export const rnd = Math.random;
  * @param {(number) => number} rounder rounding function (defaults to floor)
  * @returns {number}
  */
-export function rndr(
+export function randomRange(
 	min: number,
 	max: number,
 	rounder: (value: number) => number = Math.floor
@@ -276,12 +275,12 @@ export function rndr(
 
 /**
  * Return a random angle within a range
- * @param {number} min minimum angle
- * @param {number} max maximum angle
- * @returns {number}
+ * @param {Radians} min minimum angle
+ * @param {Radians} max maximum angle
+ * @returns {Radians}
  */
-export function rnda(min = 0, max: number = π2): number {
-	return anglewrap(rndr(min, max, n => n));
+export function randomAngle(min: Radians = 0, max: Radians = π2) {
+	return wrapAngle(randomRange(min, max, n => n));
 }
 
 /**
@@ -289,19 +288,17 @@ export function rnda(min = 0, max: number = π2): number {
  * @param {number} percentage chance for event to occur
  * @returns {() => boolean}
  */
-export const chance = (percentage: number) => () => rndr(0, 100) < percentage;
+export const chance = (percentage: number) => () =>
+	randomRange(0, 100) < percentage;
 
 /**
  * Add up a list of numbers.
- * @param {number[]} items list of numbers
- * @param {number} start number to start from
- * @returns {number}
+ * @param {T[]} items list of numbers
+ * @param {T} start number to start from
+ * @returns {T}
  */
-export function sum(items: number[], start = 0): number {
-	items.forEach(i => {
-		start += i;
-	});
-	return start;
+export function sum<T extends number>(items: T[], start: T = 0 as T): T {
+	return items.reduce((a, b) => a + b, start) as T;
 }
 
 /**
@@ -309,9 +306,9 @@ export function sum(items: number[], start = 0): number {
  * @param {[T, number][]} weightings list of weightings
  * @returns {T}
  */
-export function rndweight<T>(...weightings: [T, number][]): T {
+export function randomWeighted<T>(...weightings: [T, number][]): T {
 	const total = sum(weightings.map(([, weight]) => weight));
-	const roll = rndr(0, total);
+	const roll = randomRange(0, total);
 	let accumulator = 0;
 	for (const [choice, weight] of weightings) {
 		if (roll < accumulator + weight) return choice;
@@ -337,8 +334,8 @@ export function lerp(a: number, b: number, f = 0.03): number {
  * @param {T[]} a choice list
  * @returns {T}
  */
-export function choose<T>(a: T[]): T {
-	return a[rndr(0, a.length)];
+export function randomItem<T>(a: T[]): T {
+	return a[randomRange(0, a.length)];
 }
 
 /**
@@ -347,16 +344,16 @@ export function choose<T>(a: T[]): T {
  * @param {string | CanvasGradient | CanvasPattern} style line style
  * @param {Pixels} x center x
  * @param {Pixels} y center y
- * @param {Hitsize} b bottom hitsize
- * @param {Hitsize} t top hitsize
+ * @param {HitSize} b bottom hitsize
+ * @param {HitSize} t top hitsize
  */
 export function drawWedge(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
 	x: Pixels,
 	y: Pixels,
-	b: Hitsize,
-	t: Hitsize
+	b: HitSize,
+	t: HitSize
 ) {
 	c.strokeStyle = style;
 	c.beginPath();
@@ -372,16 +369,16 @@ export function drawWedge(
  * @param {string | CanvasGradient | CanvasPattern} style fill style
  * @param {Pixels} x center x
  * @param {Pixels} y center y
- * @param {Hitsize} b bottom hitsize
- * @param {Hitsize} t top hitsize
+ * @param {HitSize} b bottom hitsize
+ * @param {HitSize} t top hitsize
  */
 export function fillWedge(
 	c: CanvasRenderingContext2D,
 	style: string | CanvasGradient | CanvasPattern,
 	x: Pixels,
 	y: Pixels,
-	b: Hitsize,
-	t: Hitsize
+	b: HitSize,
+	t: HitSize
 ) {
 	c.fillStyle = style;
 	c.beginPath();

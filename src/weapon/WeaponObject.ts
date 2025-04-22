@@ -3,7 +3,7 @@ import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zDecal } from '../layers';
 import { Pickup } from '../Pickup';
-import { cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
+import { cart, deg2rad, drawWedge, scaleWidth, πHalf } from '../tools';
 import Weapon from '../Weapon';
 
 export type WeaponConstructor = new (game: Game) => Weapon;
@@ -80,12 +80,12 @@ export default class WeaponObject implements Pickup {
 			bot: {
 				a,
 				r,
-				width: scalew(width, r),
+				width: scaleWidth(width, r),
 			},
 			top: {
 				a,
 				r: r + height,
-				width: scalew(width, r + height),
+				width: scaleWidth(width, r + height),
 			},
 		};
 	}

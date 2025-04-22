@@ -11,7 +11,7 @@ import Game from '../Game';
 import { zStructure } from '../layers';
 import { gHitboxScale } from '../nums';
 import Texture from '../Texture';
-import { anglewrap, cart, deg2rad, scalew, πHalf } from '../tools';
+import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Flat from './Flat';
 import Wall from './Wall';
 
@@ -43,8 +43,8 @@ export default class Platform implements DrawnComponent {
 	sprite: Texture;
 	thickness: Pixels;
 	width: Radians;
-	wleft?: Wall;
-	wright?: Wall;
+	wallLeft?: Wall;
+	wallRight?: Wall;
 
 	/**
 	 * Create a new Platform
@@ -93,24 +93,38 @@ export default class Platform implements DrawnComponent {
 		}
 
 		if (walls && !this.circle) {
-			this.wleft = new Wall(game, h, this.bottom, a - w / 2, 1, motion);
-			this.wright = new Wall(game, h, this.bottom, a + w / 2, -1, motion);
+			this.wallLeft = new Wall(
+				game,
+				h,
+				this.bottom,
+				a - w / 2,
+				1,
+				motion
+			);
+			this.wallRight = new Wall(
+				game,
+				h,
+				this.bottom,
+				a + w / 2,
+				-1,
+				motion
+			);
 
-			this.floor.wleft = this.wleft;
-			this.floor.wright = this.wright;
+			this.floor.wallLeft = this.wallLeft;
+			this.floor.wallRight = this.wallRight;
 
 			if (this.ceiling) {
-				this.ceiling.wleft = this.wleft;
-				this.ceiling.wright = this.wright;
+				this.ceiling.wallLeft = this.wallLeft;
+				this.ceiling.wallRight = this.wallRight;
 			}
 
-			this.wleft.ceiling = this.ceiling;
-			this.wleft.floor = this.floor;
+			this.wallLeft.ceiling = this.ceiling;
+			this.wallLeft.floor = this.floor;
 
-			this.wright.ceiling = this.ceiling;
-			this.wright.floor = this.floor;
+			this.wallRight.ceiling = this.ceiling;
+			this.wallRight.floor = this.floor;
 
-			game.walls.push(this.wleft, this.wright);
+			game.walls.push(this.wallLeft, this.wallRight);
 		}
 	}
 
@@ -120,7 +134,7 @@ export default class Platform implements DrawnComponent {
 	 */
 	update(time: Milliseconds): void {
 		if (this.motion) {
-			this.a = anglewrap(this.a + time * this.motion);
+			this.a = wrapAngle(this.a + time * this.motion);
 			this.left = this.a - this.width;
 			this.right = this.a + this.width;
 		}
@@ -149,8 +163,8 @@ export default class Platform implements DrawnComponent {
 	drawSlice(c: CanvasRenderingContext2D, row: string, r: number) {
 		const { left, right, game, scale, sprite, width } = this;
 		const { cx, cy } = game;
-		const step = scalew(scale, r),
-			offset = scalew(scale / 2, r);
+		const step = scaleWidth(scale, r),
+			offset = scaleWidth(scale / 2, r);
 		let remaining = width * 2,
 			a = left;
 
@@ -185,7 +199,7 @@ export default class Platform implements DrawnComponent {
 	drawHitbox(c: CanvasRenderingContext2D): void {
 		this.floor.drawHitbox(c);
 		this.ceiling?.drawHitbox(c);
-		this.wleft?.drawHitbox(c);
-		this.wright?.drawHitbox(c);
+		this.wallLeft?.drawHitbox(c);
+		this.wallRight?.drawHitbox(c);
 	}
 }

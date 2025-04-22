@@ -15,15 +15,15 @@ import { gStandThreshold, gTimeScale, gWalkScale } from '../nums';
 import physics from '../physics';
 import {
 	cart,
-	choose,
 	collides,
 	damage,
 	drawWedge,
 	fillWedge,
 	isRightOf,
-	rnda,
-	rndr,
-	scalew,
+	randomAngle,
+	randomItem,
+	randomRange,
+	scaleWidth,
 	πHalf,
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
@@ -278,7 +278,7 @@ class ShockwaveController extends AnimController {
 	constructor(img: CanvasImageSource) {
 		super({
 			img,
-			leftflip: false,
+			leftFlip: false,
 			animations: {
 				idle: {
 					loop: true,
@@ -398,8 +398,8 @@ class Shockwave extends AbstractEnemy {
 		const { r, a, width, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(width, br),
-			taw = scalew(width, tr);
+		const baw = scaleWidth(width, br),
+			taw = scaleWidth(width, tr);
 
 		return {
 			bot: {
@@ -420,7 +420,7 @@ class BulletController extends AnimController {
 	constructor(img: CanvasImageSource, xo = -40, yo = -80) {
 		super({
 			img,
-			leftflip: false,
+			leftFlip: false,
 			animations: {
 				big: {
 					loop: true,
@@ -554,8 +554,8 @@ class SmallBullet extends AbstractEnemy {
 		const { r, a, width, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(width, br),
-			taw = scalew(width, tr);
+		const baw = scaleWidth(width, br),
+			taw = scaleWidth(width, tr);
 
 		return {
 			bot: {
@@ -611,7 +611,7 @@ class BigBullet extends AbstractEnemy {
 				const bullet = new SmallBullet(
 					this.owner,
 					this.game,
-					rnda(),
+					randomAngle(),
 					this.r,
 					gSmallBulletSpeed()
 				);
@@ -681,8 +681,8 @@ class BigBullet extends AbstractEnemy {
 		const { r, a, width, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(width, br),
-			taw = scalew(width, tr);
+		const baw = scaleWidth(width, br),
+			taw = scaleWidth(width, tr);
 
 		return {
 			bot: {
@@ -784,8 +784,8 @@ class PoisonSprayField extends AbstractEnemy {
 		const { r, a, width, height } = this;
 		const br = r;
 		const tr = r + height;
-		const baw = scalew(width, br),
-			taw = scalew(width, tr);
+		const baw = scaleWidth(width, br),
+			taw = scaleWidth(width, tr);
 
 		return {
 			bot: {
@@ -893,7 +893,7 @@ const gRadiusCap = 1000;
 const gLeapSpeed = 20;
 const gBigBulletSpeed = 10;
 const gSplitCount = 5;
-const gSmallBulletSpeed = () => rndr(-8, -5);
+const gSmallBulletSpeed = () => randomRange(-8, -5);
 
 export default class Minatoad extends AbstractEnemy {
 	bullets: number;
@@ -1002,7 +1002,7 @@ export default class Minatoad extends AbstractEnemy {
 		let next: MinatoadState = this.last;
 
 		while (next === this.last) {
-			next = choose([
+			next = randomItem([
 				'leap',
 				'hop',
 				'hop',
@@ -1017,8 +1017,8 @@ export default class Minatoad extends AbstractEnemy {
 		}
 
 		this.last = next;
-		this.shots = rndr(3, 4);
-		this.jumps = rndr(3, 6);
+		this.shots = randomRange(3, 4);
+		this.jumps = randomRange(3, 6);
 		return next;
 	}
 
@@ -1070,7 +1070,7 @@ export default class Minatoad extends AbstractEnemy {
 
 			this.state = 'track';
 			this.vr = 0;
-			this.waittimer = rndr(2000, 3000);
+			this.waittimer = randomRange(2000, 3000);
 		}
 	}
 
@@ -1167,8 +1167,8 @@ export default class Minatoad extends AbstractEnemy {
 
 	getHitbox(): Hitbox {
 		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height);
 		let amod: number,
 			vbr = 0,
 			vtr = 0;

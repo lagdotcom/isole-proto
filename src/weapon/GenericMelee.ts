@@ -4,14 +4,21 @@ import { cHit } from '../colours';
 import CoordAR from '../CoordAR';
 import DrawnComponent from '../DrawnComponent';
 import Enemy from '../Enemy';
-import { eAnimationEnded, ePlayerHurt } from '../events';
+import { eAnimationEnded } from '../events';
 import { AnimName, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import HitboxXYWH from '../HitboxXYWH';
 import { zSpark } from '../layers';
 import Player from '../Player';
-import { cart, collides, displace, drawWedge, scalew, πHalf } from '../tools';
+import {
+	cart,
+	collides,
+	displace,
+	drawWedge,
+	scaleWidth,
+	πHalf,
+} from '../tools';
 import Weapon from '../Weapon';
 
 export const aIdle = 'idle',
@@ -127,8 +134,8 @@ class Swing implements DrawnComponent {
 
 	getHitbox(hitbox: HitboxXYWH): Hitbox {
 		const { r, a, w, h } = this.getHitboxPosition(hitbox);
-		const baw = scalew(w, r),
-			taw = scalew(w, r + h);
+		const baw = scaleWidth(w, r),
+			taw = scaleWidth(w, r + h);
 
 		return {
 			bot: {
@@ -181,7 +188,7 @@ export default class GenericMelee implements Weapon {
 		this.onhit = onhit.bind(this);
 		this.anim = anim;
 
-		game.on(ePlayerHurt, this.detach.bind(this));
+		game.on('player.hurt', this.detach.bind(this));
 	}
 
 	update(t: number) {

@@ -7,12 +7,12 @@ import Hitbox from './Hitbox';
 import PlayerController from './spr/PlayerController';
 
 export default interface Player extends DrawnComponent, Damageable {
-	finishdeath(): void;
+	finishDeath(): void;
 	getHitbox(): Hitbox;
 
 	body: Channel;
 	facing: Facing;
-	removecontrol: boolean;
+	removeControl: boolean;
 	sprite: PlayerController;
 	va: number;
 	vfa: number;

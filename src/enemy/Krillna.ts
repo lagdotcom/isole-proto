@@ -14,13 +14,13 @@ import {
 } from '../nums';
 import controller from '../spr/krillna';
 import {
-	anglecollides,
-	angledist,
-	anglewrap,
+	angleCollides,
+	angleDistance,
 	cart,
 	drawWedge,
 	first,
-	scalew,
+	scaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -106,7 +106,7 @@ export default class Krillna extends AbstractEnemy {
 		let floor: Flat | null = null;
 		if (vr <= 0 || last.floor) {
 			floor = first(floors, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -115,7 +115,7 @@ export default class Krillna extends AbstractEnemy {
 		let ceiling: Flat | null = null;
 		if (vr > 0 || last.ceiling) {
 			ceiling = first(ceilings, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
@@ -132,7 +132,7 @@ export default class Krillna extends AbstractEnemy {
 				if (vas !== w.direction && !w.motion) return false;
 
 				return (
-					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+					top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
 				);
 			});
 		}
@@ -165,12 +165,12 @@ export default class Krillna extends AbstractEnemy {
 			vr = (dir === dUp ? speed : -speed) * gRadiusMult;
 			vfa = w.motion * time;
 
-			const wsw = scalew(width, r);
+			const wsw = scaleWidth(width, r);
 			if (w.direction === 1) {
-				sprite.wleft();
+				sprite.walkLeft();
 				a = w.a - wsw;
 			} else {
-				sprite.wright();
+				sprite.walkRight();
 				a = w.a + wsw;
 			}
 		}
@@ -198,11 +198,12 @@ export default class Krillna extends AbstractEnemy {
 			applyfloor(floor);
 		} else if (last.floor) {
 			if (
-				angledist(a, last.floor.right) < angledist(a, last.floor.left)
+				angleDistance(a, last.floor.right) <
+				angleDistance(a, last.floor.left)
 			) {
-				wall = last.floor.wright ?? null;
+				wall = last.floor.wallRight ?? null;
 			} else {
-				wall = last.floor.wleft ?? null;
+				wall = last.floor.wallLeft ?? null;
 			}
 
 			if (wall) {
@@ -215,12 +216,12 @@ export default class Krillna extends AbstractEnemy {
 			applyceiling(ceiling);
 		} else if (last.ceiling) {
 			if (
-				angledist(a, last.ceiling.right) <
-				angledist(a, last.ceiling.left)
+				angleDistance(a, last.ceiling.right) <
+				angleDistance(a, last.ceiling.left)
 			) {
-				wall = last.ceiling.wright ?? null;
+				wall = last.ceiling.wallRight ?? null;
 			} else {
-				wall = last.ceiling.wleft ?? null;
+				wall = last.ceiling.wallLeft ?? null;
 			}
 
 			if (wall) {
@@ -263,7 +264,7 @@ export default class Krillna extends AbstractEnemy {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 		this.dir = dir;
 		this.last = { wall, floor, ceiling };
@@ -306,8 +307,8 @@ export default class Krillna extends AbstractEnemy {
 
 	getHitbox(): Hitbox {
 		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height);
 		let amod,
 			vbr = 0,
 			vtr = 0;

@@ -5,7 +5,7 @@ export interface ControllerInit {
 	flip?: boolean;
 	h: Pixels;
 	img: CanvasImageSource;
-	leftflip?: boolean;
+	leftFlip?: boolean;
 	r?: SpriteRow;
 	w: Pixels;
 	xo?: Pixels;
@@ -18,7 +18,7 @@ export default class Controller {
 	flip: boolean;
 	h: Pixels;
 	img: CanvasImageSource;
-	leftflip: boolean;
+	leftFlip: boolean;
 	r: SpriteRow;
 	state: string;
 	timer: Milliseconds;
@@ -38,7 +38,7 @@ export default class Controller {
 				r: 0,
 				xo: 0,
 				yo: 0,
-				leftflip: true,
+				leftFlip: true,
 				flip: false,
 				timer: 0,
 			},
@@ -50,14 +50,14 @@ export default class Controller {
 	 * Face right
 	 */
 	right(): void {
-		this.flip = !this.leftflip;
+		this.flip = !this.leftFlip;
 	}
 
 	/**
 	 * Face left
 	 */
 	left(): void {
-		this.flip = this.leftflip;
+		this.flip = this.leftFlip;
 	}
 
 	/**
@@ -82,20 +82,20 @@ export default class Controller {
 	/**
 	 * Draw the image
 	 * @param {CanvasRenderingContext2D} ctx image context
-	 * @param {Pixels} xadd x offset
-	 * @param {Pixels} yadd y offset
+	 * @param {Pixels} offsetX x offset
+	 * @param {Pixels} offsetY y offset
 	 */
 	draw(
 		ctx: CanvasRenderingContext2D,
-		xadd: Pixels = 0,
-		yadd: Pixels = 0
+		offsetX: Pixels = 0,
+		offsetY: Pixels = 0
 	): void {
 		const { w, c, h, r, flip, img, xo, yo } = this,
 			sx: Pixels = w * c,
 			sy: Pixels = h * r;
 
 		if (flip) ctx.scale(-1, 1);
-		ctx.drawImage(img, sx, sy, w, h, xo + xadd, yo + yadd, w, h);
+		ctx.drawImage(img, sx, sy, w, h, xo + offsetX, yo + offsetY, w, h);
 		if (flip) ctx.scale(-1, 1);
 	}
 }

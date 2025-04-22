@@ -13,16 +13,16 @@ import { zFlying } from '../layers';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
 import Player from '../Player';
 import {
-	anglecollides,
-	angledist,
-	anglewrap,
+	angleCollides,
+	angleDistance,
 	cart,
 	collides,
 	damage,
 	displace,
 	drawWedge,
 	first,
-	scalew,
+	scaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -91,7 +91,7 @@ class Rock implements DrawnComponent {
 		let floor: Flat | null = null;
 		if (vr < 0) {
 			floor = first(floors, f => {
-				const da = angledist(a, f.a);
+				const da = angleDistance(a, f.a);
 				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
 			});
 		}
@@ -99,7 +99,7 @@ class Rock implements DrawnComponent {
 		let wall: Wall | null = null;
 		wall = first(
 			walls,
-			w => top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+			w => top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
 		);
 
 		if (floor || wall) {
@@ -119,7 +119,7 @@ class Rock implements DrawnComponent {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 		this.float = float;
 	}
@@ -150,8 +150,8 @@ class Rock implements DrawnComponent {
 
 	getHitbox(): Hitbox {
 		const { r, a, va, vr, w, h, tscale } = this;
-		const baw = scalew(w, r),
-			taw = scalew(w, r + h);
+		const baw = scaleWidth(w, r),
+			taw = scaleWidth(w, r + h);
 		let amod: number,
 			vbr = 0,
 			vtr = 0;

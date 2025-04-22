@@ -5,10 +5,15 @@ import Wall from '../component/Wall';
 import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
 import Enemy from '../Enemy';
-import { ePlayerDied, ePlayerDying, ePlayerHurt } from '../events';
-import { Pixels, Radians, ResourceName } from '../flavours';
+import {
+	DisplayLayer,
+	Milliseconds,
+	Pixels,
+	Radians,
+	ResourceName,
+} from '../flavours';
 import Game from '../Game';
-import { Hitsize } from '../Hitbox';
+import { HitSize } from '../Hitbox';
 import { InputButton } from '../InputMapper';
 import { zPlayer } from '../layers';
 import mel from '../makeElement';
@@ -26,19 +31,19 @@ import {
 import Player, { PlayerInit } from '../Player';
 import PlayerController from '../spr/PlayerController';
 import {
-	anglecollides,
-	anglewrap,
+	angleCollides,
 	cart,
 	collides,
 	damage,
 	deg2rad,
-	dirv,
 	displace,
 	drawCross,
 	drawWedge,
 	first,
+	getDirectionVector,
 	jbr,
-	scalew,
+	scaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -58,22 +63,22 @@ export default abstract class AbstractPlayer implements Player {
 	facing: Facing;
 	game: Game;
 	grounded: boolean;
-	h: number;
+	h: Pixels;
 	invincible?: boolean;
-	invtimer: number;
+	invincibleTimer: Milliseconds;
 	isPlayer: true;
-	jumpd: boolean;
+	canDoubleJump: boolean;
 	jumplg: boolean;
 	jumpt: number;
 	health: number;
 	hurtSound: ResourceName;
-	layer: number;
+	layer: DisplayLayer;
 	name: string;
 	pickupdebounce: boolean;
 	r: Pixels;
-	removecontrol: boolean;
+	removeControl: boolean;
 	sprite: PlayerController;
-	steph: number;
+	stepHeight: Pixels;
 	tscale: number;
 	va: number;
 	vfa: number;
@@ -88,7 +93,7 @@ export default abstract class AbstractPlayer implements Player {
 				isPlayer: true,
 				layer: zPlayer,
 				game,
-				steph: 10,
+				stepHeight: 10,
 				a: 0,
 				r: 300,
 				va: 0,
@@ -97,7 +102,7 @@ export default abstract class AbstractPlayer implements Player {
 				vfr: 0,
 				facing: dRight,
 				jumpt: 0,
-				jumpd: true,
+				canDoubleJump: true,
 				jumplg: false,
 				tscale: 0,
 				alive: true,
@@ -119,8 +124,8 @@ export default abstract class AbstractPlayer implements Player {
 
 	abstract getDefaultInit(game: Game, options: PlayerInit): Partial<this>;
 
-	update(time: number): void {
-		let { a, r, va, vr, vfa, jumpd, jumplg, jumpt } = this;
+	update(time: Milliseconds): void {
+		let { a, r, va, vr, vfa, canDoubleJump, jumplg, jumpt } = this;
 		const { game, sprite } = this;
 		const { walls, ceilings, floors, keys, enemies } = game,
 			tscale = time / gTimeScale;
@@ -134,7 +139,7 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('down');
 			floor = first(
 				floors,
-				f => bot.r <= f.r && step.r >= f.r && anglecollides(step, f)
+				f => bot.r <= f.r && step.r >= f.r && angleCollides(step, f)
 			);
 		}
 
@@ -143,7 +148,7 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('up');
 			ceiling = first(
 				ceilings,
-				f => bot.r <= f.r && top.r >= f.r && anglecollides(top, f)
+				f => bot.r <= f.r && top.r >= f.r && angleCollides(top, f)
 			);
 			if (ceiling) {
 				flags.push('ceiling');
@@ -160,7 +165,7 @@ export default abstract class AbstractPlayer implements Player {
 				if (vas !== w.direction && !w.motion) return false;
 
 				return (
-					top.r >= w.bottom && bot.r <= w.top && anglecollides(bot, w)
+					top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
 				);
 			});
 		}
@@ -199,7 +204,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		if (floor && jumpt <= 0) {
 			this.grounded = true;
-			this.jumpd = jumpd = true;
+			this.canDoubleJump = canDoubleJump = true;
 
 			r = floor.r;
 			vr = 0;
@@ -214,14 +219,14 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
-		if (ok && !sprite.flags.noControl && !this.removecontrol) {
+		if (ok && !sprite.flags.noControl && !this.removeControl) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				va -= strength;
 				controls.push('left');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(-1, this.grounded, jumpd);
+					sprite.face(-1, this.grounded, canDoubleJump);
 					this.facing = dLeft;
 				}
 			} else if (keys.has(InputButton.Right)) {
@@ -229,7 +234,7 @@ export default abstract class AbstractPlayer implements Player {
 				controls.push('right');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(1, this.grounded, jumpd);
+					sprite.face(1, this.grounded, canDoubleJump);
 					this.facing = dRight;
 				}
 			}
@@ -240,9 +245,13 @@ export default abstract class AbstractPlayer implements Player {
 					this.jumpt = jumpt = gJumpTimer;
 					controls.push('jump');
 					this.body.play('player.jump');
-				} else if (jumpt < gJumpDoubleTimer && jumpd && jumplg) {
+				} else if (
+					jumpt < gJumpDoubleTimer &&
+					canDoubleJump &&
+					jumplg
+				) {
 					this.jumpt = jumpt = gJumpTimer;
-					this.jumpd = jumpd = false;
+					this.canDoubleJump = canDoubleJump = false;
 					vr = gJumpStrength;
 					controls.push('jumpd');
 					this.body.play('player.jump');
@@ -301,11 +310,11 @@ export default abstract class AbstractPlayer implements Player {
 			a += π;
 		}
 
-		this.a = anglewrap(a);
+		this.a = wrapAngle(a);
 		this.r = r;
 
 		if (!this.grounded) {
-			if (jumpd) sprite.jump(time);
+			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
 		} else if (Math.abs(va) < gStandThreshold) {
 			sprite.stand(time);
@@ -369,14 +378,14 @@ export default abstract class AbstractPlayer implements Player {
 		drawCross(c, cHotspot, cx + h.x, cy + h.y);
 	}
 
-	getHitbox(): { bot: Hitsize; top: Hitsize; step: Hitsize } {
-		const { r, a, va, vr, w, h, steph, tscale } = this;
-		const baw = scalew(w, r),
-			taw = scalew(w, r + h),
-			saw = scalew(w, r + steph);
-		let amod: number,
-			vbr = 0,
-			vtr = 0;
+	getHitbox(): { bot: HitSize; top: HitSize; step: HitSize } {
+		const { r, a, va, vr, w, h, stepHeight, tscale } = this;
+		const baw = scaleWidth(w, r),
+			taw = scaleWidth(w, r + h),
+			saw = scaleWidth(w, r + stepHeight);
+		let amod: Radians,
+			vbr: Pixels = 0,
+			vtr: Pixels = 0;
 
 		if (tscale) amod = a + (va / r) * tscale * gWalkScale;
 		else amod = a;
@@ -396,7 +405,7 @@ export default abstract class AbstractPlayer implements Player {
 				width: taw,
 			},
 			step: {
-				r: r + steph + vtr,
+				r: r + stepHeight + vtr,
 				a: amod,
 				width: saw,
 			},
@@ -405,31 +414,31 @@ export default abstract class AbstractPlayer implements Player {
 
 	hurt(by: Damageable, damage: number): void {
 		this.invincible = true;
-		this.invtimer = 1000;
+		this.invincibleTimer = 1000;
 
 		// TODO: is this working?
-		const dv = dirv(this, by);
+		const dv = getDirectionVector(this, by);
 		this.va += dv.a * 5;
 		this.vr += dv.r * 5;
 
-		this.game.fire(ePlayerHurt, { by, damage });
+		this.game.fire('player.hurt', { by, damage });
 		this.voice.play(this.hurtSound);
 		this.sprite.hurt();
 	}
 
-	hurtTimer(t: number): void {
-		this.invtimer -= t;
-		if (this.invtimer <= 0) this.invincible = false;
+	hurtTimer(t: Milliseconds): void {
+		this.invincibleTimer -= t;
+		if (this.invincibleTimer <= 0) this.invincible = false;
 	}
 
 	die(by: Damageable): void {
-		this.game.fire(ePlayerDying, { by });
+		this.game.fire('player.dying', { by });
 		this.voice.play(this.deadSound);
 		this.sprite.die();
 	}
 
-	finishdeath(): void {
-		this.game.fire(ePlayerDied);
+	finishDeath(): void {
+		this.game.fire('player.died', {});
 		this.game.remove(this);
 	}
 }

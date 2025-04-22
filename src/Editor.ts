@@ -1,5 +1,4 @@
 import Cartographer from './Cartographer';
-import clearChildren from './clearChildren';
 import Decal, { DecalPosition } from './component/Decal';
 import Flat from './component/Flat';
 import Platform from './component/Platform';
@@ -24,7 +23,7 @@ import EditorData, {
 	EditorWall,
 	EditorWeapon,
 } from './EditorData';
-import { eGameReady, eLevelEnter, eMapEnter } from './events';
+import emptyElement from './emptyElement';
 import Game, {
 	GameMode,
 	LevelGenerator,
@@ -40,7 +39,7 @@ import RockItem from './item/Rock';
 import layers, { zBackground } from './layers';
 import mel from './makeElement';
 import MapNode from './MapNode';
-import { choose } from './tools';
+import { randomItem } from './tools';
 import AxeWeapon from './weapon/Axe';
 import WeaponObject from './weapon/WeaponObject';
 import { roundwoods } from './worlds';
@@ -73,9 +72,9 @@ export default class Editor
 		this.nodes = [];
 		materials = Object.keys(game.materials);
 		objects = Object.keys(game.objects);
-		game.on(eGameReady, () => this.refresh());
-		game.on(eLevelEnter, () => this.game.enter(this));
-		game.on(eMapEnter, () => {
+		game.on('game.ready', () => this.refresh());
+		game.on('level.enter', () => this.game.enter(this));
+		game.on('map.enter', () => {
 			this.mode = MapMode;
 			this.game.show(this);
 		});
@@ -138,7 +137,7 @@ export default class Editor
 	}
 
 	makeLevel(game: Game) {
-		const data = this.me ? this.data : choose(roundwoods);
+		const data = this.me ? this.data : randomItem(roundwoods);
 		const {
 			platforms,
 			walls,
@@ -242,7 +241,7 @@ export default class Editor
 		let c = this.container;
 
 		if (c) {
-			clearChildren(c);
+			emptyElement(c);
 		} else {
 			c = this.container = mel(parent, 'div', { className: 'editor' });
 		}

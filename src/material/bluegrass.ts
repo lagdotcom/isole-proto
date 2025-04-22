@@ -4,7 +4,7 @@ import Game from '../Game';
 import { zDecal } from '../layers';
 import textures from '../texture/bluegrass';
 import TileController from '../texture/TileController';
-import { cart, scalew, πHalf } from '../tools';
+import { cart, scaleWidth, πHalf } from '../tools';
 
 const bluegrassTips = game =>
 	new TileController(game.resources['tile.bluegrass'], {
@@ -34,8 +34,8 @@ class GrassTips implements DrawnComponent {
 		const { flat, game, r, sprite } = this;
 		const { left, right, scale, width } = flat;
 		const { cx, cy } = game;
-		const step = scalew(scale, r),
-			offset = scalew(scale / 2, r);
+		const step = scaleWidth(scale, r),
+			offset = scaleWidth(scale / 2, r);
 		let remaining = width * 2,
 			a = left;
 

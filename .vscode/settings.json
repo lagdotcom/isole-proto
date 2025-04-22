@@ -1,3 +1,14 @@
 {
-	"cSpell.words": ["Flazza", "hitbox", "hitboxes", "Krillna", "Minatoad"]
+	"cSpell.words": [
+		"Delaunay",
+		"Everknot",
+		"Flazza",
+		"gamepadconnected",
+		"gamepaddisconnected",
+		"hitbox",
+		"hitboxes",
+		"Krillna",
+		"lerp",
+		"Minatoad"
+	]
 }

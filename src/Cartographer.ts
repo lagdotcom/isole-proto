@@ -5,14 +5,14 @@ import MapNode, { NodeType } from './MapNode';
 import IfInDoubtFight from './mutator/IfInDoubtFight';
 import LockedTreasure from './mutator/LockedTreasure';
 import NeedAShop from './mutator/NeedAShop';
-import { rndr } from './tools';
+import { randomRange } from './tools';
 
 const stageCount = [10, 12, 14];
 const stageGap: Pixels[] = [120, 100, 85];
 const offsets: Pixels[][] = [[0], [-60, 60], [-100, 0, 100]];
 
 const maxwiggle: Pixels = 20;
-const wiggle = (): Pixels => rndr(-maxwiggle, maxwiggle);
+const wiggle = (): Pixels => randomRange(-maxwiggle, maxwiggle);
 
 export interface GameState {
 	floor: number;
@@ -42,7 +42,7 @@ export default class Cartographer {
 		for (let stage = 0; stage < stages; stage++) {
 			const first = stage === 0;
 			const last = stage === stages - 1;
-			const size = first ? 1 : last ? 1 : rndr(2, 4);
+			const size = first ? 1 : last ? 1 : randomRange(2, 4);
 			const yo = offsets[size - 1];
 
 			for (let i = 0; i < size; i++) {

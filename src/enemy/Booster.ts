@@ -1,8 +1,7 @@
 import Controller from '../Controller';
 import { Facing } from '../dirs';
-import { Milliseconds, Pixels, ResourceName } from '../flavours';
+import { Milliseconds, ResourceName } from '../flavours';
 import Game from '../Game';
-import Player from '../Player';
 import Buster from './Buster';
 
 class BoosterController extends Controller {
@@ -16,8 +15,11 @@ class BoosterController extends Controller {
 		});
 	}
 
-	idle(t: Milliseconds) {}
-	near(t: Milliseconds) {}
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	idle() {}
+
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	near() {}
 
 	jump(t: Milliseconds) {
 		if (this.show('jump', 0, 0)) {
@@ -71,7 +73,7 @@ export default class Booster extends Buster {
 		this.dir = dir;
 	}
 
-	canAttack(player: Player, playerDist: Pixels) {
+	canAttack() {
 		return true;
 	}
 

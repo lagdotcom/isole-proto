@@ -14,7 +14,7 @@ import {
 } from '../anims';
 import Player from '../Player';
 
-const midairAnimations = [aJump, aDoubleJump];
+const midAirAnimations = [aJump, aDoubleJump];
 
 export default class PlayerController extends AnimController {
 	facing: 1 | -1;
@@ -39,7 +39,7 @@ export default class PlayerController extends AnimController {
 	}
 
 	stand(t: number): void {
-		if (midairAnimations.includes(this.a)) {
+		if (midAirAnimations.includes(this.a)) {
 			this.play(aLand);
 		}
 
@@ -63,7 +63,7 @@ export default class PlayerController extends AnimController {
 	}
 
 	walk(t: number): void {
-		if (midairAnimations.includes(this.a)) {
+		if (midAirAnimations.includes(this.a)) {
 			this.play(aLand);
 		}
 
@@ -90,6 +90,6 @@ export default class PlayerController extends AnimController {
 	}
 
 	ondeath(): void {
-		this.parent.finishdeath();
+		this.parent.finishDeath();
 	}
 }

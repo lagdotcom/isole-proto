@@ -1,19 +1,21 @@
-// TODO: config
-export const kLeft = 'ArrowLeft';
-export const kRight = 'ArrowRight';
-export const kUp = 'ArrowUp';
-export const kDown = 'ArrowDown';
-export const kJump = 'ArrowUp';
-export const kThrow = 'Space';
-export const kCycle = 'KeyZ';
-export const kSwing = 'KeyA';
-export const kFreeMoney = 'KeyM';
+import { KeyCode, PadCode } from './flavours';
 
-export const jLeft = 'JoypadLeft';
-export const jRight = 'JoypadRight';
-export const jUp = 'JoypadUp';
-export const jDown = 'JoypadDown';
-export const jButton1 = 'Joypad1';
-export const jButton2 = 'Joypad2';
-export const jButton3 = 'Joypad3';
-export const jButton4 = 'Joypad4';
+// TODO: config
+export const kLeft: KeyCode = 'ArrowLeft';
+export const kRight: KeyCode = 'ArrowRight';
+export const kUp: KeyCode = 'ArrowUp';
+export const kDown: KeyCode = 'ArrowDown';
+export const kJump: KeyCode = 'ArrowUp';
+export const kThrow: KeyCode = 'Space';
+export const kCycle: KeyCode = 'KeyZ';
+export const kSwing: KeyCode = 'KeyA';
+export const kFreeMoney: KeyCode = 'KeyM';
+
+export const jLeft: PadCode = 'JoypadLeft';
+export const jRight: PadCode = 'JoypadRight';
+export const jUp: PadCode = 'JoypadUp';
+export const jDown: PadCode = 'JoypadDown';
+export const jButton1: PadCode = 'Joypad1';
+export const jButton2: PadCode = 'Joypad2';
+export const jButton3: PadCode = 'Joypad3';
+export const jButton4: PadCode = 'Joypad4';

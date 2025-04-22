@@ -13,7 +13,14 @@ import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zBackground } from '../layers';
 import { gTimeScale } from '../nums';
-import { anglewrap, cart, deg2rad, drawWedge, scalew, πHalf } from '../tools';
+import {
+	cart,
+	deg2rad,
+	drawWedge,
+	scaleWidth,
+	wrapAngle,
+	πHalf,
+} from '../tools';
 
 export type DecalPosition = 'normal' | 'static';
 
@@ -58,7 +65,7 @@ export default class Decal implements Component {
 		this.layer = layer;
 		this.game = game;
 		this.r = r;
-		this.a = anglewrap(deg2rad(a));
+		this.a = wrapAngle(deg2rad(a));
 		this.motion = deg2rad(motion / 100);
 		this.parallax = parallax / 10;
 		this.position = position;
@@ -77,7 +84,7 @@ export default class Decal implements Component {
 
 	update?(time: number): void {
 		const { a, game, motion, parallax } = this;
-		let amod = 0;
+		let amod: Radians = 0;
 
 		if (motion) {
 			amod += time * motion;
@@ -87,7 +94,7 @@ export default class Decal implements Component {
 			amod += (game.player.va / gTimeScale + game.player.vfa) * parallax;
 		}
 
-		this.a = anglewrap(a + amod);
+		this.a = wrapAngle(a + amod);
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
@@ -127,8 +134,8 @@ export default class Decal implements Component {
 
 	getHitbox(): Hitbox {
 		const { r, a, width, height } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height);
 
 		return {
 			bot: {

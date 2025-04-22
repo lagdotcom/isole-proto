@@ -5,7 +5,7 @@ import Texture, { TileDataMap } from '../Texture';
 export default class TileController extends Controller implements Texture {
 	count: number;
 	tiles: TileDataMap;
-	tname: TileName;
+	tileName: TileName;
 
 	constructor(img: CanvasImageSource, tiles: TileDataMap, options = {}) {
 		super(
@@ -30,7 +30,7 @@ export default class TileController extends Controller implements Texture {
 			this.r = t.r;
 
 			if (t.cycle) {
-				if (this.tname === n) {
+				if (this.tileName === n) {
 					this.count = (this.count + 1) % t.cycle;
 					this.c += this.count;
 				} else {
@@ -39,7 +39,7 @@ export default class TileController extends Controller implements Texture {
 			}
 		}
 
-		this.tname = n;
+		this.tileName = n;
 	}
 
 	reset() {

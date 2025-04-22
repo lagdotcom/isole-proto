@@ -32,19 +32,19 @@ import controller, {
 	eWakeDone,
 } from '../spr/bat';
 import {
-	angledist,
-	anglewrap,
+	angleDistance,
 	cart,
-	choose,
 	collides,
 	drawWedge,
 	fittest,
 	lerp,
 	min,
+	randomAngle,
+	randomItem,
+	randomRange,
 	rnd,
-	rnda,
-	rndr,
-	scalew,
+	scaleWidth,
+	wrapAngle,
 	π,
 	πHalf,
 } from '../tools';
@@ -193,7 +193,7 @@ export default class Bat extends AbstractEnemy {
 			a += π;
 		}
 
-		Object.assign(this, { a: anglewrap(a), r, va, vr, tscale });
+		Object.assign(this, { a: wrapAngle(a), r, va, vr, tscale });
 	}
 
 	turn(): void {
@@ -282,7 +282,7 @@ export default class Bat extends AbstractEnemy {
 
 		if (this.verticalTimer <= 0) {
 			if (rnd() * time < gVerticalChance) {
-				this.targetradius = rndr(minradius, maxradius);
+				this.targetradius = randomRange(minradius, maxradius);
 				this.verticalTimer = gVerticalChange;
 			}
 		} else {
@@ -301,7 +301,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	changeSubstate(): void {
-		this.substate = choose([ssNormal, ssTurn, ssFast, ssSlow]);
+		this.substate = randomItem([ssNormal, ssTurn, ssFast, ssSlow]);
 		this.substateTimer = gSubstateChange;
 	}
 
@@ -345,15 +345,15 @@ export default class Bat extends AbstractEnemy {
 
 	getNearestCeiling(): Flat | null {
 		return fittest(this.game.ceilings, c => {
-			const dl = angledist(this.a, c.left);
-			const dr = angledist(this.a, c.right);
+			const dl = angleDistance(this.a, c.left);
+			const dr = angleDistance(this.a, c.right);
 			return -min(dl, dr);
 		});
 	}
 
 	[sRoosting + 'Update'](time: Milliseconds): void {
 		if (!this.roostangle) {
-			this.roostangle = rnda(this.roost!.left, this.roost!.right);
+			this.roostangle = randomAngle(this.roost!.left, this.roost!.right);
 			this.roostradius = this.roost!.r - this.height;
 
 			const nd = this.roostangle > this.a ? dRight : dLeft;
@@ -381,7 +381,7 @@ export default class Bat extends AbstractEnemy {
 	roostingAngleUpdate(): number {
 		let { dir, roostangle, va } = this;
 
-		const adiff = angledist(this.a, roostangle!);
+		const adiff = angleDistance(this.a, roostangle!);
 		if (adiff < gZeroAngleThreshold) {
 			this.a = roostangle!;
 			return 0;
@@ -457,8 +457,8 @@ export default class Bat extends AbstractEnemy {
 
 	getHitbox() {
 		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scalew(width, r),
-			taw = scalew(width, r + height);
+		const baw = scaleWidth(width, r),
+			taw = scaleWidth(width, r + height);
 		let amod: Radians,
 			vbr = 0,
 			vtr = 0;
@@ -493,7 +493,7 @@ export default class Bat extends AbstractEnemy {
 
 	getPunchHitbox(): Hitbox {
 		const { r, a, va, vr, height, tscale, dir } = this;
-		const attackWidth = scalew((gAttackFar - gAttackNear) / 2, r);
+		const attackWidth = scaleWidth((gAttackFar - gAttackNear) / 2, r);
 		const left = dir === dLeft;
 		const aoffset = left ? -attackWidth : attackWidth;
 
@@ -524,8 +524,8 @@ export default class Bat extends AbstractEnemy {
 		const br = r - gWakeHitboxExtend;
 		const tr = r + height + gWakeHitboxExtend;
 		const width2 = width + gWakeHitboxExtend * 2;
-		const baw = scalew(width2, br),
-			taw = scalew(width2, tr);
+		const baw = scaleWidth(width2, br),
+			taw = scaleWidth(width2, tr);
 
 		return {
 			bot: {

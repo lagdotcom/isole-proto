@@ -40,7 +40,7 @@ export interface EditorPlatform {
 	h: Pixels;
 	w: Degrees;
 	a: Degrees;
-	th: number;
+	th: Pixels;
 	motion?: number;
 	material: MaterialName;
 	ceiling?: boolean;

@@ -1,5 +1,4 @@
 import DrawnComponent from '../DrawnComponent';
-import { eEnemyDied, eMapEnter } from '../events';
 import Game from '../Game';
 import { zUI } from '../layers';
 
@@ -16,7 +15,7 @@ export default class LeaveTimer implements DrawnComponent {
 		this.game = game;
 		this.layer = zUI;
 
-		game.on(eEnemyDied, this.deathCheck.bind(this));
+		game.on('enemy.died', this.deathCheck.bind(this));
 	}
 
 	deathCheck() {
@@ -31,7 +30,7 @@ export default class LeaveTimer implements DrawnComponent {
 			this.timer -= t;
 			if (this.timer <= 0) {
 				this.active = false;
-				this.game.fire(eMapEnter);
+				this.game.fire('map.enter', {});
 			}
 		}
 	}

@@ -27,56 +27,56 @@ export default class ShopView implements DrawnComponent {
 	game: Game;
 	layer: DisplayLayer;
 	offers: Offer[];
-	xmid: Pixels;
-	xoff: Pixels;
-	yoff: Pixels;
+	midX: Pixels;
+	offsetX: Pixels;
+	offsetY: Pixels;
 
 	constructor(game: Game) {
 		this.bg = game.resources['shop.bg'];
 		this.game = game;
 		this.layer = zBeforeUI;
-		this.xmid = game.options.width / 2;
-		this.xoff = (game.options.width - this.bg.width) / 2;
-		this.yoff = (game.options.height - this.bg.height) / 2;
+		this.midX = game.options.width / 2;
+		this.offsetX = (game.options.width - this.bg.width) / 2;
+		this.offsetY = (game.options.height - this.bg.height) / 2;
 
 		this.clear();
 	}
 
 	offerLocations(c: CanvasRenderingContext2D) {
-		let x = this.xmid - ((this.offers.length - 1) * ItemGap) / 2;
+		let x = this.midX - ((this.offers.length - 1) * ItemGap) / 2;
 		return this.offers.map(o => {
 			const text = o.cost.toString();
 			const size = c.measureText(text);
 
-			const oloc = {
+			const objectLocation = {
 				image: o.object,
 				text,
-				iloc: { x, y: 560 },
-				tloc: { x: x - size.width / 2, y: 600 },
+				itemLocation: { x, y: 560 },
+				textLocation: { x: x - size.width / 2, y: 600 },
 			};
 
 			x += ItemGap;
-			return oloc;
+			return objectLocation;
 		});
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { bg, xoff, yoff } = this;
-		c.drawImage(bg, xoff, yoff);
+		const { bg, offsetX, offsetY } = this;
+		c.drawImage(bg, offsetX, offsetY);
 
 		c.font = '20px sans-serif';
 		c.fillStyle = '#ffffff';
 
 		this.offerLocations(c).forEach(l => {
-			l.image.draw(c, l.iloc.x, l.iloc.y);
-			c.fillText(l.text, l.tloc.x, l.tloc.y);
+			l.image.draw(c, l.itemLocation.x, l.itemLocation.y);
+			c.fillText(l.text, l.textLocation.x, l.textLocation.y);
 		});
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
 		this.offerLocations(c).forEach(l => {
-			drawCross(c, 'lime', l.iloc.x, l.iloc.y);
-			drawCross(c, 'green', l.tloc.x, l.tloc.y);
+			drawCross(c, 'lime', l.itemLocation.x, l.itemLocation.y);
+			drawCross(c, 'green', l.textLocation.x, l.textLocation.y);
 		});
 	}
 
