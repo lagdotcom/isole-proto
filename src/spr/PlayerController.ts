@@ -1,12 +1,16 @@
 import AnimController from '../AnimController';
 import {
-	aDJFlip,
+	aBackgroundLeap,
+	aBackgroundLeapFlip,
 	aDoubleJump,
+	aDoubleJumpFlip,
 	aDying,
 	aFlip,
+	aForegroundLeap,
+	aForegroundLeapFlip,
 	aHurt,
-	aJFlip,
 	aJump,
+	aJumpFlip,
 	aLand,
 	aStand,
 	aThrow,
@@ -38,6 +42,11 @@ export default class PlayerController extends AnimController {
 		this.next(t);
 	}
 
+	leap(t: number, leaping: 'f' | 'b'): void {
+		this.play(leaping === 'f' ? aForegroundLeap : aBackgroundLeap);
+		this.next(t);
+	}
+
 	stand(t: number): void {
 		if (midAirAnimations.includes(this.a)) {
 			this.play(aLand);
@@ -47,15 +56,21 @@ export default class PlayerController extends AnimController {
 		this.next(t);
 	}
 
-	face(vr: 1 | -1, grounded: boolean, canDoubleJump: boolean): void {
+	face(
+		vr: 1 | -1,
+		grounded: boolean,
+		canDoubleJump: boolean,
+		leaping?: 'f' | 'b'
+	): void {
 		if (vr !== this.facing) {
 			this.facing = vr;
 
-			if (grounded) {
-				this.play(aFlip);
-			} else {
-				if (canDoubleJump) this.play(aJFlip);
-				else this.play(aDJFlip);
+			if (leaping === 'f') this.play(aForegroundLeapFlip);
+			else if (leaping === 'b') this.play(aBackgroundLeapFlip);
+			else if (grounded) this.play(aFlip);
+			else {
+				if (canDoubleJump) this.play(aJumpFlip);
+				else this.play(aDoubleJumpFlip);
 			}
 
 			this.flip = vr < 0;

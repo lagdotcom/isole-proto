@@ -34,12 +34,13 @@ interface KrillnaInit {
 
 export default class Krillna extends AbstractEnemy {
 	dir: 'L' | 'R' | 'U' | 'D';
-	last: { ceiling?: Flat | null; floor?: Flat | null; wall?: Wall | null };
+	last: { ceiling?: Flat; floor?: Flat; wall?: Wall };
 	movefn: (frame: number, n: number) => number;
 	speed: number;
 	sprite: controller;
 	tscale: number;
 	vfa: number;
+	ignoreGravity: boolean;
 
 	constructor(
 		game: Game,
@@ -72,23 +73,26 @@ export default class Krillna extends AbstractEnemy {
 			alive: true,
 			health: 5,
 			damage: 1,
+			ignoreGravity: false,
 		});
 	}
 
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		const { speed, last, sprite, height, width, movefn } = this;
-		let { a, r, z, va, vr, vfa, dir } = this;
+		const { z, speed, last, sprite, height, width, movefn } = this;
+		let { a, r, va, vr, vfa, dir } = this;
 		const tscale = time / gTimeScale;
 		this.tscale = tscale;
 		const { bot, top } = this.getHitbox();
 
+		this.ignoreGravity = !!(last.ceiling || last.floor || last.wall);
+		if (last.ceiling) this.vr = 0.001; // make sure it checks the current ceiling again
 		let { floor, ceiling, wall } = physics(this, time);
 
-		function applyfloor(f: Flat) {
+		function applyFloor(f: Flat) {
 			floor = f;
-			wall = null;
+			wall = undefined;
 			stuck = f;
 			r = f.r;
 			vr = 0;
@@ -104,10 +108,10 @@ export default class Krillna extends AbstractEnemy {
 			sprite.ground();
 		}
 
-		function applywall(w: Wall) {
+		function applyWall(w: Wall) {
 			wall = w;
-			floor = null;
-			ceiling = null;
+			floor = undefined;
+			ceiling = undefined;
 			stuck = w;
 			va = 0;
 			dir = dir === dDown ? dir : dUp;
@@ -124,9 +128,9 @@ export default class Krillna extends AbstractEnemy {
 			}
 		}
 
-		function applyceiling(c: Flat) {
+		function applyCeiling(c: Flat) {
 			ceiling = c;
-			wall = null;
+			wall = undefined;
 			stuck = c;
 			r = c.r - height;
 			vr = 0;
@@ -144,15 +148,15 @@ export default class Krillna extends AbstractEnemy {
 
 		let stuck: Flat | Wall | null = null;
 		if (floor && !last.wall) {
-			applyfloor(floor);
+			applyFloor(floor);
 		} else if (last.floor) {
 			if (
 				angleDistance(a, last.floor.right) <
 				angleDistance(a, last.floor.left)
 			) {
-				wall = last.floor.wallRight ?? null;
+				wall = last.floor.wallRight;
 			} else {
-				wall = last.floor.wallLeft ?? null;
+				wall = last.floor.wallLeft;
 			}
 
 			if (wall) {
@@ -162,15 +166,15 @@ export default class Krillna extends AbstractEnemy {
 		}
 
 		if (ceiling && !last.wall) {
-			applyceiling(ceiling);
+			applyCeiling(ceiling);
 		} else if (last.ceiling) {
 			if (
 				angleDistance(a, last.ceiling.right) <
 				angleDistance(a, last.ceiling.left)
 			) {
-				wall = last.ceiling.wallRight ?? null;
+				wall = last.ceiling.wallRight;
 			} else {
-				wall = last.ceiling.wallLeft ?? null;
+				wall = last.ceiling.wallLeft;
 			}
 
 			if (wall) {
@@ -180,18 +184,18 @@ export default class Krillna extends AbstractEnemy {
 		}
 
 		if (wall) {
-			applywall(wall);
+			applyWall(wall);
 		} else if (last.wall) {
 			if (bot.r <= last.wall.top && top.r >= last.wall.bottom) {
-				applywall(last.wall);
+				applyWall(last.wall);
 			} else if (dir === dDown && last.wall.ceiling) {
 				if (last.wall.direction === 1) dir = dRight;
 				else dir = dLeft;
-				applyceiling(last.wall.ceiling);
+				applyCeiling(last.wall.ceiling);
 			} else if (dir === dUp && last.wall.floor) {
 				if (last.wall.direction === 1) dir = dRight;
 				else dir = dLeft;
-				applyfloor(last.wall.floor);
+				applyFloor(last.wall.floor);
 			}
 		}
 

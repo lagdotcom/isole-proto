@@ -4,6 +4,7 @@ import {
 	jButton2,
 	jButton3,
 	jButton4,
+	jButton5,
 	jDown,
 	jLeft,
 	jRight,
@@ -12,6 +13,7 @@ import {
 	kDown,
 	kFreeMoney,
 	kJump,
+	kLeap,
 	kLeft,
 	kRight,
 	kSwing,
@@ -33,6 +35,7 @@ export enum InputButton {
 	Cycle,
 	Pickup,
 	FreeMoney,
+	Leap,
 }
 
 interface InputDevice {
@@ -86,7 +89,7 @@ export class GamepadInput implements InputDevice {
 	}
 
 	add(pad: Gamepad) {
-		if (pad.buttons.length < 4) {
+		if (pad.buttons.length < 5) {
 			console.log(`Cannot use pad ${pad.id} - not enough buttons.`);
 			return;
 		}
@@ -119,6 +122,7 @@ export class GamepadInput implements InputDevice {
 			if (buttons[1].pressed) mapper.press(jButton2);
 			if (buttons[2].pressed) mapper.press(jButton3);
 			if (buttons[3].pressed) mapper.press(jButton4);
+			if (buttons[4].pressed) mapper.press(jButton5);
 		});
 	}
 }
@@ -146,6 +150,7 @@ export default class InputMapper {
 		this.map(kSwing, InputButton.Swing);
 		this.map(kThrow, InputButton.Throw);
 		this.map(kCycle, InputButton.Cycle);
+		this.map(kLeap, InputButton.Leap);
 		this.map(kDown, InputButton.Pickup);
 		this.map(kFreeMoney, InputButton.FreeMoney);
 
@@ -157,6 +162,7 @@ export default class InputMapper {
 		this.map(jButton2, InputButton.Throw);
 		this.map(jButton3, InputButton.Swing);
 		this.map(jButton4, InputButton.Cycle);
+		this.map(jButton5, InputButton.Leap);
 		this.map(jDown, InputButton.Pickup);
 	}
 

@@ -1,9 +1,10 @@
 import CoordARZ from './CoordARZ';
 import CoordXY from './CoordXY';
 import Damageable from './Damageable';
+import DrawnComponent from './DrawnComponent';
 import { Degrees, Multiplier, Pixels, Radians } from './flavours';
 import Hitbox, { HitSize } from './Hitbox';
-import { gHitboxScale } from './nums';
+import { gBackZ, gFrontZ, gHitboxScale } from './nums';
 
 export const π: Radians = Math.PI,
 	π2: Radians = π * 2,
@@ -121,17 +122,17 @@ export function any<T>(a: T[], fn: (value: T) => boolean): boolean {
  * Find the first item in a list that matches a predicate
  * @param {T[]} a item list
  * @param {(T, number) => boolean} fn check function
- * @returns {T|null} first matching item or null
+ * @returns {T|undefined} first matching item or null
  */
 export function first<T>(
 	a: T[],
-	fn: (object: T, index?: number) => boolean
-): T | null {
+	fn: (object: T, index: number) => boolean
+): T | undefined {
 	for (let i = 0; i < a.length; i++) {
 		if (fn(a[i], i)) return a[i];
 	}
 
-	return null;
+	return undefined;
 }
 
 /**
@@ -360,6 +361,8 @@ export function drawWedge(
 	b: HitSize,
 	t: HitSize
 ) {
+	if (b.r < 0 || t.r < 0) return;
+
 	c.strokeStyle = style;
 	c.beginPath();
 	c.arc(x, y, b.r, b.a - b.width, b.a + b.width);
@@ -439,4 +442,12 @@ export function drawCross(
 	c.moveTo(x + size, y - size);
 	c.lineTo(x - size, y + size);
 	c.stroke();
+}
+
+export function compareDrawnComponent(a: DrawnComponent, b: DrawnComponent) {
+	if (a.layer !== b.layer) return a.layer - b.layer;
+
+	const az = 'z' in a ? (a.z as Multiplier) : a.back ? gBackZ : gFrontZ;
+	const bz = 'z' in b ? (b.z as Multiplier) : b.back ? gBackZ : gFrontZ;
+	return bz - az;
 }

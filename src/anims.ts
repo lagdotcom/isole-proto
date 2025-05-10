@@ -2,8 +2,10 @@ import { AnimName } from './flavours';
 
 export const aStand: AnimName = 'stand',
 	aFlip: AnimName = 'flip',
-	aJFlip: AnimName = 'jflip',
-	aDJFlip: AnimName = 'djflip',
+	aJumpFlip: AnimName = 'jflip',
+	aDoubleJumpFlip: AnimName = 'djflip',
+	aBackgroundLeapFlip: AnimName = 'blflip',
+	aForegroundLeapFlip: AnimName = 'flflip',
 	aWalk: AnimName = 'walk',
 	aJump: AnimName = 'jump',
 	aDoubleJump: AnimName = 'djump',
@@ -12,4 +14,6 @@ export const aStand: AnimName = 'stand',
 	aAxe: AnimName = 'axe',
 	aHurt: AnimName = 'hurt',
 	aStatus: AnimName = 'status',
-	aDying: AnimName = 'dying';
+	aDying: AnimName = 'dying',
+	aBackgroundLeap: AnimName = 'bleap',
+	aForegroundLeap: AnimName = 'fleap';

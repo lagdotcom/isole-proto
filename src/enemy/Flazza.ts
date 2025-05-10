@@ -237,7 +237,7 @@ export default class Flazza extends AbstractEnemy {
 		};
 	}
 
-	getFloor(): Flat | null {
+	getFloor(): Flat | undefined {
 		const { bot, top } = this.getHitbox();
 		const { back, game } = this;
 

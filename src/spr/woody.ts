@@ -1,12 +1,16 @@
 import {
 	aAxe,
-	aDJFlip,
+	aBackgroundLeap,
+	aBackgroundLeapFlip,
 	aDoubleJump,
+	aDoubleJumpFlip,
 	aDying,
 	aFlip,
+	aForegroundLeap,
+	aForegroundLeapFlip,
 	aHurt,
-	aJFlip,
 	aJump,
+	aJumpFlip,
 	aLand,
 	aStand,
 	aStatus,
@@ -16,6 +20,25 @@ import {
 import { eSwing, eThrow } from '../events';
 import Player from '../Player';
 import PlayerController from './PlayerController';
+
+/*
+Cell order, left to right:
+- Idle
+- Turn frames (top to bottom is on ground turn, in air single jump turn, in air double jump turn, in air background leap turn, and in air foreground leap turn)
+- Run
+- Jump (loop last 4 frames only)
+- Double Jump (loop last 4 frames only)
+- Landing frames (play when landing jump, double jump, foreground and background leap)
+- Background leap (loop last 4 frames only)
+- Foreground leap (loop last 4 frames only)
+- Default swing animation (there might be a lot more of these later)
+- Foreground facing ward stance
+- Same lane facing ward stance (left/right)
+- Background ward stance
+- Dodge (loop frames 3, 4, 5, and 6 til player hits ground, then play rest of animation, final two frames have a tiny bit of skid to them physic wise)
+- Hurt (loop last 4 frames only, briefly)
+- Death (on death, play hurt animation once fully, then death animation after)
+*/
 
 export default function woodyController(
 	parent: Player,
@@ -35,6 +58,26 @@ export default function woodyController(
 			[aFlip]: {
 				priority: 5,
 				frames: [{ c: 1, r: 0, t: 75 }],
+			},
+
+			[aJumpFlip]: {
+				priority: 5,
+				frames: [{ c: 1, r: 1, t: 75 }],
+			},
+
+			[aDoubleJumpFlip]: {
+				priority: 5,
+				frames: [{ c: 1, r: 2, t: 75 }],
+			},
+
+			[aBackgroundLeapFlip]: {
+				priority: 5,
+				frames: [{ c: 1, r: 3, t: 75 }],
+			},
+
+			[aForegroundLeapFlip]: {
+				priority: 5,
+				frames: [{ c: 1, r: 4, t: 75 }],
 			},
 
 			[aWalk]: {
@@ -89,14 +132,30 @@ export default function woodyController(
 				],
 			},
 
-			[aJFlip]: {
-				priority: 5,
-				frames: [{ c: 1, r: 1, t: 75 }],
+			[aBackgroundLeap]: {
+				loop: true,
+				loopTo: 2,
+				frames: [
+					{ c: 6, r: 0, t: 75 },
+					{ c: 6, r: 1, t: 75 },
+					{ c: 6, r: 2, t: 75 },
+					{ c: 6, r: 3, t: 75 },
+					{ c: 6, r: 4, t: 75 },
+					{ c: 6, r: 5, t: 75 },
+				],
 			},
 
-			[aDJFlip]: {
-				priority: 5,
-				frames: [{ c: 1, r: 2, t: 75 }],
+			[aForegroundLeap]: {
+				loop: true,
+				loopTo: 2,
+				frames: [
+					{ c: 7, r: 0, t: 75 },
+					{ c: 7, r: 1, t: 75 },
+					{ c: 7, r: 2, t: 75 },
+					{ c: 7, r: 3, t: 75 },
+					{ c: 7, r: 4, t: 75 },
+					{ c: 7, r: 5, t: 75 },
+				],
 			},
 
 			[aThrow]: {

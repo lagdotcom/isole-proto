@@ -2,7 +2,6 @@ import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
 import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
-import Enemy from '../Enemy';
 import {
 	DisplayLayer,
 	Milliseconds,
@@ -18,9 +17,9 @@ import { zPlayer } from '../layers';
 import mel from '../makeElement';
 import {
 	gAirWalk,
+	gBackZ,
 	getZ,
-	gGravityStrength,
-	gGroundFriction,
+	gFrontZ,
 	gGroundWalk,
 	gMaxVA,
 	gStandThreshold,
@@ -44,15 +43,14 @@ import {
 	getDirectionVector,
 	jbr,
 	scaleWidth,
-	wrapAngle,
-	π,
 } from '../tools';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer = -10,
 	gJumpDoubleTimer = -10,
 	gJumpStrength = 4,
-	gJumpTimer = 8;
+	gJumpTimer = 8,
+	gLeapSpeed = 0.02;
 
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
@@ -65,17 +63,19 @@ export default abstract class AbstractPlayer implements Player {
 	game: Game;
 	grounded: boolean;
 	h: Pixels;
+	ignoreGravity: boolean;
 	invincible?: boolean;
 	invincibleTimer: Milliseconds;
 	isPlayer: true;
 	canDoubleJump: boolean;
 	jumplg: boolean;
-	jumpt: number;
+	jumpTimer: number;
 	health: number;
 	hurtSound: ResourceName;
 	layer: DisplayLayer;
+	leaping?: 'f' | 'b';
 	name: string;
-	pickupdebounce: boolean;
+	pickUpDebounce: boolean;
 	r: Pixels;
 	removeControl: boolean;
 	sprite: PlayerController;
@@ -104,13 +104,14 @@ export default abstract class AbstractPlayer implements Player {
 				vfa: 0,
 				vfr: 0,
 				facing: dRight,
-				jumpt: 0,
+				jumpTimer: 0,
 				canDoubleJump: true,
 				jumplg: false,
 				tscale: 0,
 				alive: true,
 				health: 5,
-				pickupdebounce: false,
+				pickUpDebounce: false,
+				ignoreGravity: false,
 			},
 			this.getDefaultInit(game, options),
 			options
@@ -129,8 +130,8 @@ export default abstract class AbstractPlayer implements Player {
 	abstract getDefaultInit(game: Game, options: PlayerInit): Partial<this>;
 
 	update(time: Milliseconds): void {
-		let { a, r, va, vr, vfa, canDoubleJump, jumplg, jumpt } = this;
-		const { back, game, sprite } = this;
+		let { z, canDoubleJump, jumplg, jumpTimer } = this;
+		const { game, sprite, va, vr } = this;
 		const { keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
@@ -138,6 +139,44 @@ export default abstract class AbstractPlayer implements Player {
 		let debug = '';
 		const flags: string[] = [];
 
+		const hurtEnemy =
+			vr < 0
+				? first(enemies, (e, i) => {
+						if (collides({ bot, top: step }, e.getHitbox())) {
+							debug += `jumped on e${i}: ${e.name}<br>`;
+							return true;
+						}
+
+						return false;
+					})
+				: undefined;
+
+		const hitEnemy = !this.invincible
+			? first(enemies, (e, i) => {
+					if (
+						e !== hurtEnemy &&
+						collides({ bot, top }, e.getHitbox())
+					) {
+						debug += `hit by e${i}: ${e.name}<br>`;
+						return true;
+					}
+
+					return false;
+				})
+			: undefined;
+
+		this.jumpTimer = jumpTimer -= tscale;
+
+		if (hurtEnemy) {
+			this.vr = gJumpStrength * 0.75;
+			damage(hurtEnemy, this, 1);
+			this.body.play('player.bop');
+		}
+		if (hitEnemy) {
+			damage(this, hitEnemy, hitEnemy.damage ?? 1);
+		}
+
+		this.ignoreGravity = !!this.leaping;
 		const { floor, ceiling, wall } = physics(this, time);
 
 		if (vr <= 0) {
@@ -148,8 +187,7 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('up');
 			if (ceiling) {
 				flags.push('ceiling');
-				if (vr > 0) this.body.play('player.bonk');
-				vr = 0;
+				this.body.play('player.bonk');
 			}
 		}
 
@@ -157,58 +195,11 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('sideways');
 		}
 
-		let hurtenemy: Enemy | null = null;
-		if (vr < 0) {
-			hurtenemy = first(enemies, (e, i) => {
-				if (
-					e.back === back &&
-					collides({ bot, top: step }, e.getHitbox())
-				) {
-					debug += `jumped on e${i}: ${e.name}<br>`;
-					return true;
-				}
-
-				return false;
-			});
-		}
-
-		const hitenemy = first(enemies, (e, i) => {
-			if (
-				e.back === back &&
-				e !== hurtenemy &&
-				collides({ bot, top }, e.getHitbox())
-			) {
-				debug += `hit by e${i}: ${e.name}<br>`;
-				return true;
-			}
-
-			return false;
-		});
-
-		this.jumpt = jumpt -= tscale;
-
-		if (hurtenemy) {
-			vr = gJumpStrength * 0.75;
-			damage(hurtenemy, this, 1);
-			this.body.play('player.bop');
-		}
-		if (hitenemy && hurtenemy !== hitenemy) {
-			damage(this, hitenemy, hitenemy.damage ?? 1);
-		}
-
-		if (floor && jumpt <= 0) {
+		if (floor && !this.leaping) {
 			this.grounded = true;
 			this.canDoubleJump = canDoubleJump = true;
-
-			r = floor.r;
-			vr = 0;
-			va *= gGroundFriction;
-			vfa = floor.motion * time;
 		} else {
 			this.grounded = false;
-
-			vr -= gGravityStrength;
-			vfa = 0;
 		}
 
 		const ok = game.mode === 'level';
@@ -216,41 +207,41 @@ export default abstract class AbstractPlayer implements Player {
 		if (ok && !sprite.flags.noControl && !this.removeControl) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
-				va -= strength;
+				this.va -= strength;
 				controls.push('left');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(-1, this.grounded, canDoubleJump);
+					sprite.face(-1, this.grounded, canDoubleJump, this.leaping);
 					this.facing = dLeft;
 				}
 			} else if (keys.has(InputButton.Right)) {
-				va += strength;
+				this.va += strength;
 				controls.push('right');
 
 				if (!sprite.flags.noTurn) {
-					sprite.face(1, this.grounded, canDoubleJump);
+					sprite.face(1, this.grounded, canDoubleJump, this.leaping);
 					this.facing = dRight;
 				}
 			}
 
 			if (keys.has(InputButton.Jump)) {
 				if (floor) {
-					vr += gJumpStrength;
-					this.jumpt = jumpt = gJumpTimer;
+					this.vr += gJumpStrength;
+					this.jumpTimer = jumpTimer = gJumpTimer;
 					controls.push('jump');
 					this.body.play('player.jump');
 				} else if (
-					jumpt < gJumpDoubleTimer &&
+					jumpTimer < gJumpDoubleTimer &&
 					canDoubleJump &&
 					jumplg
 				) {
-					this.jumpt = jumpt = gJumpTimer;
+					this.jumpTimer = jumpTimer = gJumpTimer;
 					this.canDoubleJump = canDoubleJump = false;
-					vr = gJumpStrength;
+					this.vr = gJumpStrength;
 					controls.push('jumpd');
 					this.body.play('player.jump');
-				} else if (jumpt >= gJumpAffectTimer && !jumplg) {
-					vr += gJumpAffectStrength;
+				} else if (jumpTimer >= gJumpAffectTimer && !jumplg) {
+					this.vr += gJumpAffectStrength;
 					controls.push('jump+');
 				}
 
@@ -265,18 +256,26 @@ export default abstract class AbstractPlayer implements Player {
 			if (keys.has(InputButton.Pickup)) {
 				controls.push('pickup');
 
-				if (!this.pickupdebounce) {
+				if (!this.pickUpDebounce) {
 					const item = game.pickups.find(p =>
 						collides({ bot, top }, p.getHitbox())
 					);
 
 					if (item) {
-						this.pickupdebounce = true;
+						this.pickUpDebounce = true;
 						item.take();
 					}
 				}
 			} else {
-				this.pickupdebounce = false;
+				this.pickUpDebounce = false;
+			}
+
+			if (keys.has(InputButton.Leap)) {
+				if (this.grounded) {
+					this.leaping = this.z == gFrontZ ? 'b' : 'f';
+					controls.push('leap');
+					this.body.play('player.jump');
+				}
 			}
 		} else controls.push('nocontrol');
 
@@ -284,39 +283,40 @@ export default abstract class AbstractPlayer implements Player {
 			flags.push('wall');
 			const bounce = wall.direction * gWallBounce;
 			if (wall.direction === 1) {
-				a = wall.a - bot.width;
-				if (va > bounce) va = bounce;
+				this.a = wall.a - bot.width;
+				if (va > bounce) this.va = bounce;
 			} else {
-				a = wall.a + bot.width;
-				if (va < -bounce) va = -bounce;
+				this.a = wall.a + bot.width;
+				if (va < -bounce) this.va = -bounce;
 			}
-		} else if (va > gMaxVA) va = gMaxVA;
-		else if (va < -gMaxVA) va = -gMaxVA;
+		} else if (va > gMaxVA) this.va = gMaxVA;
+		else if (va < -gMaxVA) this.va = -gMaxVA;
 
-		this.va = va;
-		this.vfa = vfa;
-		this.vr = vr;
-		a += (va / r) * tscale * gWalkScale + vfa;
-		r += vr * tscale;
+		if (this.leaping) {
+			const vz = this.leaping === 'f' ? gLeapSpeed : -gLeapSpeed;
+			z += vz;
+			game.redraw = true; // this is kinda stupid
+			if (z <= gBackZ) {
+				z = gBackZ;
+				this.leaping = undefined;
+				this.back = true;
+			} else if (z >= gFrontZ) {
+				z = gFrontZ;
+				this.leaping = undefined;
+				this.back = false;
+			}
 
-		if (r < 0) {
-			r *= -1;
-			a += π;
+			this.z = z;
 		}
 
-		this.a = wrapAngle(a);
-		this.r = r;
-
-		if (!this.grounded) {
+		if (this.leaping) sprite.leap(time, this.leaping);
+		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
-		} else if (Math.abs(va) < gStandThreshold) {
-			sprite.stand(time);
-		} else {
-			sprite.walk(time);
-		}
+		} else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
+		else sprite.walk(time);
 
-		if (jumpt > 0) flags.push('jump');
+		if (jumpTimer > 0) flags.push('jump');
 		if (this.grounded) flags.push('grounded');
 
 		this.hurtTimer(time);
@@ -326,8 +326,8 @@ export default abstract class AbstractPlayer implements Player {
 				'<b>Player</b>',
 				`controls: ${controls.join(' ')}`,
 				`flags: ${flags.join(' ')}`,
-				`vel: ${vr.toFixed(2)},${va.toFixed(2)}r`,
-				`pos: ${r.toFixed(2)},${a.toFixed(2)}r`,
+				`vel: ${this.vr.toFixed(2)},${this.va.toFixed(2)}r`,
+				`pos: ${this.r.toFixed(2)},${this.a.toFixed(2)}r`,
 				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
 					sprite.flip ? 'flip' : 'normal'
 				}`,
@@ -406,8 +406,8 @@ export default abstract class AbstractPlayer implements Player {
 
 		// TODO: is this working?
 		const dv = getDirectionVector(this, by);
-		this.va += dv.a * 5;
-		this.vr += dv.r * 5;
+		this.va += dv.a * 2;
+		this.vr += dv.r * 2;
 
 		this.game.fire('player.hurt', { by, damage });
 		this.voice.play(this.hurtSound);

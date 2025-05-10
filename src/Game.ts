@@ -33,7 +33,7 @@ import { Pickup } from './Pickup';
 import Player from './Player';
 import addResources from './resources';
 import Texture from './Texture';
-import { min } from './tools';
+import { compareDrawnComponent, min } from './tools';
 import Zoomer from './Zoomer';
 
 export const LevelMode = 'level';
@@ -460,8 +460,6 @@ export default class Game {
 	getDrawnComponents(): DrawnComponent[] {
 		return this.components
 			.filter(co => co.draw)
-			.sort(
-				(a: DrawnComponent, b: DrawnComponent) => a.layer - b.layer
-			) as DrawnComponent[];
+			.sort(compareDrawnComponent) as DrawnComponent[];
 	}
 }

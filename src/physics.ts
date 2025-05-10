@@ -1,6 +1,6 @@
 import Flat from './component/Flat';
 import Wall from './component/Wall';
-import { Milliseconds, Pixels, Radians } from './flavours';
+import { Milliseconds, Multiplier, Pixels, Radians } from './flavours';
 import Game from './Game';
 import Hitbox from './Hitbox';
 import {
@@ -25,6 +25,7 @@ interface PhysicsObject {
 	va: number;
 	vfa: number;
 	vr: number;
+	z: Multiplier;
 }
 
 export default function physics(obj: PhysicsObject, time: Milliseconds) {
@@ -41,7 +42,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		tscale = time / gTimeScale;
 	const { bot, top } = obj.getHitbox();
 
-	let floor: Flat | null = null;
+	let floor: Flat | undefined;
 	if (vr <= 0 && !ignoreFloors) {
 		floor = first(floors, f => {
 			const da = angleDistance(a, f.a);
@@ -55,7 +56,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		});
 	}
 
-	let ceiling: Flat | null = null;
+	let ceiling: Flat | undefined;
 	if (vr > 0 && !ignoreCeilings) {
 		ceiling = first(ceilings, f => {
 			const da = angleDistance(a, f.a);
@@ -72,7 +73,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		}
 	}
 
-	let wall: Wall | null = null;
+	let wall: Wall | undefined;
 	if (
 		!ignoreWalls &&
 		(Math.abs(va) > gStandThreshold || game.wallsInMotion)
@@ -101,17 +102,18 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		vfa = 0;
 	}
 
-	obj.va = va;
-	obj.vfa = vfa;
-	obj.vr = vr;
 	a += (va / r) * tscale * gWalkScale + vfa;
 	r += vr * tscale;
 
 	if (r < 0) {
-		r *= -1;
+		r = -r;
 		a += π;
+		vr = -vr;
 	}
 
+	obj.va = va;
+	obj.vfa = vfa;
+	obj.vr = vr;
 	obj.a = wrapAngle(a);
 	obj.r = r;
 

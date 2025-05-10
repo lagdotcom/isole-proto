@@ -1,11 +1,11 @@
 import {
 	aAxe,
-	aDJFlip,
+	aDoubleJumpFlip,
 	aDoubleJump,
 	aDying,
 	aFlip,
 	aHurt,
-	aJFlip,
+	aJumpFlip,
 	aJump,
 	aLand,
 	aStand,
@@ -78,12 +78,12 @@ export default function woodyController(
 				],
 			},
 
-			[aJFlip]: {
+			[aJumpFlip]: {
 				priority: 5,
 				frames: [{ c: 4, r: 0, t: 75 }],
 			},
 
-			[aDJFlip]: {
+			[aDoubleJumpFlip]: {
 				priority: 5,
 				frames: [{ c: 4, r: 0, t: 75 }],
 			},
