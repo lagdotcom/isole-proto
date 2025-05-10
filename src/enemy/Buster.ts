@@ -170,7 +170,7 @@ export default class Buster extends AbstractEnemy {
 		} else {
 			this.grounded = false;
 
-			vr -= gGravityStrength;
+			vr -= gGravityStrength * tscale;
 			vfa = 0;
 		}
 

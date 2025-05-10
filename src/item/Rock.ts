@@ -84,7 +84,7 @@ class Rock implements DrawnComponent {
 		this.tscale = tscale;
 		float -= tscale;
 
-		if (float <= 0) vr -= gGravityStrength;
+		if (float <= 0) vr -= gGravityStrength * tscale;
 		va *= gWindLoss;
 
 		// TODO check ceiling?

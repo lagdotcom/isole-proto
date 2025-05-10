@@ -98,7 +98,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		va *= gGroundFriction;
 		vfa = floor.motion * time;
 	} else {
-		if (!ignoreGravity) vr -= gGravityStrength;
+		if (!ignoreGravity) vr -= gGravityStrength * tscale;
 		vfa = 0;
 	}
 

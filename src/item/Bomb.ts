@@ -151,7 +151,7 @@ class Bomb implements DrawnComponent {
 
 			if (r < floor.r) r = floor.r;
 		} else {
-			vr -= gGravityStrength;
+			vr -= gGravityStrength * tscale;
 		}
 
 		this.va = va;

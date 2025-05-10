@@ -200,7 +200,7 @@ export default class Krillna extends AbstractEnemy {
 		}
 
 		if (!stuck) {
-			vr -= gGravityStrength;
+			vr -= gGravityStrength * tscale;
 		}
 
 		const mva = stuck ? movefn(sprite.r, va) : va,

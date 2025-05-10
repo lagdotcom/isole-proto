@@ -294,7 +294,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		if (this.leaping) {
 			const vz = this.leaping === 'f' ? gLeapSpeed : -gLeapSpeed;
-			z += vz;
+			z += vz * tscale;
 			game.redraw = true; // this is kinda stupid
 			if (z <= gBackZ) {
 				z = gBackZ;
