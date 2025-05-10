@@ -1,7 +1,7 @@
-import CoordAR from './CoordAR';
+import CoordARZ from './CoordARZ';
 import CoordXY from './CoordXY';
 import Damageable from './Damageable';
-import { Degrees, Pixels, Radians } from './flavours';
+import { Degrees, Multiplier, Pixels, Radians } from './flavours';
 import Hitbox, { HitSize } from './Hitbox';
 import { gHitboxScale } from './nums';
 
@@ -74,10 +74,11 @@ export function cart<T extends number>(a: Radians, r: T): CoordXY<T> {
  * Scale a width according to its radius
  * @param {Pixels} w width
  * @param {Pixels} r radius
+ * @param {Multiplier} z depth
  * @returns {Radians} scaled width
  */
-export function scaleWidth(w: Pixels, r: Pixels): Radians {
-	return (w / r) * gHitboxScale;
+export function scaleWidth(w: Pixels, r: Pixels, z: Multiplier): Radians {
+	return (w / r) * gHitboxScale * z;
 }
 
 /**
@@ -139,8 +140,7 @@ export function first<T>(
  * @param b second hitsize
  */
 export function angleCollides(a: HitSize, b: HitSize): boolean {
-	const ad = angleDistance(a.a, b.a);
-	return ad < a.width + b.width;
+	return a.back === b.back && angleDistance(a.a, b.a) < a.width + b.width;
 }
 
 /**
@@ -152,7 +152,10 @@ export function angleCollides(a: HitSize, b: HitSize): boolean {
 export function collides(a: Hitbox, b: Hitbox): boolean {
 	// TODO: should this also check .t.a?
 	return (
-		a.bot.r <= b.top.r && a.top.r >= b.bot.r && angleCollides(a.bot, b.bot)
+		a.bot.back === b.bot.back &&
+		a.bot.r <= b.top.r &&
+		a.top.r >= b.bot.r &&
+		angleCollides(a.bot, b.bot)
 	);
 }
 
@@ -193,44 +196,46 @@ export function damage(
 
 /**
  * Create a vector between two coordinates
- * @param {CoordAR} x first coord
- * @param {CoordAR} y second coord
- * @returns {CoordAR} vector
+ * @param {CoordARZ} x first coord
+ * @param {CoordARZ} y second coord
+ * @returns {CoordARZ} vector
  */
-export function getDirectionVector(x: CoordAR, y: CoordAR): CoordAR {
+export function getDirectionVector(x: CoordARZ, y: CoordARZ): CoordARZ {
 	const rd = x.r - y.r;
 	const ad = x.a - y.a;
-	const t = Math.abs(rd + ad);
+	const zd = x.z - y.z;
+	const t = Math.abs(rd + ad + zd);
 	const r = rd / t;
 	const a = ad / t;
+	const z = zd / t;
 
-	return { r, a };
+	return { r, a, z };
 }
 
 /**
  * Displace a polar coordinate by a list of cartesian coordinates
- * @param {CoordAR} origin origin
+ * @param {CoordARZ} origin origin
  * @param {CoordXY[]} offsets offset list
  * @param {boolean} flip flip on X axis
- * @returns {CoordAR} final position
+ * @returns {CoordARZ} final position
  */
 export function displace(
-	origin: CoordAR,
+	origin: CoordARZ,
 	offsets: CoordXY[] = [],
 	flip = false
-): CoordAR {
-	const { a, r } = origin;
+): CoordARZ {
+	const { a, r, z } = origin;
 	let x: Pixels = 0,
 		y: Pixels = 0;
 
 	offsets.forEach(h => {
-		x += h.x;
-		y += h.y;
+		x += h.x * z;
+		y += h.y * z;
 	});
 
 	if (flip) x = 0 - x;
 
-	return { a: a + scaleWidth(x, r + y), r: r + y };
+	return { a: a + scaleWidth(x, r + y, z), r: r + y, z };
 }
 
 /**

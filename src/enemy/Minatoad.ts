@@ -7,14 +7,20 @@ import { cAI, cAIDark, cHurt } from '../colours';
 import { Facing } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
 import { eAnimationEnded } from '../events';
-import { AnimName, Pixels, Radians, ResourceName } from '../flavours';
+import {
+	AnimName,
+	Multiplier,
+	Pixels,
+	Radians,
+	ResourceName,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zSpark } from '../layers';
-import { gStandThreshold, gTimeScale, gWalkScale } from '../nums';
+import { getZ, gStandThreshold, gTimeScale, gWalkScale } from '../nums';
 import physics from '../physics';
+import { draw3D } from '../rendering';
 import {
-	cart,
 	collides,
 	damage,
 	drawWedge,
@@ -24,7 +30,6 @@ import {
 	randomItem,
 	randomRange,
 	scaleWidth,
-	πHalf,
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
@@ -216,6 +221,7 @@ const gMaxReticleVA = 0.1;
 const gMaxReticleVR = 5;
 
 class Reticle implements DrawnComponent {
+	back: boolean;
 	a: number;
 	sprite: ReticleController;
 	game: Game;
@@ -223,8 +229,11 @@ class Reticle implements DrawnComponent {
 	r: number;
 	va: number;
 	vr: number;
+	z: Multiplier;
 
 	constructor(game: Game) {
+		this.back = false;
+		this.z = getZ(this.back);
 		this.a = 0;
 		this.sprite = new ReticleController(game.resources['reticle']);
 		this.game = game;
@@ -233,6 +242,7 @@ class Reticle implements DrawnComponent {
 	}
 
 	reset() {
+		this.back = this.game.player.back;
 		this.a = this.game.player.a;
 		this.r = this.game.player.r;
 		this.va = 0;
@@ -261,16 +271,7 @@ class Reticle implements DrawnComponent {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-
-		sprite.draw(c);
-
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 }
 
@@ -306,11 +307,12 @@ class Shockwave extends AbstractEnemy {
 	active: boolean;
 	sprite: ShockwaveController;
 
-	constructor(game: Game, a: number, r: number, va: number) {
+	constructor(game: Game, back: boolean, a: number, r: number, va: number) {
 		super({
 			name: 'Minatoad Shockwave',
 			game,
 			active: true,
+			back,
 			a,
 			r,
 			va,
@@ -361,19 +363,7 @@ class Shockwave extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-
-		const { x, y } = cart(a, r);
-		const normal = a + πHalf;
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
@@ -389,27 +379,31 @@ class Shockwave extends AbstractEnemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { r: 0, a: 0, width: 0 },
-			top: { r: 0, a: 0, width: 0 },
+			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(width, br),
-			taw = scaleWidth(width, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(width, br, z),
+			taw = scaleWidth(width, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};
@@ -458,12 +452,20 @@ class SmallBullet extends AbstractEnemy {
 	sprite: BulletController;
 	vfa: number;
 
-	constructor(owner: Minatoad, game: Game, a: number, r: number, vr: number) {
+	constructor(
+		owner: Minatoad,
+		game: Game,
+		back: boolean,
+		a: number,
+		r: number,
+		vr: number
+	) {
 		super({
 			name: 'Minatoad Small Bullet',
 			owner,
 			game,
 			active: true,
+			back,
 			a,
 			r,
 			va: 0,
@@ -521,19 +523,7 @@ class SmallBullet extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-
-		const { x, y } = cart(a, r);
-		const normal = a + πHalf;
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
@@ -551,21 +541,25 @@ class SmallBullet extends AbstractEnemy {
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(width, br),
-			taw = scaleWidth(width, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(width, br, z),
+			taw = scaleWidth(width, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};
@@ -577,12 +571,20 @@ class BigBullet extends AbstractEnemy {
 	owner: Minatoad;
 	sprite: BulletController;
 
-	constructor(owner: Minatoad, game: Game, a: number, r: number, vr: number) {
+	constructor(
+		owner: Minatoad,
+		game: Game,
+		back: boolean,
+		a: number,
+		r: number,
+		vr: number
+	) {
 		super({
 			name: 'Minatoad Big Bullet',
 			owner,
 			game,
 			active: true,
+			back,
 			a,
 			r,
 			va: 0,
@@ -611,6 +613,7 @@ class BigBullet extends AbstractEnemy {
 				const bullet = new SmallBullet(
 					this.owner,
 					this.game,
+					this.back,
 					randomAngle(),
 					this.r,
 					gSmallBulletSpeed()
@@ -644,19 +647,7 @@ class BigBullet extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-
-		const { x, y } = cart(a, r);
-		const normal = a + πHalf;
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
@@ -672,27 +663,31 @@ class BigBullet extends AbstractEnemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { r: 0, a: 0, width: 0 },
-			top: { r: 0, a: 0, width: 0 },
+			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(width, br),
-			taw = scaleWidth(width, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(width, br, z),
+			taw = scaleWidth(width, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};
@@ -726,8 +721,10 @@ class PoisonSprayField extends AbstractEnemy {
 			game,
 			duration,
 			spread,
+			back: owner.back,
 			a,
 			r,
+			z: getZ(owner.back),
 			width: 150,
 			height: 100,
 			va: 0,
@@ -781,21 +778,25 @@ class PoisonSprayField extends AbstractEnemy {
 	}
 
 	getAttackHitbox() {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(width, br),
-			taw = scaleWidth(width, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(width, br, z),
+			taw = scaleWidth(width, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};
@@ -972,6 +973,7 @@ export default class Minatoad extends AbstractEnemy {
 		const bullet = new BigBullet(
 			this,
 			this.game,
+			this.back,
 			this.a,
 			this.r + this.height,
 			gBigBulletSpeed
@@ -1080,6 +1082,8 @@ export default class Minatoad extends AbstractEnemy {
 			this.state = 'fall';
 
 			this.game.remove(this.reticle);
+			this.back = this.game.player.back;
+			this.z = getZ(this.back);
 			this.a = this.reticle.a;
 			this.vr = -20;
 			this.hidden = false;
@@ -1098,12 +1102,14 @@ export default class Minatoad extends AbstractEnemy {
 
 			const leftsh = new Shockwave(
 				this.game,
+				this.back,
 				this.a,
 				this.r,
 				-gShockwaveSpeed
 			);
 			const rightsh = new Shockwave(
 				this.game,
+				this.back,
 				this.a,
 				this.r,
 				gShockwaveSpeed
@@ -1140,21 +1146,8 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite, hidden } = this;
-		if (hidden) return;
-
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		if (this.hidden) return;
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -1166,9 +1159,9 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	getHitbox(): Hitbox {
-		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height);
+		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z);
 		let amod: number,
 			vbr = 0,
 			vtr = 0;
@@ -1181,13 +1174,17 @@ export default class Minatoad extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height + vtr,
+				back,
+				r: r + height * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 		};

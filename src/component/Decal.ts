@@ -1,10 +1,10 @@
 import { cIgnore } from '../colours';
 import Component from '../Component';
 import Controller from '../Controller';
-import PointAR from '../CoordAR';
 import {
 	Degrees,
 	DisplayLayer,
+	Multiplier,
 	ObjectName,
 	Pixels,
 	Radians,
@@ -12,19 +12,16 @@ import {
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zBackground } from '../layers';
-import { gTimeScale } from '../nums';
-import {
-	cart,
-	deg2rad,
-	drawWedge,
-	scaleWidth,
-	wrapAngle,
-	πHalf,
-} from '../tools';
+import { getZ, gTimeScale } from '../nums';
+import { draw2D, draw3D } from '../rendering';
+import { deg2rad, drawWedge, scaleWidth, wrapAngle } from '../tools';
 
 export type DecalPosition = 'normal' | 'static';
 
-interface DecalInit extends PointAR<Degrees> {
+interface DecalInit {
+	back?: boolean;
+	a: Degrees;
+	r: Pixels;
 	layer?: DisplayLayer;
 	motion?: number;
 	object: ObjectName;
@@ -34,6 +31,7 @@ interface DecalInit extends PointAR<Degrees> {
 
 export default class Decal implements Component {
 	a: Radians;
+	back: boolean;
 	game: Game;
 	height: Pixels;
 	isDecal: true;
@@ -46,12 +44,14 @@ export default class Decal implements Component {
 	x: Pixels;
 	width: Pixels;
 	y: Pixels;
+	z: Multiplier;
 
 	constructor(
 		game: Game,
 		{
 			object,
 			layer = zBackground,
+			back = false,
 			a = 0,
 			r = 0,
 			motion = 0,
@@ -64,6 +64,8 @@ export default class Decal implements Component {
 		this.isDecal = true;
 		this.layer = layer;
 		this.game = game;
+		this.back = back;
+		this.z = getZ(this.back);
 		this.r = r;
 		this.a = wrapAngle(deg2rad(a));
 		this.motion = deg2rad(motion / 100);
@@ -98,30 +100,11 @@ export default class Decal implements Component {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawStatic(c: CanvasRenderingContext2D): void {
-		const { x, y, game, sprite } = this;
-		const { cx, cy } = game;
-
-		c.translate(x + cx, y + cy);
-
-		sprite.draw(c);
-
-		c.translate(-x - cx, -y - cy);
+		draw2D(c, this);
 	}
 
 	drawHitbox?(c: CanvasRenderingContext2D): void {
@@ -133,19 +116,23 @@ export default class Decal implements Component {
 	}
 
 	getHitbox(): Hitbox {
-		const { r, a, width, height } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height);
+		const { back, r, a, z, width, height } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z);
 
 		return {
 			bot: {
+				back,
 				r,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height,
+				back,
+				r: r + height * z,
 				a,
+				z,
 				width: taw,
 			},
 		};

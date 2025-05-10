@@ -4,18 +4,21 @@ import {
 	DisplayLayer,
 	MaterialName,
 	Milliseconds,
+	Multiplier,
 	Pixels,
 	Radians,
 } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
-import { gHitboxScale } from '../nums';
+import { getZ, gHitboxScale } from '../nums';
+import { drawSprite } from '../rendering';
 import Texture from '../Texture';
 import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Flat from './Flat';
 import Wall from './Wall';
 
 export interface PlatformInit {
+	back: boolean;
 	h: Pixels;
 	th: Pixels;
 	a: Degrees;
@@ -29,6 +32,7 @@ export interface PlatformInit {
 /** Full platform */
 export default class Platform implements DrawnComponent {
 	a: Radians;
+	back: boolean;
 	bottom: Pixels;
 	ceiling?: Flat;
 	circle: boolean;
@@ -45,6 +49,7 @@ export default class Platform implements DrawnComponent {
 	width: Radians;
 	wallLeft?: Wall;
 	wallRight?: Wall;
+	z: Multiplier;
 
 	/**
 	 * Create a new Platform
@@ -53,6 +58,7 @@ export default class Platform implements DrawnComponent {
 	constructor(init: PlatformInit & { game: Game }) {
 		const {
 			game,
+			back,
 			h,
 			th,
 			a,
@@ -64,6 +70,8 @@ export default class Platform implements DrawnComponent {
 		} = init;
 
 		this.game = game;
+		this.back = back;
+		this.z = getZ(this.back);
 		this.layer = zStructure;
 		this.r = h;
 		this.thickness = th;
@@ -77,13 +85,20 @@ export default class Platform implements DrawnComponent {
 		this.sprite = game.textures[material];
 		this.scale = this.sprite.w / gHitboxScale;
 
-		this.floor = new Flat(game, { height: h, angle: a, width: w, motion });
+		this.floor = new Flat(game, {
+			back,
+			height: h,
+			angle: a,
+			width: w,
+			motion,
+		});
 		this.floor.scale = this.scale;
 		game.materials[material].spawner(this.floor);
 		game.floors.push(this.floor);
 
 		if (ceiling) {
 			this.ceiling = new Flat(game, {
+				back,
 				height: this.bottom,
 				angle: a,
 				width: w,
@@ -95,6 +110,7 @@ export default class Platform implements DrawnComponent {
 		if (walls && !this.circle) {
 			this.wallLeft = new Wall(
 				game,
+				back,
 				h,
 				this.bottom,
 				a - w / 2,
@@ -103,6 +119,7 @@ export default class Platform implements DrawnComponent {
 			);
 			this.wallRight = new Wall(
 				game,
+				back,
 				h,
 				this.bottom,
 				a + w / 2,
@@ -161,10 +178,10 @@ export default class Platform implements DrawnComponent {
 	}
 
 	drawSlice(c: CanvasRenderingContext2D, row: string, r: number) {
-		const { left, right, game, scale, sprite, width } = this;
+		const { left, right, game, scale, sprite, width, z } = this;
 		const { cx, cy } = game;
-		const step = scaleWidth(scale, r),
-			offset = scaleWidth(scale / 2, r);
+		const step = scaleWidth(scale, r, z),
+			offset = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -178,13 +195,7 @@ export default class Platform implements DrawnComponent {
 			const normal = a + offset + πHalf;
 			const { x, y } = cart(a, r);
 
-			c.translate(x + cx, y + cy);
-			c.rotate(normal);
-
-			sprite.draw(c);
-
-			c.rotate(-normal);
-			c.translate(-x - cx, -y - cy);
+			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 
 			remaining -= step;
 			a += step;

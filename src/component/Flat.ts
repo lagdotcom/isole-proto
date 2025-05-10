@@ -5,13 +5,15 @@ import {
 	Degrees,
 	DisplayLayer,
 	Milliseconds,
+	Multiplier,
 	Pixels,
 	Radians,
 	TextureName,
 } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
-import { gHitboxScale } from '../nums';
+import { getZ, gHitboxScale } from '../nums';
+import { drawSprite } from '../rendering';
 import Texture from '../Texture';
 import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Wall from './Wall';
@@ -20,6 +22,7 @@ import Wall from './Wall';
 export default class Flat implements DrawnComponent {
 	a: Radians;
 	attachments: Component[];
+	back: boolean;
 	circle: boolean;
 	game: Game;
 	isFlat: true;
@@ -33,6 +36,7 @@ export default class Flat implements DrawnComponent {
 	width: Radians;
 	wallLeft?: Wall;
 	wallRight?: Wall;
+	z: Multiplier;
 
 	/**
 	 * Create a new Flat
@@ -46,12 +50,14 @@ export default class Flat implements DrawnComponent {
 	constructor(
 		game: Game,
 		{
+			back,
 			height,
 			angle,
 			width,
 			motion = 0,
 			texture,
 		}: {
+			back: boolean;
 			height: Pixels;
 			angle: Degrees;
 			width: Degrees;
@@ -66,6 +72,7 @@ export default class Flat implements DrawnComponent {
 			layer: zStructure,
 			game,
 			attachments: [],
+			back,
 			r: height,
 			a: deg2rad(angle),
 			width: deg2rad(width) / 2,
@@ -74,6 +81,7 @@ export default class Flat implements DrawnComponent {
 
 		this.left = this.a - this.width;
 		this.right = this.a + this.width;
+		this.z = getZ(this.back);
 
 		if (texture) {
 			this.sprite = game.textures[texture];
@@ -103,10 +111,10 @@ export default class Flat implements DrawnComponent {
 	 * @param {CanvasRenderingContext2D} c image context
 	 */
 	draw(c: CanvasRenderingContext2D): void {
-		const { left, right, r, game, scale, sprite, width } = this;
+		const { left, right, r, game, scale, sprite, width, z } = this;
 		const { cx, cy } = game;
-		const step = scaleWidth(scale, r),
-			offset = scaleWidth(scale / 2, r);
+		const step = scaleWidth(scale, r, z),
+			offset = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -123,13 +131,7 @@ export default class Flat implements DrawnComponent {
 			const normal = a + offset + πHalf;
 			const { x, y } = cart(a, r);
 
-			c.translate(x + cx, y + cy);
-			c.rotate(normal);
-
-			sprite.draw(c);
-
-			c.rotate(-normal);
-			c.translate(-x - cx, -y - cy);
+			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 
 			remaining -= step;
 			a += step;

@@ -1,9 +1,16 @@
 import Damageable from '../Damageable';
 import Enemy from '../Enemy';
-import { DisplayLayer, Milliseconds, Pixels, Radians } from '../flavours';
+import {
+	DisplayLayer,
+	Milliseconds,
+	Multiplier,
+	Pixels,
+	Radians,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import mel from '../makeElement';
+import { getZ } from '../nums';
 import { deg2rad, jbr } from '../tools';
 
 const gStunMultiplier = 200;
@@ -11,6 +18,7 @@ const gStunMultiplier = 200;
 export default abstract class AbstractEnemy implements Enemy {
 	a: Radians;
 	alive: boolean;
+	back: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
@@ -24,6 +32,7 @@ export default abstract class AbstractEnemy implements Enemy {
 	va: number;
 	vr: number;
 	width: Pixels;
+	z: Multiplier;
 
 	abstract draw(ctx: CanvasRenderingContext2D): void;
 	abstract getHitbox(): Hitbox;
@@ -33,6 +42,8 @@ export default abstract class AbstractEnemy implements Enemy {
 		this.stuntimer = 0;
 
 		Object.assign(this, options);
+		this.back = options.back ?? false;
+		this.z = getZ(this.back);
 		this.a = deg2rad(options.a ?? 0);
 
 		if (this.game.options.showDebug) {

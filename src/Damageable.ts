@@ -1,7 +1,7 @@
-import CoordAR from './CoordAR';
+import CoordARZ from './CoordARZ';
 import DrawnComponent from './DrawnComponent';
 
-export default interface Damageable extends CoordAR, DrawnComponent {
+export default interface Damageable extends CoordARZ, DrawnComponent {
 	alive: boolean;
 	health: number;
 	invincible?: boolean;

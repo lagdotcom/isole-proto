@@ -1,16 +1,17 @@
 import AnimController from '../AnimController';
 import { aAxe } from '../anims';
 import { cHit } from '../colours';
-import CoordAR from '../CoordAR';
+import CoordARZ from '../CoordARZ';
 import DrawnComponent from '../DrawnComponent';
 import Enemy from '../Enemy';
 import { eAnimationEnded } from '../events';
-import { AnimName, ResourceName } from '../flavours';
+import { AnimName, Pixels, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import HitboxXYWH from '../HitboxXYWH';
 import { zSpark } from '../layers';
 import Player from '../Player';
+import { drawSprite } from '../rendering';
 import {
 	cart,
 	collides,
@@ -28,6 +29,7 @@ type ControllerGen = (img: CanvasImageSource, flip?: boolean) => AnimController;
 type OnEnemyHit = (enemy: Enemy) => void;
 
 class Swing implements DrawnComponent {
+	back: boolean;
 	game: Game;
 	hits: Enemy[];
 	layer: number;
@@ -43,6 +45,7 @@ class Swing implements DrawnComponent {
 	) {
 		this.game = game;
 		this.owner = game.player;
+		this.back = this.owner.back;
 		this.sprite = controllerGen(
 			game.resources[resource],
 			game.player.sprite.flip
@@ -77,7 +80,7 @@ class Swing implements DrawnComponent {
 		this.onhit(enemy);
 	}
 
-	getPosition(): CoordAR {
+	getPosition(): CoordARZ {
 		const { owner, sprite } = this;
 
 		return displace(
@@ -91,6 +94,7 @@ class Swing implements DrawnComponent {
 		const { owner, sprite } = this;
 
 		return {
+			back: owner.back ?? false,
 			w: hitbox.w,
 			h: hitbox.h,
 			...displace(
@@ -102,23 +106,17 @@ class Swing implements DrawnComponent {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { game, owner, sprite } = this;
+		if (!this.owner.alive) return;
+
+		const { game, sprite } = this;
 		const { cx, cy } = game;
-		const { a, r } = this.getPosition();
+		const { a, r, z } = this.getPosition();
 
 		const normal = a + πHalf;
 
-		if (!owner.alive) return;
-
 		const { x, y } = cart(a, r);
 
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -133,19 +131,23 @@ class Swing implements DrawnComponent {
 	}
 
 	getHitbox(hitbox: HitboxXYWH): Hitbox {
-		const { r, a, w, h } = this.getHitboxPosition(hitbox);
-		const baw = scaleWidth(w, r),
-			taw = scaleWidth(w, r + h);
+		const { back, r, a, z, w, h } = this.getHitboxPosition(hitbox);
+		const baw = scaleWidth(w, r, z),
+			taw = scaleWidth(w, r + h, z);
 
 		return {
 			bot: {
+				back,
 				r,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + h,
+				back,
+				r: r + h * z,
 				a,
+				z,
 				width: taw,
 			},
 		};
@@ -205,10 +207,8 @@ export default class GenericMelee implements Weapon {
 		);
 	}
 
-	draw(c: CanvasRenderingContext2D, x: number, y: number): void {
-		c.translate(x, y);
-		this.sprite.draw(c);
-		c.translate(-x, -y);
+	draw(c: CanvasRenderingContext2D, x?: Pixels, y?: Pixels): void {
+		this.sprite.draw(c, x, y);
 	}
 
 	use(): void {

@@ -1,4 +1,4 @@
-import CoordAR from './CoordAR';
+import CoordARZ from './CoordARZ';
 import { Facing } from './dirs';
 import {
 	Degrees,
@@ -19,12 +19,17 @@ export default interface EditorData {
 	items?: EditorItem[];
 }
 
-export interface EditorEnemy extends CoordAR<Degrees> {
+interface Position extends Omit<CoordARZ<Degrees>, 'z'> {
+	back?: boolean;
+}
+
+export interface EditorEnemy extends Position {
 	dir: Facing;
 	type: string;
 }
 
 export interface EditorFloor {
+	back?: boolean;
 	a: Degrees;
 	h: Pixels;
 	material: TextureName; // TODO lol
@@ -32,11 +37,12 @@ export interface EditorFloor {
 	w: Degrees;
 }
 
-export interface EditorObject extends CoordAR<Degrees> {
+export interface EditorObject extends Position {
 	object: ObjectName;
 }
 
 export interface EditorPlatform {
+	back?: boolean;
 	h: Pixels;
 	w: Degrees;
 	a: Degrees;
@@ -47,13 +53,14 @@ export interface EditorPlatform {
 	walls?: boolean;
 }
 
-export interface EditorPlayer extends CoordAR<Degrees> {
+export interface EditorPlayer extends Position {
 	type: string;
 	item?: string;
 	weapon?: string;
 }
 
 export interface EditorWall {
+	back?: boolean;
 	top: Pixels;
 	bottom: Pixels;
 	a: Degrees;
@@ -62,10 +69,10 @@ export interface EditorWall {
 	material: string;
 }
 
-export interface EditorWeapon extends CoordAR<Degrees> {
+export interface EditorWeapon extends Position {
 	weapon: string;
 }
 
-export interface EditorItem extends CoordAR<Degrees> {
+export interface EditorItem extends Position {
 	item: string;
 }

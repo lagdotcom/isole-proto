@@ -7,6 +7,7 @@ import {
 	Degrees,
 	DisplayLayer,
 	Milliseconds,
+	Multiplier,
 	Pixels,
 	Radians,
 	ResourceName,
@@ -15,15 +16,15 @@ import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
 import mel from '../makeElement';
+import { getZ } from '../nums';
+import { draw3D } from '../rendering';
 import {
-	cart,
 	collides,
 	damage,
 	deg2rad,
 	drawWedge,
 	jbr,
 	scaleWidth,
-	πHalf,
 } from '../tools';
 
 const aIdle: AnimName = 'idle',
@@ -45,6 +46,7 @@ interface ChompChampSprite {
 }
 
 interface ChompChampInit {
+	back?: boolean;
 	a?: Degrees;
 	img?: ResourceName;
 	r?: Pixels;
@@ -148,6 +150,7 @@ export default class ChompChamp implements Enemy {
 	a: Radians;
 	alive: true;
 	attackWidth: Pixels;
+	back: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
@@ -160,10 +163,17 @@ export default class ChompChamp implements Enemy {
 	state: string;
 	va: number;
 	width: Pixels;
+	z: Multiplier;
 
 	constructor(
 		game: Game,
-		{ a = 0, r = 0, sprite, img = 'enemy.chompchamp' }: ChompChampInit = {}
+		{
+			back = false,
+			a = 0,
+			r = 0,
+			sprite,
+			img = 'enemy.chompchamp',
+		}: ChompChampInit = {}
 	) {
 		this.isEnemy = true;
 		this.name = 'Chomp Champ';
@@ -174,6 +184,8 @@ export default class ChompChamp implements Enemy {
 		this.width = 80;
 		this.attackWidth = 80;
 		this.height = 40;
+		this.back = back;
+		this.z = getZ(this.back);
 		this.a = deg2rad(a);
 		this.r = r;
 		this.sprite =
@@ -236,19 +248,7 @@ export default class ChompChamp implements Enemy {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
@@ -272,48 +272,56 @@ export default class ChompChamp implements Enemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { r: 0, a: 0, width: 0 },
-			top: { r: 0, a: 0, width: 0 },
+			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { r, a, attackWidth, height } = this;
+		const { back, r, a, z, attackWidth, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(attackWidth, br),
-			taw = scaleWidth(attackWidth, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(attackWidth, br, z),
+			taw = scaleWidth(attackWidth, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};
 	}
 
 	getCatchHitbox(): Hitbox {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r;
-		const tr = r + height;
-		const baw = scaleWidth(width, br),
-			taw = scaleWidth(width, tr);
+		const tr = r + height * z;
+		const baw = scaleWidth(width, br, z),
+			taw = scaleWidth(width, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};

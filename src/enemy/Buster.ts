@@ -1,33 +1,29 @@
 import { cAI, cAIDark, cHurt } from '../colours';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
 import { Milliseconds, Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
-import Hitbox, { HitSize } from '../Hitbox';
+import { HitSize } from '../Hitbox';
 import { zEnemy } from '../layers';
 import {
 	gGravityStrength,
 	gGroundFriction,
 	gMaxVA,
-	gStandThreshold,
 	gTimeScale,
 	gWalkScale,
 	gWallBounce,
 } from '../nums';
+import physics from '../physics';
 import Player from '../Player';
+import { draw3D } from '../rendering';
 import controller from '../spr/buster';
 import {
 	angleDistance,
-	cart,
 	drawArc,
 	drawWedge,
-	first,
 	isRightOf,
 	scaleWidth,
 	unscaleWidth,
 	wrapAngle,
 	π,
-	πHalf,
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
@@ -54,6 +50,7 @@ interface BusterController {
 }
 
 interface BusterInit {
+	back?: boolean;
 	a?: Radians;
 	damage?: number;
 	health?: number;
@@ -78,6 +75,7 @@ export default class Buster extends AbstractEnemy {
 	constructor(
 		game: Game,
 		{
+			back = false,
 			width = 52,
 			height = 30,
 			a = 0,
@@ -94,6 +92,7 @@ export default class Buster extends AbstractEnemy {
 			layer: zEnemy,
 			game,
 			name: 'Buster',
+			back,
 			width,
 			height,
 			a,
@@ -116,48 +115,15 @@ export default class Buster extends AbstractEnemy {
 	update(time: Milliseconds): void {
 		if (!(time = this.dostun(time))) return;
 
-		let { a, r, va, vr, vfa, game, sprite, state } = this;
-		const { player, walls, ceilings, floors } = game,
+		const { game, sprite } = this;
+		let { a, r, va, vr, vfa, state } = this;
+		const { player } = game,
 			tscale = time / gTimeScale;
-		const { bot, top } = this.getHitbox();
+		const { bot } = this.getHitbox();
 		const playerDist = unscaleWidth(angleDistance(a, player.a), r),
 			near = player.alive && playerDist - player.w <= gNearWidth;
 
-		let floor: Flat | null = null;
-		if (vr <= 0) {
-			floor = first(floors, f => {
-				const da = angleDistance(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-		}
-
-		let ceiling: Flat | null = null;
-		if (vr > 0) {
-			ceiling = first(ceilings, f => {
-				const da = angleDistance(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-			if (ceiling) {
-				vr = 0;
-			}
-		}
-
-		let wall: Wall | null = null;
-		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
-			const vas = Math.sign(va + vfa);
-			wall = first(walls, w => {
-				if (vas !== w.direction && !w.motion) return false;
-
-				return (
-					bot.a - bot.width <= w.a &&
-					bot.a + bot.width >= w.a &&
-					top.r >= w.bottom &&
-					bot.r <= w.top
-				);
-			});
-		}
+		const { floor, ceiling, wall } = physics(this, time);
 
 		this.fatigue -= tscale;
 
@@ -266,19 +232,7 @@ export default class Buster extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal: Radians = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -293,11 +247,11 @@ export default class Buster extends AbstractEnemy {
 	}
 
 	getHitbox(): { top: HitSize; bot: HitSize; a: HitSize; n: HitSize } {
-		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height),
-			aaw = scaleWidth(gAttackWidth, r),
-			naw = scaleWidth(gNearWidth, r);
+		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z),
+			aaw = scaleWidth(gAttackWidth, r, z),
+			naw = scaleWidth(gNearWidth, r, z);
 		let amod: Radians,
 			vbr: Pixels = 0,
 			vtr: Pixels = 0;
@@ -310,23 +264,31 @@ export default class Buster extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height + vtr,
+				back,
+				r: r + height * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 			a: {
-				r: r + height / 2 + vbr,
+				back,
+				r: r + (height * z) / 2 + vbr,
 				a: amod,
+				z,
 				width: aaw,
 			},
 			n: {
-				r: r + height / 2 + vbr,
+				back,
+				r: r + (height * z) / 2 + vbr,
 				a: amod,
+				z,
 				width: naw,
 			},
 		};

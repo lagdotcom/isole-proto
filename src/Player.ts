@@ -21,6 +21,7 @@ export default interface Player extends DrawnComponent, Damageable {
 }
 
 export interface PlayerInit {
+	back?: boolean;
 	a?: Degrees;
 	img?: ResourceName;
 	r?: Pixels;

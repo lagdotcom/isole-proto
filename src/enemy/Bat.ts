@@ -25,6 +25,7 @@ import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
+import { draw3D } from '../rendering';
 import controller, {
 	ePunchDone,
 	ePunchForward,
@@ -33,7 +34,6 @@ import controller, {
 } from '../spr/bat';
 import {
 	angleDistance,
-	cart,
 	collides,
 	drawWedge,
 	fittest,
@@ -46,7 +46,6 @@ import {
 	scaleWidth,
 	wrapAngle,
 	π,
-	πHalf,
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
@@ -430,19 +429,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -456,9 +443,9 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getHitbox() {
-		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height);
+		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z);
 		let amod: Radians,
 			vbr = 0,
 			vtr = 0;
@@ -471,13 +458,17 @@ export default class Bat extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height + vtr,
+				back,
+				r: r + height * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 			a: this.getAttackHitbox(),
@@ -492,8 +483,8 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getPunchHitbox(): Hitbox {
-		const { r, a, va, vr, height, tscale, dir } = this;
-		const attackWidth = scaleWidth((gAttackFar - gAttackNear) / 2, r);
+		const { back, r, a, z, va, vr, height, tscale, dir } = this;
+		const attackWidth = scaleWidth((gAttackFar - gAttackNear) / 2, r, z);
 		const left = dir === dLeft;
 		const aoffset = left ? -attackWidth : attackWidth;
 
@@ -507,35 +498,43 @@ export default class Bat extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod + aoffset,
+				z,
 				width: attackWidth,
 			},
 			top: {
-				r: r + height + vbr,
+				back,
+				r: r + height * z + vbr,
 				a: amod + aoffset,
+				z,
 				width: attackWidth,
 			},
 		};
 	}
 
 	getSleepingHitbox(): Hitbox {
-		const { r, a, width, height } = this;
+		const { back, r, a, z, width, height } = this;
 		const br = r - gWakeHitboxExtend;
-		const tr = r + height + gWakeHitboxExtend;
+		const tr = r + height * z + gWakeHitboxExtend;
 		const width2 = width + gWakeHitboxExtend * 2;
-		const baw = scaleWidth(width2, br),
-			taw = scaleWidth(width2, tr);
+		const baw = scaleWidth(width2, br, z),
+			taw = scaleWidth(width2, tr, z);
 
 		return {
 			bot: {
+				back,
 				r: br,
 				a,
+				z,
 				width: baw,
 			},
 			top: {
+				back,
 				r: tr,
 				a,
+				z,
 				width: taw,
 			},
 		};

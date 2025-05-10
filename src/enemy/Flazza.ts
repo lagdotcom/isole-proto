@@ -16,18 +16,17 @@ import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { zFlying } from '../layers';
 import { gTimeScale, gWalkScale } from '../nums';
+import { draw3D } from '../rendering';
 import controller, { eDrop, eRecover } from '../spr/flazza';
 import {
 	angleCollides,
 	angleDistance,
-	cart,
 	drawWedge,
 	first,
 	scaleWidth,
 	unscaleWidth,
 	wrapAngle,
 	π,
-	πHalf,
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
@@ -95,20 +94,9 @@ export default class Flazza extends AbstractEnemy {
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		let {
-			a,
-			r,
-			rtop,
-			va,
-			vr,
-			game,
-			sprite,
-			state,
-			dir,
-			speed,
-			dropSpeed,
-			recoverSpeed,
-		} = this;
+		const { rtop, game, sprite, dir, speed, dropSpeed, recoverSpeed } =
+			this;
+		let { a, r, va, vr, state } = this;
 		const { player } = game,
 			tscale = time / gTimeScale;
 
@@ -165,7 +153,8 @@ export default class Flazza extends AbstractEnemy {
 		this.r = r;
 		this.state = state;
 
-		dir === dLeft ? sprite.left() : sprite.right();
+		if (dir === dLeft) sprite.left();
+		else sprite.right();
 
 		switch (state) {
 			case sProwling:
@@ -196,19 +185,7 @@ export default class Flazza extends AbstractEnemy {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -221,10 +198,10 @@ export default class Flazza extends AbstractEnemy {
 	}
 
 	getHitbox(): { bot: HitSize; top: HitSize; a: HitSize } {
-		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height),
-			aaw = scaleWidth(gAttackWidth, r);
+		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z),
+			aaw = scaleWidth(gAttackWidth, r, z);
 		let amod: number,
 			vbr = 0,
 			vtr = 0;
@@ -237,18 +214,24 @@ export default class Flazza extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height + vtr,
+				back,
+				r: r + height * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 			a: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: aaw,
 			},
 		};
@@ -256,11 +239,15 @@ export default class Flazza extends AbstractEnemy {
 
 	getFloor(): Flat | null {
 		const { bot, top } = this.getHitbox();
-		const { game } = this;
+		const { back, game } = this;
 
 		return first(
 			game.floors,
-			f => bot.r <= f.r && top.r >= f.r && angleCollides(top, f)
+			f =>
+				back === f.back &&
+				bot.r <= f.r &&
+				top.r >= f.r &&
+				angleCollides(top, f)
 		);
 	}
 

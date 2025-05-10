@@ -23,6 +23,7 @@ interface WeaponOffer {
 type Offer = ItemOffer | WeaponOffer;
 
 export default class ShopView implements DrawnComponent {
+	back: boolean;
 	bg: HTMLImageElement;
 	game: Game;
 	layer: DisplayLayer;
@@ -33,6 +34,7 @@ export default class ShopView implements DrawnComponent {
 
 	constructor(game: Game) {
 		this.bg = game.resources['shop.bg'];
+		this.back = false;
 		this.game = game;
 		this.layer = zBeforeUI;
 		this.midX = game.options.width / 2;

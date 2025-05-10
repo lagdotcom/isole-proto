@@ -1,4 +1,4 @@
-import { Milliseconds, Pixels } from './flavours';
+import { Milliseconds, Multiplier, Pixels } from './flavours';
 
 export const gTimeScale = 10,
 	gHitboxScale = Math.PI / 6,
@@ -12,4 +12,10 @@ export const gTimeScale = 10,
 	gStandThreshold = 0.005,
 	gWallGap: Pixels = 5,
 	gWallBounce = -0.01,
-	gPadAxisThreshold = 0.4;
+	gPadAxisThreshold = 0.4,
+	gBackZ: Multiplier = 0.5,
+	gFrontZ: Multiplier = 1;
+
+export function getZ(back: boolean) {
+	return back ? gBackZ : gFrontZ;
+}

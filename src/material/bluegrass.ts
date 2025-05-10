@@ -1,7 +1,10 @@
 import Flat from '../component/Flat';
 import DrawnComponent from '../DrawnComponent';
+import { DisplayLayer, Multiplier, Pixels } from '../flavours';
 import Game from '../Game';
 import { zDecal } from '../layers';
+import { getZ } from '../nums';
+import { drawSprite } from '../rendering';
 import textures from '../texture/bluegrass';
 import TileController from '../texture/TileController';
 import { cart, scaleWidth, πHalf } from '../tools';
@@ -14,28 +17,33 @@ const bluegrassTips = game =>
 	});
 
 class GrassTips implements DrawnComponent {
+	back: boolean;
 	flat: Flat;
 	game: Game;
-	layer: number;
-	r: number;
+	layer: DisplayLayer;
+	r: Pixels;
 	sprite: TileController;
+	z: Multiplier;
 
 	constructor(flat: Flat) {
 		Object.assign(this, {
 			flat,
+			back: flat.back,
+			z: getZ(flat.back),
 			game: flat.game,
 			layer: zDecal,
-			r: flat.r + 30,
 			sprite: bluegrassTips(flat.game),
 		});
+
+		this.r = flat.r + 30 * this.z;
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { flat, game, r, sprite } = this;
+		const { flat, game, r, z, sprite } = this;
 		const { left, right, scale, width } = flat;
 		const { cx, cy } = game;
-		const step = scaleWidth(scale, r),
-			offset = scaleWidth(scale / 2, r);
+		const step = scaleWidth(scale, r, z),
+			offset = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -49,13 +57,7 @@ class GrassTips implements DrawnComponent {
 			const normal = a + offset + πHalf;
 			const { x, y } = cart(a, r);
 
-			c.translate(x + cx, y + cy);
-			c.rotate(normal);
-
-			sprite.draw(c);
-
-			c.rotate(-normal);
-			c.translate(-x - cx, -y - cy);
+			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 
 			remaining -= step;
 			a += step;

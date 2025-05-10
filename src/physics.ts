@@ -13,6 +13,7 @@ import {
 import { angleDistance, first, wrapAngle, π } from './tools';
 
 interface PhysicsObject {
+	back: boolean;
 	a: Radians;
 	game: Game;
 	getHitbox(): Hitbox;
@@ -27,16 +28,15 @@ interface PhysicsObject {
 }
 
 export default function physics(obj: PhysicsObject, time: Milliseconds) {
-	const { game, ignoreCeilings, ignoreFloors, ignoreGravity, ignoreWalls } =
-		this;
-	let {
-		a,
-
-		r,
-		va,
-		vfa,
-		vr,
+	const {
+		back,
+		game,
+		ignoreCeilings,
+		ignoreFloors,
+		ignoreGravity,
+		ignoreWalls,
 	} = obj;
+	let { a, r, va, vfa, vr } = obj;
 	const { walls, ceilings, floors } = game,
 		tscale = time / gTimeScale;
 	const { bot, top } = obj.getHitbox();
@@ -46,7 +46,12 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		floor = first(floors, f => {
 			const da = angleDistance(a, f.a);
 
-			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
+			return (
+				f.back === back &&
+				bot.r <= f.r &&
+				top.r >= f.r &&
+				da < f.width + top.width
+			);
 		});
 	}
 
@@ -55,7 +60,12 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		ceiling = first(ceilings, f => {
 			const da = angleDistance(a, f.a);
 
-			return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
+			return (
+				f.back === back &&
+				bot.r <= f.r &&
+				top.r >= f.r &&
+				da < f.width + top.width
+			);
 		});
 		if (ceiling) {
 			vr = 0;
@@ -69,6 +79,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 	) {
 		const vas = Math.sign(va + vfa);
 		wall = first(walls, w => {
+			if (w.back !== back) return false;
 			if (vas !== w.direction && !w.motion) return false;
 
 			return (

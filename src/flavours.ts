@@ -14,6 +14,7 @@ export type GameEvent = Flavour<string, 'GameEvent'>;
 export type KeyCode = Flavour<string, 'KeyCode'>;
 export type MaterialName = Flavour<string, 'MaterialName'>;
 export type Milliseconds = Flavour<number, 'Milliseconds'>;
+export type Multiplier = Flavour<number, 'Multiplier'>;
 export type ObjectName = Flavour<string, 'ObjectName'>;
 export type PadCode = Flavour<string, 'PadCode'>;
 export type Pixels = Flavour<number, 'Pixels'>;

@@ -1,11 +1,10 @@
 import AnimController from '../AnimController';
 import { aThrow } from '../anims';
 import { cHit } from '../colours';
-import Flat from '../component/Flat';
-import Wall from '../component/Wall';
 import { dLeft } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
 import { eThrow } from '../events';
+import { Multiplier, Pixels } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Item from '../Item';
@@ -16,11 +15,10 @@ import {
 	gTimeScale,
 	gWalkScale,
 } from '../nums';
+import physics from '../physics';
 import Player from '../Player';
+import { draw3D } from '../rendering';
 import {
-	angleCollides,
-	angleDistance,
-	cart,
 	collides,
 	displace,
 	drawWedge,
@@ -28,7 +26,6 @@ import {
 	scaleWidth,
 	wrapAngle,
 	π,
-	πHalf,
 } from '../tools';
 
 const gBombTimer = 3000,
@@ -92,6 +89,7 @@ class BombController extends AnimController {
 
 class Bomb implements DrawnComponent {
 	a: number;
+	back: boolean;
 	game: Game;
 	h: number;
 	layer: number;
@@ -104,6 +102,7 @@ class Bomb implements DrawnComponent {
 	vfa: number;
 	vr: number;
 	w: number;
+	z: Multiplier;
 
 	constructor(game: Game, options = {}) {
 		Object.assign(
@@ -126,30 +125,20 @@ class Bomb implements DrawnComponent {
 	}
 
 	update(time: number): void {
-		let { game, va, vfa, vr, a, r, timer } = this,
-			{ enemies, floors, walls } = game,
-			tscale = time / gTimeScale;
+		const { game, timer } = this;
+		let { va, vfa, vr, a, r } = this;
+		const tscale = time / gTimeScale;
 
 		const { bot, top } = this.getHitbox();
-		const enemy = first(enemies, e =>
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const enemy = first(game.enemies, e =>
 			collides({ bot, top }, e.getHitbox())
 		);
 
 		this.tscale = tscale;
 
-		let floor: Flat | null = null;
-		if (vr < 0) {
-			floor = first(floors, f => {
-				const da = angleDistance(a, f.a);
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-		}
-
-		let wall: Wall | null = null;
-		wall = first(
-			walls,
-			w => top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
-		);
+		// TODO check ceiling?
+		const { floor, wall } = physics(this, time);
 
 		if (wall) {
 			va *= -gBounciness;
@@ -193,19 +182,7 @@ class Bomb implements DrawnComponent {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		const { a, r, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -217,9 +194,9 @@ class Bomb implements DrawnComponent {
 	}
 
 	getHitbox(): Hitbox {
-		const { r, a, va, vr, w, h, tscale } = this;
-		const baw = scaleWidth(w, r),
-			taw = scaleWidth(w, r + h);
+		const { back, r, a, z, va, vr, w, h, tscale } = this;
+		const baw = scaleWidth(w, r, z),
+			taw = scaleWidth(w, r + h, z);
 		let amod,
 			vbr = 0,
 			vtr = 0;
@@ -232,13 +209,17 @@ class Bomb implements DrawnComponent {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + h + vtr,
+				back,
+				r: r + h * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 		};
@@ -261,10 +242,8 @@ export default class BombItem implements Item {
 		this.sprite.idle();
 	}
 
-	draw(c: CanvasRenderingContext2D, x: number, y: number) {
-		c.translate(x, y);
-		this.sprite.draw(c);
-		c.translate(-x, -y);
+	draw(c: CanvasRenderingContext2D, x?: Pixels, y?: Pixels) {
+		this.sprite.draw(c, x, y);
 	}
 
 	canUse() {
@@ -295,6 +274,7 @@ export default class BombItem implements Item {
 					[game.player.sprite.hotspot],
 					facingLeft
 				),
+				back: game.player.back,
 				va: game.player.va + (facingLeft ? -gThrowVA : gThrowVA),
 				vr: game.player.vr + gThrowVR,
 				owner: game.player,

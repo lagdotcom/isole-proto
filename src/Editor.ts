@@ -55,6 +55,24 @@ interface EditorInit {
 	parent: HTMLElement;
 }
 
+const defaultData: EditorData = {
+	platforms: [
+		{ h: 340, a: 235, w: 30, th: 32, motion: 0, material: 'grass2' },
+	],
+	walls: [],
+	floors: [
+		{ h: 150, a: 0, w: 360, material: 'bluegrass' },
+		{ h: 150, a: 0, w: 360, material: 'bluegrass', back: true },
+		{ h: 300, a: 180, w: 30, motion: 2, material: 'cloud' },
+		{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
+		{ h: 500, a: 190, w: 40, motion: 0, material: 'grass' },
+		{ h: 700, a: 140, w: 30, motion: 0, material: 'grass' },
+	],
+	objects: [],
+	player: { type: 'woody', a: 50, r: 200, item: 'rock', weapon: 'axe' },
+	enemies: [{ type: 'minatoad', a: 0, r: 150, dir: 'L' }],
+};
+
 export default class Editor
 	implements LevelGenerator, MapGenerator, ShopGenerator
 {
@@ -81,35 +99,7 @@ export default class Editor
 
 		this.game = game;
 		this.mode = LevelMode;
-		this.data = data ?? {
-			platforms: [
-				{
-					h: 340,
-					a: 235,
-					w: 30,
-					th: 32,
-					motion: 0,
-					material: 'grass2',
-				},
-			],
-			walls: [],
-			floors: [
-				{ h: 150, a: 0, w: 360, material: 'bluegrass' },
-				{ h: 300, a: 180, w: 30, motion: 2, material: 'cloud' },
-				{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
-				{ h: 500, a: 190, w: 40, motion: 0, material: 'grass' },
-				{ h: 700, a: 140, w: 30, motion: 0, material: 'grass' },
-			],
-			objects: [],
-			player: {
-				type: 'woody',
-				a: 50,
-				r: 200,
-				item: 'rock',
-				weapon: 'axe',
-			},
-			enemies: [{ type: 'minatoad', a: 0, r: 150, dir: 'L' }],
-		};
+		this.data = data ?? defaultData;
 
 		this.makeDom(parent);
 	}
@@ -150,13 +140,16 @@ export default class Editor
 		} = data;
 
 		platforms?.forEach(p => {
-			game.platforms.push(new Platform({ game, ...p }));
+			game.platforms.push(
+				new Platform({ game, ...p, back: p.back ?? false })
+			);
 		});
 
 		walls?.forEach(w => {
 			game.walls.push(
 				new Wall(
 					game,
+					w.back ?? false,
 					w.top,
 					w.bottom,
 					w.a,
@@ -170,6 +163,7 @@ export default class Editor
 		floors?.forEach(f => {
 			game.floors.push(
 				new Flat(game, {
+					back: f.back ?? false,
 					height: f.h,
 					angle: f.a,
 					width: f.w,
@@ -192,6 +186,7 @@ export default class Editor
 		weapons?.forEach(w => {
 			game.pickups.push(
 				new WeaponObject(game, {
+					back: w.back ?? false,
 					a: w.a,
 					r: w.r,
 					weapon: weaponTypes[w.weapon],
@@ -202,6 +197,7 @@ export default class Editor
 		items?.forEach(i => {
 			game.pickups.push(
 				new ItemObject(game, {
+					back: i.back ?? false,
 					a: i.a,
 					r: i.r,
 					item: itemTypes[i.item],
@@ -438,7 +434,7 @@ export default class Editor
 				innerText: label,
 			}),
 			'input',
-			{ type: 'checkbox' },
+			{ type: 'checkbox', checked: !!object[attribute] },
 			{
 				change: () => {
 					object[attribute] = el.checked;
@@ -528,6 +524,7 @@ export default class Editor
 	makePlayerDom(parent: HTMLElement, o: EditorPlayer) {
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeChoiceInput(e, o, 'Character', 'type', playerNames);
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeChoiceInput(e, o, 'Item', 'item', itemNames);
@@ -537,6 +534,7 @@ export default class Editor
 	makePlatformDom(parent: HTMLElement, o: EditorPlatform) {
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'platforms');
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'h');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeNumInput(e, o, 'Width', 'w');
@@ -550,6 +548,7 @@ export default class Editor
 	makeWallDom(parent: HTMLElement, o: EditorWall) {
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'walls');
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Top', 'top');
 		this.makeNumInput(e, o, 'Bottom', 'bottom');
 		this.makeAngleInput(e, o, 'Angle', 'a');
@@ -561,6 +560,7 @@ export default class Editor
 	makeFloorDom(parent: HTMLElement, o: EditorFloor) {
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'floors');
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'h');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeNumInput(e, o, 'Width', 'w');
@@ -572,6 +572,7 @@ export default class Editor
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'objects');
 		this.makeChoiceInput(e, o, 'Position', 'position', objectPositions);
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height/Y', 'r');
 		this.makeAngleInput(e, o, 'Angle/X', 'a');
 		this.makeNumInput(e, o, 'Motion', 'motion');
@@ -586,6 +587,7 @@ export default class Editor
 		const e = mel(parent, 'div', { className: 'entry' });
 		this.makeDel(e, o, 'enemies');
 		this.makeChoiceInput(e, o, 'Type', 'type', enemyNames);
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 		this.makeChoiceInput(e, o, 'Direction', 'dir', [dLeft, dRight]);
@@ -601,6 +603,7 @@ export default class Editor
 			'weapon',
 			weaponNames.filter(x => x)
 		);
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 	}
@@ -615,6 +618,7 @@ export default class Editor
 			'item',
 			itemNames.filter(x => x)
 		);
+		this.makeBoolInput(e, o, 'Back?', 'back');
 		this.makeNumInput(e, o, 'Height', 'r');
 		this.makeAngleInput(e, o, 'Angle', 'a');
 	}

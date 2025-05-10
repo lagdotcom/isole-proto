@@ -4,13 +4,15 @@ import {
 	Degrees,
 	DisplayLayer,
 	Milliseconds,
+	Multiplier,
 	Pixels,
 	Radians,
 	TextureName,
 } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
-import { gHitboxScale, gWallGap } from '../nums';
+import { getZ, gHitboxScale, gWallGap } from '../nums';
+import { drawSprite } from '../rendering';
 import Texture from '../Texture';
 import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
 import Flat from './Flat';
@@ -18,6 +20,7 @@ import Flat from './Flat';
 export default class Wall implements DrawnComponent {
 	a: Radians;
 	b: Pixels;
+	back: boolean;
 	bottom: Pixels;
 	ceiling?: Flat;
 	direction: 1 | -1;
@@ -36,11 +39,13 @@ export default class Wall implements DrawnComponent {
 	t: Pixels;
 	top: Pixels;
 	width: Radians; // used for angleCollides()
+	z: Multiplier;
 
 	draw: (c: CanvasRenderingContext2D) => void;
 
 	constructor(
 		game: Game,
+		back: boolean,
 		t: Pixels,
 		b: Pixels,
 		angle: Degrees,
@@ -56,6 +61,8 @@ export default class Wall implements DrawnComponent {
 			isWall: true,
 			layer: zStructure,
 			game,
+			back,
+			z: getZ(back),
 			top,
 			bottom,
 			t,
@@ -98,7 +105,7 @@ export default class Wall implements DrawnComponent {
 	}
 
 	drawLeft(c: CanvasRenderingContext2D): void {
-		const { a, t, b, game, scale, sprite } = this;
+		const { a, t, b, z, game, scale, sprite } = this;
 		const { cx, cy } = game;
 		const step = sprite.h;
 
@@ -112,18 +119,12 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scaleWidth(scale / 2, r),
-				amod: Radians = a - scaleWidth(scale, r),
+			const offset = scaleWidth(scale / 2, r, z),
+				amod: Radians = a - scaleWidth(scale, r, z),
 				normal: Radians = amod + offset + πHalf,
 				{ x, y } = cart(amod, r);
 
-			c.translate(x + cx, y + cy);
-			c.rotate(normal);
-
-			sprite.draw(c);
-
-			c.rotate(-normal);
-			c.translate(-x - cx, -y - cy);
+			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 
 			remaining -= step;
 			r -= step;
@@ -132,7 +133,7 @@ export default class Wall implements DrawnComponent {
 	}
 
 	drawRight(c: CanvasRenderingContext2D): void {
-		const { a, t, b, game, scale, sprite } = this;
+		const { a, t, b, z, game, scale, sprite } = this;
 		const { cx, cy } = game;
 		const step = sprite.h;
 
@@ -146,17 +147,11 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scaleWidth(scale / 2, r),
+			const offset = scaleWidth(scale / 2, r, z),
 				normal: Radians = a + offset + πHalf,
 				{ x, y } = cart(a, r);
 
-			c.translate(x + cx, y + cy);
-			c.rotate(normal);
-
-			sprite.draw(c);
-
-			c.rotate(-normal);
-			c.translate(-x - cx, -y - cy);
+			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 
 			remaining -= step;
 			r -= step;

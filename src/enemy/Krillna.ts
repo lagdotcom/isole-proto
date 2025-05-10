@@ -6,19 +6,14 @@ import { Pixels, Radians, ResourceName } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zEnemy } from '../layers';
-import {
-	gGravityStrength,
-	gStandThreshold,
-	gTimeScale,
-	gWalkScale,
-} from '../nums';
+import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
+import physics from '../physics';
+import { drawSprite } from '../rendering';
 import controller from '../spr/krillna';
 import {
-	angleCollides,
 	angleDistance,
 	cart,
 	drawWedge,
-	first,
 	scaleWidth,
 	wrapAngle,
 	π,
@@ -83,59 +78,13 @@ export default class Krillna extends AbstractEnemy {
 	update(time: number): void {
 		if (!(time = this.dostun(time))) return;
 
-		let {
-			a,
-			r,
-			va,
-			vr,
-			vfa,
-			game,
-			dir,
-			speed,
-			last,
-			sprite,
-			height,
-			width,
-			movefn,
-		} = this;
-		const { walls, ceilings, floors } = game,
-			tscale = time / gTimeScale;
+		const { speed, last, sprite, height, width, movefn } = this;
+		let { a, r, z, va, vr, vfa, dir } = this;
+		const tscale = time / gTimeScale;
 		this.tscale = tscale;
 		const { bot, top } = this.getHitbox();
 
-		let floor: Flat | null = null;
-		if (vr <= 0 || last.floor) {
-			floor = first(floors, f => {
-				const da = angleDistance(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-		}
-
-		let ceiling: Flat | null = null;
-		if (vr > 0 || last.ceiling) {
-			ceiling = first(ceilings, f => {
-				const da = angleDistance(a, f.a);
-
-				return bot.r <= f.r && top.r >= f.r && da < f.width + top.width;
-			});
-			if (ceiling) {
-				vr = 0;
-			}
-		}
-
-		let wall: Wall | null = null;
-		if (Math.abs(va) > gStandThreshold || game.wallsInMotion) {
-			const vas = Math.sign(va + vfa);
-
-			wall = first(walls, w => {
-				if (vas !== w.direction && !w.motion) return false;
-
-				return (
-					top.r >= w.bottom && bot.r <= w.top && angleCollides(bot, w)
-				);
-			});
-		}
+		let { floor, ceiling, wall } = physics(this, time);
 
 		function applyfloor(f: Flat) {
 			floor = f;
@@ -165,7 +114,7 @@ export default class Krillna extends AbstractEnemy {
 			vr = (dir === dUp ? speed : -speed) * gRadiusMult;
 			vfa = w.motion * time;
 
-			const wsw = scaleWidth(width, r);
+			const wsw = scaleWidth(width, r, z);
 			if (w.direction === 1) {
 				sprite.walkLeft();
 				a = w.a - wsw;
@@ -281,23 +230,15 @@ export default class Krillna extends AbstractEnemy {
 		});
 	}
 
-	draw(c) {
-		const { a, r, game, sprite } = this;
+	draw(c: CanvasRenderingContext2D) {
+		const { a, r, z, game, sprite } = this;
 		const { cx, cy } = game;
 		const normal = a + πHalf + sprite.normal;
-
 		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		sprite.draw(c);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 	}
 
-	drawHitbox(c) {
+	drawHitbox(c: CanvasRenderingContext2D) {
 		const { game } = this;
 		const { cx, cy } = game;
 		const { bot, top } = this.getHitbox();
@@ -306,9 +247,9 @@ export default class Krillna extends AbstractEnemy {
 	}
 
 	getHitbox(): Hitbox {
-		const { r, a, va, vr, width, height, tscale } = this;
-		const baw = scaleWidth(width, r),
-			taw = scaleWidth(width, r + height);
+		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const baw = scaleWidth(width, r, z),
+			taw = scaleWidth(width, r + height, z);
 		let amod,
 			vbr = 0,
 			vtr = 0;
@@ -321,13 +262,17 @@ export default class Krillna extends AbstractEnemy {
 
 		return {
 			bot: {
+				back,
 				r: r + vbr,
 				a: amod,
+				z,
 				width: baw,
 			},
 			top: {
-				r: r + height + vtr,
+				back,
+				r: r + height * z + vtr,
 				a: amod,
+				z,
 				width: taw,
 			},
 		};

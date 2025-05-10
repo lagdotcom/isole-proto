@@ -1,44 +1,58 @@
 import { cIgnore } from '../colours';
+import {
+	Degrees,
+	DisplayLayer,
+	Multiplier,
+	Pixels,
+	Radians,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Item from '../Item';
 import { zDecal } from '../layers';
+import { getZ } from '../nums';
 import { Pickup } from '../Pickup';
-import { cart, deg2rad, drawWedge, scaleWidth, πHalf } from '../tools';
+import { draw3D } from '../rendering';
+import { deg2rad, drawWedge, scaleWidth } from '../tools';
 
 export type ItemConstructor = new (game: Game) => Item;
 interface ItemObjectInit {
-	a: number;
+	back: boolean;
+	a: Degrees;
+	r: Pixels;
 	item: ItemConstructor;
-	r: number;
 }
 
 export default class ItemObject implements Pickup {
-	a: number;
-	height: number;
-	item: Item;
-	itemconst: ItemConstructor;
-	layer: number;
-	r: number;
-	width: number;
+	a: Radians;
+	back: boolean;
+	height: Pixels;
+	sprite: Item;
+	itemConstructor: ItemConstructor;
+	layer: DisplayLayer;
+	r: Pixels;
+	width: Pixels;
+	z: Multiplier;
 
 	constructor(
 		public game: Game,
 		init: ItemObjectInit
 	) {
+		this.back = init.back;
+		this.z = getZ(this.back);
 		this.a = deg2rad(init.a);
 		this.height = 30;
-		this.item = new init.item(game);
-		this.itemconst = init.item;
+		this.sprite = new init.item(game);
+		this.itemConstructor = init.item;
 		this.layer = zDecal;
 		this.r = init.r;
 		this.width = 30;
 	}
 
 	take() {
-		const { game, itemconst } = this;
+		const { game, itemConstructor } = this;
 
-		if (game.inventory.add(itemconst)) {
+		if (game.inventory.add(itemConstructor)) {
 			game.remove(this);
 			return true;
 		}
@@ -47,19 +61,7 @@ export default class ItemObject implements Pickup {
 	}
 
 	draw(c: CanvasRenderingContext2D) {
-		const { a, r, game, item } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		c.translate(x + cx, y + cy);
-		c.rotate(normal);
-
-		item.draw(c, 0, 0);
-
-		c.rotate(-normal);
-		c.translate(-x - cx, -y - cy);
+		draw3D(c, this);
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
@@ -69,18 +71,22 @@ export default class ItemObject implements Pickup {
 	}
 
 	getHitbox(): Hitbox {
-		const { a, r, width, height } = this;
+		const { back, a, r, z, width, height } = this;
 
 		return {
 			bot: {
+				back,
 				a,
 				r,
-				width: scaleWidth(width, r),
+				z,
+				width: scaleWidth(width, r, z),
 			},
 			top: {
+				back,
 				a,
-				r: r + height,
-				width: scaleWidth(width, r + height),
+				r: r + height * z,
+				z,
+				width: scaleWidth(width, r + height, z),
 			},
 		};
 	}
