@@ -9,7 +9,6 @@ import ShopView from './component/ShopView';
 import Wall from './component/Wall';
 import Controller from './Controller';
 import Damageable from './Damageable';
-import dispatch from './dispatchEvent';
 import DrawnComponent from './DrawnComponent';
 import emptyElement from './emptyElement';
 import Enemy from './Enemy';
@@ -319,7 +318,7 @@ export default class Game {
 	 * @param {unknown} detail event details
 	 */
 	fire<T extends GameEventName>(event: T, detail: GameEvents[T]): void {
-		dispatch(this.element, event, detail);
+		this.element.dispatchEvent(new CustomEvent(event, { detail }));
 	}
 
 	/**
