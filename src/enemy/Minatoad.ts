@@ -254,11 +254,11 @@ class Reticle implements DrawnComponent {
 
 		const target = this.game.player;
 
-		if (isRightOf(this.a, target.a)) this.va += 0.005;
-		else this.va -= 0.005;
+		if (isRightOf(this.a, target.a)) this.va += 0.0005 * t;
+		else this.va -= 0.0005 * t;
 
-		if (target.r < this.r) this.vr -= 1;
-		else if (target.r > this.r) this.vr += 1;
+		if (target.r < this.r) this.vr -= 0.01 * t;
+		else if (target.r > this.r) this.vr += 0.01 * t;
 
 		if (this.va < -gMaxReticleVA) this.va = -gMaxReticleVA;
 		else if (this.va > gMaxReticleVA) this.va = gMaxReticleVA;
@@ -606,7 +606,7 @@ class BigBullet extends AbstractEnemy {
 		const { active, game, sprite } = this;
 
 		sprite.update(t);
-		this.r += this.vr;
+		this.r += this.vr * t;
 
 		if (this.r >= gRadiusCap) {
 			for (let i = 0; i < gSplitCount; i++) {
@@ -743,7 +743,7 @@ class PoisonSprayField extends AbstractEnemy {
 		}
 
 		this.spread -= t;
-		if (this.spread > 0) this.width += 5;
+		if (this.spread > 0) this.width += 0.3 * t;
 
 		if (this.del) {
 			const { va, vr, r, a } = this;
@@ -892,7 +892,7 @@ const gJumpSpeed = 0.4;
 const gShockwaveSpeed = 0.08;
 const gRadiusCap = 1000;
 const gLeapSpeed = 20;
-const gBigBulletSpeed = 10;
+const gBigBulletSpeed = 1;
 const gSplitCount = 5;
 const gSmallBulletSpeed = () => randomRange(-8, -5);
 
@@ -975,7 +975,7 @@ export default class Minatoad extends AbstractEnemy {
 			this.game,
 			this.back,
 			this.a,
-			this.r + this.height,
+			this.r + this.height * this.z,
 			gBigBulletSpeed
 		);
 		this.game.components.push(bullet);
