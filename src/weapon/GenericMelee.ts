@@ -29,7 +29,6 @@ type ControllerGen = (img: CanvasImageSource, flip?: boolean) => AnimController;
 type OnEnemyHit = (enemy: Enemy) => void;
 
 class Swing implements DrawnComponent {
-	back: boolean;
 	game: Game;
 	hits: Enemy[];
 	layer: number;
@@ -45,7 +44,6 @@ class Swing implements DrawnComponent {
 	) {
 		this.game = game;
 		this.owner = game.player;
-		this.back = this.owner.back;
 		this.sprite = controllerGen(
 			game.resources[resource],
 			game.player.sprite.flip
@@ -94,7 +92,6 @@ class Swing implements DrawnComponent {
 		const { owner, sprite } = this;
 
 		return {
-			back: owner.back ?? false,
 			w: hitbox.w,
 			h: hitbox.h,
 			...displace(
@@ -131,20 +128,18 @@ class Swing implements DrawnComponent {
 	}
 
 	getHitbox(hitbox: HitboxXYWH): Hitbox {
-		const { back, r, a, z, w, h } = this.getHitboxPosition(hitbox);
+		const { r, a, z, w, h } = this.getHitboxPosition(hitbox);
 		const baw = scaleWidth(w, r, z),
 			taw = scaleWidth(w, r + h, z);
 
 		return {
 			bot: {
-				back,
 				r,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + h * z,
 				a,
 				z,

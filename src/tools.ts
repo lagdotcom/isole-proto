@@ -4,7 +4,7 @@ import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import { Degrees, Multiplier, Pixels, Radians } from './flavours';
 import Hitbox, { HitSize } from './Hitbox';
-import { gBackZ, gFrontZ, gHitboxScale } from './nums';
+import { gCollideZ, gFrontZ, gHitboxScale } from './nums';
 
 export const π: Radians = Math.PI,
 	π2: Radians = π * 2,
@@ -141,7 +141,10 @@ export function first<T>(
  * @param b second hitsize
  */
 export function angleCollides(a: HitSize, b: HitSize): boolean {
-	return a.back === b.back && angleDistance(a.a, b.a) < a.width + b.width;
+	return (
+		Math.abs(a.z - b.z) <= gCollideZ &&
+		angleDistance(a.a, b.a) < a.width + b.width
+	);
 }
 
 /**
@@ -153,7 +156,7 @@ export function angleCollides(a: HitSize, b: HitSize): boolean {
 export function collides(a: Hitbox, b: Hitbox): boolean {
 	// TODO: should this also check .t.a?
 	return (
-		a.bot.back === b.bot.back &&
+		Math.abs(a.bot.z - b.bot.z) <= gCollideZ &&
 		a.bot.r <= b.top.r &&
 		a.top.r >= b.bot.r &&
 		angleCollides(a.bot, b.bot)
@@ -447,7 +450,7 @@ export function drawCross(
 export function compareDrawnComponent(a: DrawnComponent, b: DrawnComponent) {
 	if (a.layer !== b.layer) return a.layer - b.layer;
 
-	const az = 'z' in a ? (a.z as Multiplier) : a.back ? gBackZ : gFrontZ;
-	const bz = 'z' in b ? (b.z as Multiplier) : b.back ? gBackZ : gFrontZ;
+	const az = 'z' in a ? (a.z as Multiplier) : gFrontZ;
+	const bz = 'z' in b ? (b.z as Multiplier) : gFrontZ;
 	return bz - az;
 }

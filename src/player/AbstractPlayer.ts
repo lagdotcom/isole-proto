@@ -55,7 +55,6 @@ const gJumpAffectStrength = 0.15,
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
 	alive: boolean;
-	back: boolean;
 	body: Channel;
 	deadSound: ResourceName;
 	del?: HTMLElement;
@@ -96,7 +95,6 @@ export default abstract class AbstractPlayer implements Player {
 				layer: zPlayer,
 				game,
 				stepHeight: 10,
-				back: false,
 				a: 0,
 				r: 300,
 				va: 0,
@@ -118,7 +116,7 @@ export default abstract class AbstractPlayer implements Player {
 		);
 
 		this.a = deg2rad(options.a ?? 0);
-		this.z = getZ(this.back);
+		this.z = getZ(options.back ?? false);
 
 		if (game.options.showDebug) {
 			this.del = mel(game.options.debugContainer, 'div', {
@@ -292,18 +290,17 @@ export default abstract class AbstractPlayer implements Player {
 		} else if (va > gMaxVA) this.va = gMaxVA;
 		else if (va < -gMaxVA) this.va = -gMaxVA;
 
+		let vz = 0;
 		if (this.leaping) {
-			const vz = this.leaping === 'f' ? gLeapSpeed : -gLeapSpeed;
+			vz = this.leaping === 'f' ? gLeapSpeed : -gLeapSpeed;
 			z += vz * tscale;
 			game.redraw = true; // this is kinda stupid
 			if (z <= gBackZ) {
 				z = gBackZ;
 				this.leaping = undefined;
-				this.back = true;
 			} else if (z >= gFrontZ) {
 				z = gFrontZ;
 				this.leaping = undefined;
-				this.back = false;
 			}
 
 			this.z = z;
@@ -326,8 +323,8 @@ export default abstract class AbstractPlayer implements Player {
 				'<b>Player</b>',
 				`controls: ${controls.join(' ')}`,
 				`flags: ${flags.join(' ')}`,
-				`vel: ${this.vr.toFixed(2)},${this.va.toFixed(2)}r`,
-				`pos: ${this.r.toFixed(2)},${this.a.toFixed(2)}r`,
+				`vel: ${this.vr.toFixed(2)},${this.va.toFixed(2)}r,${vz.toFixed(2)}`,
+				`pos: ${this.r.toFixed(2)},${this.a.toFixed(2)}r,${this.z.toFixed(2)}`,
 				`anim: ${sprite.a}+${sprite.at.toFixed(0)}ms, ${
 					sprite.flip ? 'flip' : 'normal'
 				}`,
@@ -361,7 +358,7 @@ export default abstract class AbstractPlayer implements Player {
 	}
 
 	getHitbox(): { bot: HitSize; top: HitSize; step: HitSize } {
-		const { back, r, a, z, va, vr, w, h, stepHeight, tscale } = this;
+		const { r, a, z, va, vr, w, h, stepHeight, tscale } = this;
 		const baw = scaleWidth(w, r, z),
 			taw = scaleWidth(w, r + h, z),
 			saw = scaleWidth(w, r + stepHeight, z);
@@ -377,21 +374,18 @@ export default abstract class AbstractPlayer implements Player {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + h * z + vtr,
 				a: amod,
 				z,
 				width: taw,
 			},
 			step: {
-				back,
 				r: r + stepHeight * z + vtr,
 				a: amod,
 				z,

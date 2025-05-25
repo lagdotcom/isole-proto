@@ -150,7 +150,6 @@ export default class ChompChamp implements Enemy {
 	a: Radians;
 	alive: true;
 	attackWidth: Pixels;
-	back: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
@@ -184,8 +183,7 @@ export default class ChompChamp implements Enemy {
 		this.width = 80;
 		this.attackWidth = 80;
 		this.height = 40;
-		this.back = back;
-		this.z = getZ(this.back);
+		this.z = getZ(back);
 		this.a = deg2rad(a);
 		this.r = r;
 		this.sprite =
@@ -272,13 +270,13 @@ export default class ChompChamp implements Enemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
-			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			bot: { r: 0, a: 0, z: 0, width: 0 },
+			top: { r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { back, r, a, z, attackWidth, height } = this;
+		const { r, a, z, attackWidth, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(attackWidth, br, z),
@@ -286,14 +284,12 @@ export default class ChompChamp implements Enemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,
@@ -303,7 +299,7 @@ export default class ChompChamp implements Enemy {
 	}
 
 	getCatchHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(width, br, z),
@@ -311,14 +307,12 @@ export default class ChompChamp implements Enemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,

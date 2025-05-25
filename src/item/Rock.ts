@@ -32,7 +32,6 @@ const controller = (img: CanvasImageSource) =>
 
 class Rock implements DrawnComponent {
 	a: Radians;
-	back: boolean;
 	float: number;
 	game: Game;
 	h: Pixels;
@@ -125,7 +124,7 @@ class Rock implements DrawnComponent {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, r, a, z, va, vr, w, h, tscale } = this;
+		const { r, a, z, va, vr, w, h, tscale } = this;
 		const baw = scaleWidth(w, r, z),
 			taw = scaleWidth(w, r + h, z);
 		let amod: number,
@@ -140,14 +139,12 @@ class Rock implements DrawnComponent {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + h * z + vtr,
 				a: amod,
 				z,
@@ -203,7 +200,7 @@ export default class RockItem implements Item {
 					[game.player.sprite.hotspot],
 					facingLeft
 				),
-				back: game.player.back,
+				z: game.player.z,
 				va: facingLeft ? -1 : 1,
 				float: gFloatTime,
 				owner: game.player,

@@ -75,13 +75,13 @@ export default class Flat implements DrawnComponent {
 			back,
 			r: height,
 			a: deg2rad(angle),
+			z: getZ(back),
 			width: deg2rad(width) / 2,
 			motion: deg2rad(motion / 100),
 		});
 
 		this.left = this.a - this.width;
 		this.right = this.a + this.width;
-		this.z = getZ(this.back);
 
 		if (texture) {
 			this.sprite = game.textures[texture];

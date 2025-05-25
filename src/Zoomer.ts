@@ -5,7 +5,6 @@ import { zFirst } from './layers';
 import { cart } from './tools';
 
 export default class Zoomer implements DrawnComponent {
-	back: boolean;
 	game: Game;
 	layer: DisplayLayer;
 	max: number;
@@ -23,7 +22,6 @@ export default class Zoomer implements DrawnComponent {
 		vert: number
 	) {
 		this.layer = zFirst;
-		this.back = false;
 		this.game = game;
 		this.min = min;
 		this.max = max;

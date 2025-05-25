@@ -167,11 +167,11 @@ export default class Bat extends AbstractEnemy {
 		this[this.state + 'Update'](time);
 
 		if (this.del) {
-			const { va, vr, r, a, sprite, state, substate } = this;
+			const { va, vr, r, a, z, sprite, state, substate } = this;
 			this.debug({
 				state: `${state},${substate}`,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${z.toFixed(2)}`,
 				anim: `${sprite.a}+${sprite.at.toFixed(0)}ms, ${
 					sprite.flip ? 'flip' : 'normal'
 				}`,
@@ -443,7 +443,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getHitbox() {
-		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const { r, a, z, va, vr, width, height, tscale } = this;
 		const baw = scaleWidth(width, r, z),
 			taw = scaleWidth(width, r + height, z);
 		let amod: Radians,
@@ -458,14 +458,12 @@ export default class Bat extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + height * z + vtr,
 				a: amod,
 				z,
@@ -483,7 +481,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getPunchHitbox(): Hitbox {
-		const { back, r, a, z, va, vr, height, tscale, dir } = this;
+		const { r, a, z, va, vr, height, tscale, dir } = this;
 		const attackWidth = scaleWidth((gAttackFar - gAttackNear) / 2, r, z);
 		const left = dir === dLeft;
 		const aoffset = left ? -attackWidth : attackWidth;
@@ -498,14 +496,12 @@ export default class Bat extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod + aoffset,
 				z,
 				width: attackWidth,
 			},
 			top: {
-				back,
 				r: r + height * z + vbr,
 				a: amod + aoffset,
 				z,
@@ -515,7 +511,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	getSleepingHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r - gWakeHitboxExtend;
 		const tr = r + height * z + gWakeHitboxExtend;
 		const width2 = width + gWakeHitboxExtend * 2;
@@ -524,14 +520,12 @@ export default class Bat extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,

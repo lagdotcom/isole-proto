@@ -4,6 +4,7 @@ import { Milliseconds, Multiplier, Pixels, Radians } from './flavours';
 import Game from './Game';
 import Hitbox from './Hitbox';
 import {
+	getBack,
 	gGravityStrength,
 	gGroundFriction,
 	gStandThreshold,
@@ -13,7 +14,6 @@ import {
 import { angleDistance, first, wrapAngle, π } from './tools';
 
 interface PhysicsObject {
-	back: boolean;
 	a: Radians;
 	game: Game;
 	getHitbox(): Hitbox;
@@ -29,18 +29,13 @@ interface PhysicsObject {
 }
 
 export default function physics(obj: PhysicsObject, time: Milliseconds) {
-	const {
-		back,
-		game,
-		ignoreCeilings,
-		ignoreFloors,
-		ignoreGravity,
-		ignoreWalls,
-	} = obj;
+	const { game, ignoreCeilings, ignoreFloors, ignoreGravity, ignoreWalls } =
+		obj;
 	let { a, r, va, vfa, vr } = obj;
 	const { walls, ceilings, floors } = game,
 		tscale = time / gTimeScale;
 	const { bot, top } = obj.getHitbox();
+	const back = getBack(obj.z);
 
 	let floor: Flat | undefined;
 	if (vr <= 0 && !ignoreFloors) {

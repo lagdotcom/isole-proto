@@ -10,7 +10,6 @@ const connection = '#444444',
 	highlighted = '#ff4444';
 
 export default class MapView implements DrawnComponent {
-	back: boolean;
 	bossIcon: Controller;
 	current: number;
 	debounced: InputButton;
@@ -23,7 +22,6 @@ export default class MapView implements DrawnComponent {
 
 	constructor(game: Game) {
 		this.game = game;
-		this.back = false;
 		this.layer = zUI;
 		this.x = 100;
 		this.y = game.options.height / 2;

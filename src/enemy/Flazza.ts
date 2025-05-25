@@ -15,7 +15,7 @@ import { Pixels, ResourceName } from '../flavours';
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { zFlying } from '../layers';
-import { gTimeScale, gWalkScale } from '../nums';
+import { getBack, gTimeScale, gWalkScale } from '../nums';
 import { draw3D } from '../rendering';
 import controller, { eDrop, eRecover } from '../spr/flazza';
 import {
@@ -179,7 +179,7 @@ export default class Flazza extends AbstractEnemy {
 			this.debug({
 				state,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${this.z.toFixed(2)}`,
 			});
 		}
 	}
@@ -198,7 +198,7 @@ export default class Flazza extends AbstractEnemy {
 	}
 
 	getHitbox(): { bot: HitSize; top: HitSize; a: HitSize } {
-		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const { r, a, z, va, vr, width, height, tscale } = this;
 		const baw = scaleWidth(width, r, z),
 			taw = scaleWidth(width, r + height, z),
 			aaw = scaleWidth(gAttackWidth, r, z);
@@ -214,21 +214,18 @@ export default class Flazza extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + height * z + vtr,
 				a: amod,
 				z,
 				width: taw,
 			},
 			a: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
@@ -239,7 +236,8 @@ export default class Flazza extends AbstractEnemy {
 
 	getFloor(): Flat | undefined {
 		const { bot, top } = this.getHitbox();
-		const { back, game } = this;
+		const { game } = this;
+		const back = getBack(this.z);
 
 		return first(
 			game.floors,

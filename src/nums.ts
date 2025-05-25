@@ -14,8 +14,14 @@ export const gTimeScale = 10,
 	gWallBounce = -0.01,
 	gPadAxisThreshold = 0.4,
 	gBackZ: Multiplier = 0.5,
-	gFrontZ: Multiplier = 1;
+	gFrontZ: Multiplier = 1,
+	gMidZ: Multiplier = (gBackZ + gFrontZ) / 2,
+	gCollideZ: Multiplier = 0.1;
 
 export function getZ(back: boolean) {
 	return back ? gBackZ : gFrontZ;
+}
+
+export function getBack(z: Multiplier) {
+	return z <= gMidZ;
 }

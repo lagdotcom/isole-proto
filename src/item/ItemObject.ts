@@ -25,7 +25,6 @@ interface ItemObjectInit {
 
 export default class ItemObject implements Pickup {
 	a: Radians;
-	back: boolean;
 	height: Pixels;
 	sprite: Item;
 	itemConstructor: ItemConstructor;
@@ -38,8 +37,7 @@ export default class ItemObject implements Pickup {
 		public game: Game,
 		init: ItemObjectInit
 	) {
-		this.back = init.back;
-		this.z = getZ(this.back);
+		this.z = getZ(init.back);
 		this.a = deg2rad(init.a);
 		this.height = 30;
 		this.sprite = new init.item(game);
@@ -71,18 +69,16 @@ export default class ItemObject implements Pickup {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, a, r, z, width, height } = this;
+		const { a, r, z, width, height } = this;
 
 		return {
 			bot: {
-				back,
 				a,
 				r,
 				z,
 				width: scaleWidth(width, r, z),
 			},
 			top: {
-				back,
 				a,
 				r: r + height * z,
 				z,

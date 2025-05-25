@@ -89,7 +89,6 @@ class BombController extends AnimController {
 
 class Bomb implements DrawnComponent {
 	a: number;
-	back: boolean;
 	game: Game;
 	h: number;
 	layer: number;
@@ -194,7 +193,7 @@ class Bomb implements DrawnComponent {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, r, a, z, va, vr, w, h, tscale } = this;
+		const { r, a, z, va, vr, w, h, tscale } = this;
 		const baw = scaleWidth(w, r, z),
 			taw = scaleWidth(w, r + h, z);
 		let amod,
@@ -209,14 +208,12 @@ class Bomb implements DrawnComponent {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + h * z + vtr,
 				a: amod,
 				z,
@@ -274,7 +271,7 @@ export default class BombItem implements Item {
 					[game.player.sprite.hotspot],
 					facingLeft
 				),
-				back: game.player.back,
+				z: game.player.z,
 				va: game.player.va + (facingLeft ? -gThrowVA : gThrowVA),
 				vr: game.player.vr + gThrowVR,
 				owner: game.player,

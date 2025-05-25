@@ -5,14 +5,12 @@ import { zUI } from '../layers';
 const gLeaveTimer = 5000;
 
 export default class LeaveTimer implements DrawnComponent {
-	back: boolean;
 	active: boolean;
 	game: Game;
 	layer: number;
 	timer: number;
 
 	constructor(game: Game) {
-		this.back = false;
 		this.active = false;
 		this.game = game;
 		this.layer = zUI;

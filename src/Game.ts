@@ -85,12 +85,10 @@ interface GameInit {
 type ResourceLoader<T> = (url: string, callback: () => void) => T;
 
 class Unzoomer implements DrawnComponent {
-	back: boolean;
 	game: Game;
 	layer: DisplayLayer;
 
 	constructor(game: Game) {
-		this.back = false;
 		this.game = game;
 		this.layer = zBeforeUI;
 	}

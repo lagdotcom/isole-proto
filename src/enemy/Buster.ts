@@ -217,7 +217,7 @@ export default class Buster extends AbstractEnemy {
 			this.debug({
 				state,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${this.z.toFixed(2)}`,
 				jump: `${jumpdelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`,
 			});
 		}
@@ -247,7 +247,7 @@ export default class Buster extends AbstractEnemy {
 	}
 
 	getHitbox(): { top: HitSize; bot: HitSize; a: HitSize; n: HitSize } {
-		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const { r, a, z, va, vr, width, height, tscale } = this;
 		const baw = scaleWidth(width, r, z),
 			taw = scaleWidth(width, r + height, z),
 			aaw = scaleWidth(gAttackWidth, r, z),
@@ -264,28 +264,24 @@ export default class Buster extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + height * z + vtr,
 				a: amod,
 				z,
 				width: taw,
 			},
 			a: {
-				back,
 				r: r + (height * z) / 2 + vbr,
 				a: amod,
 				z,
 				width: aaw,
 			},
 			n: {
-				back,
 				r: r + (height * z) / 2 + vbr,
 				a: amod,
 				z,

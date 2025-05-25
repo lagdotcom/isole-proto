@@ -31,7 +31,6 @@ interface DecalInit {
 
 export default class Decal implements Component {
 	a: Radians;
-	back: boolean;
 	game: Game;
 	height: Pixels;
 	isDecal: true;
@@ -64,8 +63,7 @@ export default class Decal implements Component {
 		this.isDecal = true;
 		this.layer = layer;
 		this.game = game;
-		this.back = back;
-		this.z = getZ(this.back);
+		this.z = getZ(back);
 		this.r = r;
 		this.a = wrapAngle(deg2rad(a));
 		this.motion = deg2rad(motion / 100);
@@ -116,20 +114,18 @@ export default class Decal implements Component {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const baw = scaleWidth(width, r, z),
 			taw = scaleWidth(width, r + height, z);
 
 		return {
 			bot: {
-				back,
 				r,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + height * z,
 				a,
 				z,

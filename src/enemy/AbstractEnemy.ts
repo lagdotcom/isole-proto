@@ -18,7 +18,6 @@ const gStunMultiplier = 200;
 export default abstract class AbstractEnemy implements Enemy {
 	a: Radians;
 	alive: boolean;
-	back: boolean;
 	del: HTMLElement;
 	game: Game;
 	health: number;
@@ -42,8 +41,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		this.stuntimer = 0;
 
 		Object.assign(this, options);
-		this.back = options.back ?? false;
-		this.z = getZ(this.back);
+		this.z = getZ(options.back ?? false);
 		this.a = deg2rad(options.a ?? 0);
 
 		if (this.game.options.showDebug) {

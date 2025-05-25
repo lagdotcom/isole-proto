@@ -24,7 +24,6 @@ interface WeaponObjectInit {
 }
 
 export default class WeaponObject implements Pickup {
-	back: boolean;
 	a: Radians;
 	height: Pixels;
 	layer: DisplayLayer;
@@ -37,8 +36,7 @@ export default class WeaponObject implements Pickup {
 		public game: Game,
 		init: WeaponObjectInit
 	) {
-		this.back = init.back;
-		this.z = getZ(this.back);
+		this.z = getZ(init.back);
 		this.a = deg2rad(init.a);
 		this.height = 30;
 		this.layer = zDecal;
@@ -61,8 +59,7 @@ export default class WeaponObject implements Pickup {
 		// TODO: necessary?
 		this.a = game.player.a;
 		this.r = game.player.r;
-		this.back = game.player.back;
-		this.z = getZ(this.back);
+		this.z = game.player.z;
 
 		return true;
 	}
@@ -78,18 +75,16 @@ export default class WeaponObject implements Pickup {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, a, r, z, width, height } = this;
+		const { a, r, z, width, height } = this;
 
 		return {
 			bot: {
-				back,
 				a,
 				r,
 				z,
 				width: scaleWidth(width, r, z),
 			},
 			top: {
-				back,
 				a,
 				r: r + height * z,
 				z,

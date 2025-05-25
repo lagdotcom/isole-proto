@@ -17,7 +17,13 @@ import {
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zSpark } from '../layers';
-import { getZ, gStandThreshold, gTimeScale, gWalkScale } from '../nums';
+import {
+	getBack,
+	getZ,
+	gStandThreshold,
+	gTimeScale,
+	gWalkScale,
+} from '../nums';
 import physics from '../physics';
 import { draw3D } from '../rendering';
 import {
@@ -221,7 +227,6 @@ const gMaxReticleVA = 0.1;
 const gMaxReticleVR = 5;
 
 class Reticle implements DrawnComponent {
-	back: boolean;
 	a: number;
 	sprite: ReticleController;
 	game: Game;
@@ -232,8 +237,7 @@ class Reticle implements DrawnComponent {
 	z: Multiplier;
 
 	constructor(game: Game) {
-		this.back = false;
-		this.z = getZ(this.back);
+		this.z = getZ(false);
 		this.a = 0;
 		this.sprite = new ReticleController(game.resources['reticle']);
 		this.game = game;
@@ -242,7 +246,6 @@ class Reticle implements DrawnComponent {
 	}
 
 	reset() {
-		this.back = this.game.player.back;
 		this.a = this.game.player.a;
 		this.r = this.game.player.r;
 		this.va = 0;
@@ -352,12 +355,12 @@ class Shockwave extends AbstractEnemy {
 		}
 
 		if (this.del) {
-			const { va, vr, r, a } = this;
+			const { va, vr, r, a, z } = this;
 
 			this.debug({
 				active: `${active ? 'yes' : 'no'}`,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${z.toFixed(2)}`,
 			});
 		}
 	}
@@ -379,13 +382,13 @@ class Shockwave extends AbstractEnemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
-			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			bot: { r: 0, a: 0, z: 0, width: 0 },
+			top: { r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(width, br, z),
@@ -393,14 +396,12 @@ class Shockwave extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,
@@ -512,12 +513,12 @@ class SmallBullet extends AbstractEnemy {
 		}
 
 		if (this.del) {
-			const { va, vr, r, a } = this;
+			const { va, vr, r, a, z } = this;
 
 			this.debug({
 				active: `${active ? 'yes' : 'no'}`,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${z.toFixed(2)}`,
 			});
 		}
 	}
@@ -541,7 +542,7 @@ class SmallBullet extends AbstractEnemy {
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(width, br, z),
@@ -549,14 +550,12 @@ class SmallBullet extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,
@@ -613,7 +612,7 @@ class BigBullet extends AbstractEnemy {
 				const bullet = new SmallBullet(
 					this.owner,
 					this.game,
-					this.back,
+					getBack(this.z),
 					randomAngle(),
 					this.r,
 					gSmallBulletSpeed()
@@ -636,12 +635,12 @@ class BigBullet extends AbstractEnemy {
 		}
 
 		if (this.del) {
-			const { va, vr, r, a } = this;
+			const { va, vr, r, a, z } = this;
 
 			this.debug({
 				active: `${active ? 'yes' : 'no'}`,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${z.toFixed(2)}`,
 			});
 		}
 	}
@@ -663,13 +662,13 @@ class BigBullet extends AbstractEnemy {
 	getHitbox(): Hitbox {
 		// this doesn't have a hitbox as such
 		return {
-			bot: { back: false, r: 0, a: 0, z: 0, width: 0 },
-			top: { back: false, r: 0, a: 0, z: 0, width: 0 },
+			bot: { r: 0, a: 0, z: 0, width: 0 },
+			top: { r: 0, a: 0, z: 0, width: 0 },
 		};
 	}
 
 	getAttackHitbox(): Hitbox {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(width, br, z),
@@ -677,14 +676,12 @@ class BigBullet extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,
@@ -721,10 +718,9 @@ class PoisonSprayField extends AbstractEnemy {
 			game,
 			duration,
 			spread,
-			back: owner.back,
+			back: getBack(owner.z),
 			a,
 			r,
-			z: getZ(owner.back),
 			width: 150,
 			height: 100,
 			va: 0,
@@ -746,11 +742,11 @@ class PoisonSprayField extends AbstractEnemy {
 		if (this.spread > 0) this.width += 0.3 * t;
 
 		if (this.del) {
-			const { va, vr, r, a } = this;
+			const { va, vr, r, a, z } = this;
 
 			this.debug({
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
-				pos: `${r.toFixed(2)},${a.toFixed(2)}r`,
+				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${z.toFixed(2)}`,
 			});
 		}
 	}
@@ -778,7 +774,7 @@ class PoisonSprayField extends AbstractEnemy {
 	}
 
 	getAttackHitbox() {
-		const { back, r, a, z, width, height } = this;
+		const { r, a, z, width, height } = this;
 		const br = r;
 		const tr = r + height * z;
 		const baw = scaleWidth(width, br, z),
@@ -786,14 +782,12 @@ class PoisonSprayField extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: br,
 				a,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: tr,
 				a,
 				z,
@@ -973,7 +967,7 @@ export default class Minatoad extends AbstractEnemy {
 		const bullet = new BigBullet(
 			this,
 			this.game,
-			this.back,
+			getBack(this.z),
 			this.a,
 			this.r + this.height * this.z,
 			gBigBulletSpeed
@@ -1082,8 +1076,7 @@ export default class Minatoad extends AbstractEnemy {
 			this.state = 'fall';
 
 			this.game.remove(this.reticle);
-			this.back = this.game.player.back;
-			this.z = getZ(this.back);
+			this.z = getZ(getBack(this.game.player.z));
 			this.a = this.reticle.a;
 			this.vr = -20;
 			this.hidden = false;
@@ -1102,14 +1095,14 @@ export default class Minatoad extends AbstractEnemy {
 
 			const leftsh = new Shockwave(
 				this.game,
-				this.back,
+				getBack(this.z),
 				this.a,
 				this.r,
 				-gShockwaveSpeed
 			);
 			const rightsh = new Shockwave(
 				this.game,
-				this.back,
+				getBack(this.z),
 				this.a,
 				this.r,
 				gShockwaveSpeed
@@ -1159,7 +1152,7 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	getHitbox(): Hitbox {
-		const { back, r, a, z, va, vr, width, height, tscale } = this;
+		const { r, a, z, va, vr, width, height, tscale } = this;
 		const baw = scaleWidth(width, r, z),
 			taw = scaleWidth(width, r + height, z);
 		let amod: number,
@@ -1174,14 +1167,12 @@ export default class Minatoad extends AbstractEnemy {
 
 		return {
 			bot: {
-				back,
 				r: r + vbr,
 				a: amod,
 				z,
 				width: baw,
 			},
 			top: {
-				back,
 				r: r + height * z + vtr,
 				a: amod,
 				z,

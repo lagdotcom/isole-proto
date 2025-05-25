@@ -8,7 +8,6 @@ import { drawCross } from '../tools';
 import Weapon from '../Weapon';
 
 export default class Inventory implements DrawnComponent {
-	back: boolean;
 	cycling: boolean;
 	game: Game;
 	health: number;
@@ -23,7 +22,6 @@ export default class Inventory implements DrawnComponent {
 		Object.assign(this, {
 			layer: zUI,
 			game,
-			back: false,
 			items: new Array(size),
 			weapon: null,
 			cycling: false,

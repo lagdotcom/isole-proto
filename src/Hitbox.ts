@@ -11,9 +11,6 @@ export interface HitSize<
 	Angle extends number = Radians,
 	Distance extends number = Pixels,
 > {
-	// Layer
-	back: boolean;
-
 	// Radius
 	r: Distance;
 
