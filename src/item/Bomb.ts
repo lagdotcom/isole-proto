@@ -4,7 +4,13 @@ import { cHit } from '../colours';
 import { dLeft } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
 import { eThrow } from '../events';
-import { Multiplier, Pixels } from '../flavours';
+import {
+	Milliseconds,
+	Multiplier,
+	Pixels,
+	Radians,
+	ScaledTime,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Item from '../Item';
@@ -28,8 +34,8 @@ import {
 	π,
 } from '../tools';
 
-const gBombTimer = 3000,
-	gBombWarning = 1000,
+const gBombTimer: Milliseconds = 3000,
+	gBombWarning: Milliseconds = 1000,
 	gBounciness = 0.6,
 	gThrowVA = 0.4,
 	gThrowVR = 0.6;
@@ -88,19 +94,19 @@ class BombController extends AnimController {
 }
 
 class Bomb implements DrawnComponent {
-	a: number;
+	a: Radians;
 	game: Game;
-	h: number;
+	h: Pixels;
 	layer: number;
 	owner: Player;
 	sprite: BombController;
-	r: number;
-	timer: number;
-	tscale: number;
+	r: Pixels;
+	timer: Milliseconds;
+	tscale: ScaledTime;
 	va: number;
 	vfa: number;
 	vr: number;
-	w: number;
+	w: Pixels;
 	z: Multiplier;
 
 	constructor(game: Game, options = {}) {

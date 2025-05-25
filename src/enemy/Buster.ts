@@ -1,5 +1,12 @@
 import { cAI, cAIDark, cHurt } from '../colours';
-import { Milliseconds, Pixels, Radians, ResourceName } from '../flavours';
+import {
+	Degrees,
+	Milliseconds,
+	Pixels,
+	Radians,
+	ResourceName,
+	ScaledTime,
+} from '../flavours';
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { zEnemy } from '../layers';
@@ -27,9 +34,9 @@ import {
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
-const gJumpFatigue = 150,
+const gJumpFatigue: ScaledTime = 150,
 	gJumpSide = 0.4,
-	gJumpStartup = 15,
+	gJumpStartup: ScaledTime = 15,
 	gJumpStrength = 4,
 	gAttackWidth: Pixels = 250,
 	gNearWidth: Pixels = 500;
@@ -51,12 +58,12 @@ interface BusterController {
 
 interface BusterInit {
 	back?: boolean;
-	a?: Radians;
+	a?: Degrees;
 	damage?: number;
 	health?: number;
 	height?: Pixels;
 	img?: ResourceName;
-	jumpfatigue?: number;
+	jumpfatigue?: ScaledTime;
 	r?: Pixels;
 	sprite?: BusterController;
 	width?: Pixels;
@@ -65,11 +72,11 @@ interface BusterInit {
 export default class Buster extends AbstractEnemy {
 	fatigue: number;
 	grounded: boolean;
-	jumpdelay: number;
-	jumpfatigue: number;
+	jumpdelay: ScaledTime;
+	jumpfatigue: ScaledTime;
 	sprite: BusterController;
 	state: BusterState;
-	tscale: number;
+	tscale: ScaledTime;
 	vfa: number;
 
 	constructor(
@@ -118,7 +125,7 @@ export default class Buster extends AbstractEnemy {
 		const { game, sprite } = this;
 		let { a, r, va, vr, vfa, state } = this;
 		const { player } = game,
-			tscale = time / gTimeScale;
+			tscale: ScaledTime = time / gTimeScale;
 		const { bot } = this.getHitbox();
 		const playerDist = unscaleWidth(angleDistance(a, player.a), r),
 			near = player.alive && playerDist - player.w <= gNearWidth;

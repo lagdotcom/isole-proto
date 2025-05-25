@@ -9,6 +9,7 @@ import {
 	Pixels,
 	Radians,
 	ResourceName,
+	ScaledTime,
 } from '../flavours';
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
@@ -46,10 +47,10 @@ import {
 } from '../tools';
 
 const gJumpAffectStrength = 0.15,
-	gJumpAffectTimer = -10,
-	gJumpDoubleTimer = -10,
+	gJumpAffectTimer: ScaledTime = -10,
+	gJumpDoubleTimer: ScaledTime = -10,
 	gJumpStrength = 4,
-	gJumpTimer = 8,
+	gJumpTimer: ScaledTime = 8,
 	gLeapSpeed = 0.02;
 
 export default abstract class AbstractPlayer implements Player {
@@ -68,7 +69,7 @@ export default abstract class AbstractPlayer implements Player {
 	isPlayer: true;
 	canDoubleJump: boolean;
 	jumplg: boolean;
-	jumpTimer: number;
+	jumpTimer: ScaledTime;
 	health: number;
 	hurtSound: ResourceName;
 	layer: DisplayLayer;
@@ -79,12 +80,12 @@ export default abstract class AbstractPlayer implements Player {
 	removeControl: boolean;
 	sprite: PlayerController;
 	stepHeight: Pixels;
-	tscale: number;
+	tscale: ScaledTime;
 	va: number;
 	vfa: number;
 	voice: Channel;
 	vr: number;
-	w: number;
+	w: Pixels;
 	z: Multiplier;
 
 	constructor(game: Game, options: PlayerInit = {}) {

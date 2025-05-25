@@ -1,6 +1,12 @@
 import Flat from './component/Flat';
 import Wall from './component/Wall';
-import { Milliseconds, Multiplier, Pixels, Radians } from './flavours';
+import {
+	Milliseconds,
+	Multiplier,
+	Pixels,
+	Radians,
+	ScaledTime,
+} from './flavours';
 import Game from './Game';
 import Hitbox from './Hitbox';
 import {
@@ -33,7 +39,7 @@ export default function physics(obj: PhysicsObject, time: Milliseconds) {
 		obj;
 	let { a, r, va, vfa, vr } = obj;
 	const { walls, ceilings, floors } = game,
-		tscale = time / gTimeScale;
+		tscale: ScaledTime = time / gTimeScale;
 	const { bot, top } = obj.getHitbox();
 	const back = getBack(obj.z);
 

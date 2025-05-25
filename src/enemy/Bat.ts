@@ -20,6 +20,7 @@ import {
 	Pixels,
 	Radians,
 	ResourceName,
+	ScaledTime,
 } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
@@ -103,7 +104,7 @@ export default class Bat extends AbstractEnemy {
 	substate: BatSubstate;
 	substateTimer: Milliseconds;
 	targetradius: Pixels;
-	tscale: number;
+	tscale: ScaledTime;
 	verticalTimer: Milliseconds;
 
 	/**
@@ -180,7 +181,7 @@ export default class Bat extends AbstractEnemy {
 	}
 
 	physics(time: Milliseconds, va: number, vr: number): void {
-		const tscale = time / gTimeScale;
+		const tscale: ScaledTime = time / gTimeScale;
 
 		let { a, r } = this;
 

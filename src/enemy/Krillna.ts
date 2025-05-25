@@ -2,7 +2,7 @@ import { cHurt } from '../colours';
 import Flat from '../component/Flat';
 import Wall from '../component/Wall';
 import { dDown, dLeft, dRight, dUp } from '../dirs';
-import { Pixels, Radians, ResourceName } from '../flavours';
+import { Pixels, Radians, ResourceName, ScaledTime } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zEnemy } from '../layers';
@@ -38,7 +38,7 @@ export default class Krillna extends AbstractEnemy {
 	movefn: (frame: number, n: number) => number;
 	speed: number;
 	sprite: controller;
-	tscale: number;
+	tscale: ScaledTime;
 	vfa: number;
 	ignoreGravity: boolean;
 
@@ -82,7 +82,7 @@ export default class Krillna extends AbstractEnemy {
 
 		const { z, speed, last, sprite, height, width, movefn } = this;
 		let { a, r, va, vr, vfa, dir } = this;
-		const tscale = time / gTimeScale;
+		const tscale: ScaledTime = time / gTimeScale;
 		this.tscale = tscale;
 		const { bot, top } = this.getHitbox();
 

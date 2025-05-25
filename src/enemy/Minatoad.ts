@@ -9,10 +9,12 @@ import DrawnComponent from '../DrawnComponent';
 import { eAnimationEnded } from '../events';
 import {
 	AnimName,
+	Milliseconds,
 	Multiplier,
 	Pixels,
 	Radians,
 	ResourceName,
+	ScaledTime,
 } from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
@@ -817,47 +819,47 @@ class MinatoadController extends AnimController {
 		return this.play(anim, force, this.parent);
 	}
 
-	idle(t: number) {
+	idle(t: Milliseconds) {
 		this.play('idle');
 		this.next(t);
 	}
 
-	jump(t: number) {
+	jump(t: Milliseconds) {
 		this._play('jump');
 		this.next(t);
 	}
 
-	rise(t: number) {
+	rise(t: Milliseconds) {
 		this._play('rise');
 		this.next(t);
 	}
 
-	fall(t: number) {
+	fall(t: Milliseconds) {
 		this._play('fall');
 		this.next(t);
 	}
 
-	leap(t: number) {
+	leap(t: Milliseconds) {
 		this._play('leapRise');
 		this.next(t);
 	}
 
-	leapFall(t: number) {
+	leapFall(t: Milliseconds) {
 		this._play('leapFall');
 		this.next(t);
 	}
 
-	leapLand(t: number) {
+	leapLand(t: Milliseconds) {
 		this._play('leapLand');
 		this.next(t);
 	}
 
-	spray(t: number) {
+	spray(t: Milliseconds) {
 		this._play('spray');
 		this.next(t);
 	}
 
-	rapid(t: number) {
+	rapid(t: Milliseconds) {
 		this._play('rapid');
 		this.next(t);
 	}
@@ -880,7 +882,7 @@ type MinatoadState =
 	| 'spray'
 	| 'rapid';
 
-const gBetweenAttacks = 1000;
+const gBetweenAttacks: Milliseconds = 1000;
 const gJumpStrength = 5;
 const gJumpSpeed = 0.4;
 const gShockwaveSpeed = 0.08;
@@ -902,9 +904,9 @@ export default class Minatoad extends AbstractEnemy {
 	shots: number;
 	sprite: MinatoadController;
 	state: MinatoadState;
-	tscale: number;
+	tscale: ScaledTime;
 	vfa: number;
-	waittimer: number;
+	waittimer: Milliseconds;
 
 	constructor(
 		game: Game,
@@ -1018,11 +1020,10 @@ export default class Minatoad extends AbstractEnemy {
 		return next;
 	}
 
-	update(time: number) {
+	update(time: Milliseconds) {
 		if (!(time = this.dostun(time))) return;
 
-		const tscale = time / gTimeScale;
-		this.tscale = tscale;
+		this.tscale = time / gTimeScale;
 		this[this.state + 'Update'](time);
 
 		if (this.del) {
@@ -1039,7 +1040,7 @@ export default class Minatoad extends AbstractEnemy {
 		}
 	}
 
-	idleUpdate(t: number) {
+	idleUpdate(t: Milliseconds) {
 		this.sprite.idle(t);
 		physics(this, t);
 
@@ -1050,7 +1051,7 @@ export default class Minatoad extends AbstractEnemy {
 		}
 	}
 
-	leapUpdate(t: number) {
+	leapUpdate(t: Milliseconds) {
 		this.sprite.leap(t);
 		if (this.vr) this.vr = gLeapSpeed;
 
@@ -1070,7 +1071,7 @@ export default class Minatoad extends AbstractEnemy {
 		}
 	}
 
-	trackUpdate(t: number) {
+	trackUpdate(t: Milliseconds) {
 		this.waittimer -= t;
 		if (this.waittimer <= 0) {
 			this.state = 'fall';
@@ -1083,7 +1084,7 @@ export default class Minatoad extends AbstractEnemy {
 		}
 	}
 
-	fallUpdate(t: number) {
+	fallUpdate(t: Milliseconds) {
 		const { sprite } = this;
 		const { floor } = physics(this, t);
 		sprite.leapFall(t);
@@ -1113,14 +1114,14 @@ export default class Minatoad extends AbstractEnemy {
 		}
 	}
 
-	slamUpdate(t: number) {
+	slamUpdate(t: Milliseconds) {
 		this.ignoreCeilings = false;
 
 		this.sprite.leapLand(t);
 		physics(this, t);
 	}
 
-	hopUpdate(t: number) {
+	hopUpdate(t: Milliseconds) {
 		if (this.vr < 0) this.sprite.fall(t);
 		else if (this.vr > 0) this.sprite.rise(t);
 		else this.sprite.jump(t);
@@ -1128,12 +1129,12 @@ export default class Minatoad extends AbstractEnemy {
 		physics(this, t);
 	}
 
-	sprayUpdate(t: number) {
+	sprayUpdate(t: Milliseconds) {
 		this.sprite.spray(t);
 		physics(this, t);
 	}
 
-	rapidUpdate(t: number) {
+	rapidUpdate(t: Milliseconds) {
 		this.sprite.rapid(t);
 		physics(this, t);
 	}

@@ -4,7 +4,13 @@ import Controller from '../Controller';
 import { dLeft } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
 import { eThrow } from '../events';
-import { DisplayLayer, Multiplier, Pixels, Radians } from '../flavours';
+import {
+	DisplayLayer,
+	Multiplier,
+	Pixels,
+	Radians,
+	ScaledTime,
+} from '../flavours';
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import Item from '../Item';
@@ -24,26 +30,26 @@ import {
 	π,
 } from '../tools';
 
-const gFloatTime = 80,
-	gWindLoss = 0.995;
+const gFloatTime: ScaledTime = 80,
+	gWindLoss: Multiplier = 0.995;
 
 const controller = (img: CanvasImageSource) =>
 	new Controller({ img, w: 48, h: 48, xo: -24, yo: -36 });
 
 class Rock implements DrawnComponent {
 	a: Radians;
-	float: number;
+	float: ScaledTime;
 	game: Game;
 	h: Pixels;
 	layer: DisplayLayer;
 	owner: Player;
 	sprite: Controller;
 	r: Pixels;
-	tscale: number;
+	tscale: ScaledTime;
 	va: number;
 	vfa: number;
 	vr: number;
-	w: number;
+	w: Pixels;
 	z: Multiplier;
 
 	constructor(game: Game, options = {}) {

@@ -11,7 +11,7 @@ NOTES: After the body slam recovery, the flying animation will begin playing aga
 import { cAI, cHurt } from '../colours';
 import Flat from '../component/Flat';
 import { dLeft, Facing } from '../dirs';
-import { Pixels, ResourceName } from '../flavours';
+import { Pixels, ResourceName, ScaledTime } from '../flavours';
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { zFlying } from '../layers';
@@ -56,7 +56,7 @@ export default class Flazza extends AbstractEnemy {
 	speed: number;
 	sprite: controller;
 	state: FlazzaState;
-	tscale: number;
+	tscale: ScaledTime;
 
 	constructor(
 		game: Game,
@@ -98,7 +98,7 @@ export default class Flazza extends AbstractEnemy {
 			this;
 		let { a, r, va, vr, state } = this;
 		const { player } = game,
-			tscale = time / gTimeScale;
+			tscale: ScaledTime = time / gTimeScale;
 
 		switch (state) {
 			case sProwling:

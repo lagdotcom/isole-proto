@@ -20,6 +20,7 @@ export type PadCode = Flavour<string, 'PadCode'>;
 export type Pixels = Flavour<number, 'Pixels'>;
 export type Radians = Flavour<number, 'Radians'>;
 export type ResourceName = Flavour<string, 'ResourceName'>;
+export type ScaledTime = Flavour<number, 'ScaledTime'>;
 export type SpriteColumn = Flavour<number, 'SpriteColumn'>;
 export type SpriteRow = Flavour<number, 'SpriteRow'>;
 export type TextureName = Flavour<string, 'TextureName'>;

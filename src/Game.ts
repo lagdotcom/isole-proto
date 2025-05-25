@@ -16,6 +16,7 @@ import {
 	DisplayLayer,
 	MaterialName,
 	Milliseconds,
+	Multiplier,
 	ObjectName,
 	Pixels,
 	ResourceName,
@@ -72,8 +73,8 @@ interface GameInit {
 	height: Pixels;
 	maxScale?: number;
 	minScale?: number;
-	vertScale?: number;
-	zoomScale?: number;
+	vertScale?: Multiplier;
+	zoomScale?: Multiplier;
 	parent: HTMLElement;
 	showDebug?: boolean;
 	showFps?: boolean;

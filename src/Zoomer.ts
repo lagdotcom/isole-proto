@@ -1,5 +1,5 @@
 import DrawnComponent from './DrawnComponent';
-import { DisplayLayer } from './flavours';
+import { DisplayLayer, Multiplier, Pixels } from './flavours';
 import Game from './Game';
 import { zFirst } from './layers';
 import { cart } from './tools';
@@ -9,17 +9,17 @@ export default class Zoomer implements DrawnComponent {
 	layer: DisplayLayer;
 	max: number;
 	min: number;
-	px: number;
-	py: number;
-	scale: number;
-	vert: number;
+	px: Pixels;
+	py: Pixels;
+	scale: Multiplier;
+	vert: Multiplier;
 
 	constructor(
 		game: Game,
 		min: number,
 		max: number,
-		scale: number,
-		vert: number
+		scale: Multiplier,
+		vert: Multiplier
 	) {
 		this.layer = zFirst;
 		this.game = game;
