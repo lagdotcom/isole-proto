@@ -1,3 +1,4 @@
+import CoordXY from './CoordXY';
 import DrawnComponent from './DrawnComponent';
 import { DisplayLayer, Multiplier, Pixels } from './flavours';
 import Game from './Game';
@@ -11,14 +12,15 @@ export default class Zoomer implements DrawnComponent {
 	min: number;
 	px: Pixels;
 	py: Pixels;
-	scale: Multiplier;
+	scale: Pixels;
 	vert: Multiplier;
+	currentScale: Multiplier;
 
 	constructor(
 		game: Game,
 		min: number,
 		max: number,
-		scale: Multiplier,
+		scale: Pixels,
 		vert: Multiplier
 	) {
 		this.layer = zFirst;
@@ -27,6 +29,7 @@ export default class Zoomer implements DrawnComponent {
 		this.max = max;
 		this.scale = scale;
 		this.vert = vert;
+		this.currentScale = 1;
 	}
 
 	reset() {
@@ -49,11 +52,20 @@ export default class Zoomer implements DrawnComponent {
 		let s = this.scale / Math.max(ss, cs);
 		if (s < this.min) s = this.min;
 		if (s > this.max) s = this.max;
+		this.currentScale = s;
 
 		const { width, height } = this.game.options;
 		context.setTransform(s, 0, 0, s, 0, 0);
 
 		this.game.cx = width / s / 2 - this.px;
 		this.game.cy = height / s / 2 - this.py;
+	}
+
+	convert(pos: CoordXY): CoordXY {
+		const { currentScale, game } = this;
+		return {
+			x: pos.x / currentScale - game.cx,
+			y: pos.y / currentScale - game.cy,
+		};
 	}
 }

@@ -1,5 +1,9 @@
 import { KeyCode, PadCode } from './flavours';
 import {
+	jAimDown,
+	jAimLeft,
+	jAimRight,
+	jAimUp,
 	jButton1,
 	jButton2,
 	jButton3,
@@ -45,6 +49,11 @@ export enum InputButton {
 
 	AimBack,
 	AimFront,
+	AimLeft,
+	AimRight,
+	AimUp,
+	AimDown,
+	AimAtMouse,
 
 	FreeMoney,
 }
@@ -100,6 +109,11 @@ export class GamepadInput implements InputDevice {
 	}
 
 	add(pad: Gamepad) {
+		if (pad.axes.length < 4) {
+			console.log(`Cannot use pad ${pad.id} - not enough axes.`);
+			return;
+		}
+
 		console.log(`Added pad ${pad.id}.`);
 		this.pads.push(pad);
 	}
@@ -123,6 +137,10 @@ export class GamepadInput implements InputDevice {
 			if (axes[0] > gPadAxisThreshold) mapper.press(jRight);
 			if (axes[1] < -gPadAxisThreshold) mapper.press(jUp);
 			if (axes[1] > gPadAxisThreshold) mapper.press(jDown);
+			if (axes[2] < -gPadAxisThreshold) mapper.press(jAimLeft);
+			if (axes[2] > gPadAxisThreshold) mapper.press(jAimRight);
+			if (axes[3] < -gPadAxisThreshold) mapper.press(jAimUp);
+			if (axes[3] > gPadAxisThreshold) mapper.press(jAimDown);
 
 			for (let i = 0; i < buttons.length; i++)
 				if (buttons[i].pressed) mapper.press(jButtons[i]);
@@ -161,6 +179,10 @@ export default class InputMapper {
 		this.map(jUp, InputButton.Up);
 		this.map(jRight, InputButton.Right);
 		this.map(jDown, InputButton.Down);
+		this.map(jAimLeft, InputButton.AimLeft);
+		this.map(jAimUp, InputButton.AimUp);
+		this.map(jAimRight, InputButton.AimRight);
+		this.map(jAimDown, InputButton.AimDown);
 		this.map(jButton1, InputButton.Jump);
 		this.map(jButton2, InputButton.Melee);
 		this.map(jButton3, InputButton.Menu);

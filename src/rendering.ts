@@ -2,6 +2,7 @@ import CoordARZ from './CoordARZ';
 import CoordXY from './CoordXY';
 import { Multiplier, Pixels, Radians } from './flavours';
 import Game from './Game';
+import { gBackZ } from './nums';
 import { cart, πHalf } from './tools';
 
 interface HasDrawFunction {
@@ -50,15 +51,22 @@ export function drawSprite(
 	c.restore();
 }
 
-type Object2D = CoordXY & { game: Game; sprite: HasDrawFunction };
+type Object2D = CoordXY & {
+	game: Game;
+	sprite: HasDrawFunction;
+	back?: boolean;
+};
 
 export function draw2D(
 	c: CanvasRenderingContext2D,
-	{ x, y, game, sprite }: Object2D
+	{ x, y, game, sprite, back }: Object2D
 ) {
 	const { cx, cy } = game;
 
+	c.save();
 	c.translate(x + cx, y + cy);
+	if (back) c.scale(gBackZ, gBackZ);
 	sprite.draw(c);
-	c.translate(-x - cx, -y - cy);
+
+	c.restore();
 }

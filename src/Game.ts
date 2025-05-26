@@ -8,6 +8,7 @@ import Platform from './component/Platform';
 import ShopView from './component/ShopView';
 import Wall from './component/Wall';
 import Controller from './Controller';
+import CoordXY from './CoordXY';
 import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import emptyElement from './emptyElement';
@@ -74,7 +75,7 @@ interface GameInit {
 	maxScale?: number;
 	minScale?: number;
 	vertScale?: Multiplier;
-	zoomScale?: Multiplier;
+	zoomScale?: Pixels;
 	parent: HTMLElement;
 	showDebug?: boolean;
 	showFps?: boolean;
@@ -124,6 +125,8 @@ export default class Game {
 	mapView: MapView;
 	materials: Record<MaterialName, Material>;
 	mode: GameMode;
+	mousePosition: CoordXY;
+	mouseUpdate: boolean;
 	nodes: MapNode[];
 	objects: Record<ObjectName, Controller>;
 	options: GameInit;
@@ -164,6 +167,8 @@ export default class Game {
 		this.loaded = 0;
 		this.loading = 0;
 		this.materials = {};
+		this.mousePosition = { x: NaN, y: NaN };
+		this.mouseUpdate = true;
 		this.nodes = [];
 		this.objects = {};
 		this.options = options;
@@ -177,6 +182,10 @@ export default class Game {
 		this.start = this.start.bind(this);
 
 		this.element = this.makeCanvas(parent);
+		this.element.addEventListener('mousemove', e => {
+			this.mousePosition = { x: e.offsetX, y: e.offsetY };
+			this.mouseUpdate = true;
+		});
 
 		const context = this.element.getContext('2d');
 		if (!context) throw Error('Could not initialize 2D context');
@@ -429,6 +438,10 @@ export default class Game {
 		c.fillRect(0, 0, width, height);
 
 		this.keys = this.input.poll();
+		if (this.mouseUpdate) {
+			this.mouseUpdate = false;
+			this.keys.add(InputButton.AimAtMouse);
+		}
 		this.components.forEach(co => co.update?.(step));
 
 		if (this.redraw) {

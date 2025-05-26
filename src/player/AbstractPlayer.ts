@@ -20,6 +20,7 @@ import mel from '../makeElement';
 import {
 	gAirWalk,
 	gBackZ,
+	getBack,
 	getZ,
 	gFrontZ,
 	gGroundWalk,
@@ -31,12 +32,11 @@ import {
 } from '../nums';
 import physics from '../physics';
 import Player, { PlayerInit } from '../Player';
-import { draw3D } from '../rendering';
+import { draw2D, draw3D } from '../rendering';
 import PlayerController from '../spr/PlayerController';
 import ReticleController from '../spr/ReticleController';
 import {
 	cart,
-	clamp,
 	collides,
 	damage,
 	deg2rad,
@@ -45,7 +45,6 @@ import {
 	drawWedge,
 	first,
 	getDirectionVector,
-	isRightOf,
 	jbr,
 	scaleWidth,
 } from '../tools';
@@ -56,10 +55,7 @@ const gJumpAffectStrength = 0.15,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
 	gLeapSpeed = 0.02,
-	gReticleVA = 2,
-	gReticleVR = 1,
-	gReticleMinR: Pixels = 5,
-	gReticleMaxR: Pixels = 800;
+	gReticleSpeed: Pixels = 1;
 
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
@@ -120,7 +116,6 @@ export default abstract class AbstractPlayer implements Player {
 				health: 5,
 				pickUpDebounce: false,
 				ignoreGravity: false,
-				reticle: new ShootingReticle(game),
 			},
 			this.getDefaultInit(game, options),
 			options
@@ -128,6 +123,12 @@ export default abstract class AbstractPlayer implements Player {
 
 		this.a = deg2rad(options.a ?? 0);
 		this.z = getZ(options.back ?? false);
+		this.reticle = new ShootingReticle(
+			game,
+			this.a,
+			this.r + this.h / 2,
+			this.z
+		);
 
 		if (game.options.showDebug) {
 			this.del = mel(game.options.debugContainer, 'div', {
@@ -211,123 +212,77 @@ export default abstract class AbstractPlayer implements Player {
 			this.grounded = false;
 		}
 
+		const aimBack = keys.has(InputButton.AimBack);
+		const aimFront = keys.has(InputButton.AimFront);
+
+		if (aimBack) reticle.back = true;
+		else if (aimFront) reticle.back = false;
+
+		if (keys.has(InputButton.AimAtMouse)) {
+			const { x, y } = game.zoomer.convert(game.mousePosition);
+			reticle.x = x;
+			reticle.y = y;
+		}
+		if (keys.has(InputButton.AimLeft)) reticle.x -= gReticleSpeed * time;
+		if (keys.has(InputButton.AimRight)) reticle.x += gReticleSpeed * time;
+		if (keys.has(InputButton.AimUp)) reticle.y -= gReticleSpeed * time;
+		if (keys.has(InputButton.AimDown)) reticle.y += gReticleSpeed * time;
+
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
 
-		if (ok) {
-			const aimBack = keys.has(InputButton.AimBack);
-			const aimFront = keys.has(InputButton.AimFront);
+		if (ok && !sprite.flags.noControl && !this.removeControl) {
+			const strength = this.grounded ? gGroundWalk : gAirWalk;
+			if (keys.has(InputButton.Left)) {
+				this.va -= strength;
+				controls.push('left');
 
-			if (aimBack || aimFront) {
-				if (aimBack) controls.push('aim:b');
-				else controls.push('aim:f');
-
-				if (!reticle.show) {
-					reticle.show = true;
-					reticle.a = this.a;
-					reticle.r = this.r + this.h / 2;
+				if (!sprite.flags.noTurn) {
+					sprite.face(-1, this.grounded, canDoubleJump, this.leaping);
+					this.facing = dLeft;
 				}
-				reticle.z = getZ(aimBack);
+			} else if (keys.has(InputButton.Right)) {
+				this.va += strength;
+				controls.push('right');
 
-				if (keys.has(InputButton.Left))
-					reticle.a -= scaleWidth(
-						gReticleVA * time,
-						reticle.r,
-						reticle.z
-					);
-				else if (keys.has(InputButton.Right))
-					reticle.a += scaleWidth(
-						gReticleVA * time,
-						reticle.r,
-						reticle.z
-					);
+				if (!sprite.flags.noTurn) {
+					sprite.face(1, this.grounded, canDoubleJump, this.leaping);
+					this.facing = dRight;
+				}
+			}
 
-				const faceLeft = isRightOf(reticle.a, this.a);
-				sprite.face(
-					faceLeft ? -1 : 1,
-					this.grounded,
-					canDoubleJump,
-					this.leaping
-				);
-				this.facing = faceLeft ? dLeft : dRight;
-
-				if (keys.has(InputButton.Up))
-					reticle.r = clamp(
-						reticle.r + gReticleVR * time,
-						gReticleMinR,
-						gReticleMaxR
-					);
-				else if (keys.has(InputButton.Down))
-					reticle.r = clamp(
-						reticle.r - gReticleVR * time,
-						gReticleMinR,
-						gReticleMaxR
-					);
-			} else if (!sprite.flags.noControl && !this.removeControl) {
-				reticle.show = false;
-
-				const strength = this.grounded ? gGroundWalk : gAirWalk;
-				if (keys.has(InputButton.Left)) {
-					this.va -= strength;
-					controls.push('left');
-
-					if (!sprite.flags.noTurn) {
-						sprite.face(
-							-1,
-							this.grounded,
-							canDoubleJump,
-							this.leaping
-						);
-						this.facing = dLeft;
-					}
-				} else if (keys.has(InputButton.Right)) {
-					this.va += strength;
-					controls.push('right');
-
-					if (!sprite.flags.noTurn) {
-						sprite.face(
-							1,
-							this.grounded,
-							canDoubleJump,
-							this.leaping
-						);
-						this.facing = dRight;
-					}
+			if (keys.has(InputButton.Jump)) {
+				if (floor) {
+					this.vr += gJumpStrength;
+					this.jumpTimer = jumpTimer = gJumpTimer;
+					controls.push('jump');
+					this.body.play('player.jump');
+				} else if (
+					jumpTimer < gJumpDoubleTimer &&
+					canDoubleJump &&
+					jumplg
+				) {
+					this.jumpTimer = jumpTimer = gJumpTimer;
+					this.canDoubleJump = canDoubleJump = false;
+					this.vr = gJumpStrength;
+					controls.push('jumpd');
+					this.body.play('player.jump');
+				} else if (jumpTimer >= gJumpAffectTimer && !jumplg) {
+					this.vr += gJumpAffectStrength;
+					controls.push('jump+');
 				}
 
-				if (keys.has(InputButton.Jump)) {
-					if (floor) {
-						this.vr += gJumpStrength;
-						this.jumpTimer = jumpTimer = gJumpTimer;
-						controls.push('jump');
-						this.body.play('player.jump');
-					} else if (
-						jumpTimer < gJumpDoubleTimer &&
-						canDoubleJump &&
-						jumplg
-					) {
-						this.jumpTimer = jumpTimer = gJumpTimer;
-						this.canDoubleJump = canDoubleJump = false;
-						this.vr = gJumpStrength;
-						controls.push('jumpd');
-						this.body.play('player.jump');
-					} else if (jumpTimer >= gJumpAffectTimer && !jumplg) {
-						this.vr += gJumpAffectStrength;
-						controls.push('jump+');
-					}
+				this.jumplg = jumplg = false;
+			} else {
+				this.jumplg = jumplg = true;
+			}
 
-					this.jumplg = jumplg = false;
-				} else {
-					this.jumplg = jumplg = true;
-				}
-
-				// TODO: dodge
-				if (keys.has(InputButton.Shift)) {
-					if (this.grounded) {
-						this.leaping = this.z == gFrontZ ? 'b' : 'f';
-						controls.push('leap');
-						this.body.play('player.jump');
-					}
+			// TODO: dodge
+			if (keys.has(InputButton.Shift)) {
+				if (this.grounded) {
+					this.leaping = this.z == gFrontZ ? 'b' : 'f';
+					controls.push('leap');
+					this.body.play('player.jump');
 				}
 			}
 		} else controls.push('nocontrol');
@@ -481,23 +436,27 @@ export default abstract class AbstractPlayer implements Player {
 }
 
 class ShootingReticle implements DrawnComponent {
-	a: Radians;
-	r: Pixels;
-	z: Multiplier;
+	x: Pixels;
+	y: Pixels;
+	back: boolean;
 	layer: DisplayLayer;
 	sprite: ReticleController;
-	show: boolean;
 
-	constructor(public game: Game) {
-		this.a = 0;
-		this.r = 0;
-		this.z = gFrontZ;
+	constructor(
+		public game: Game,
+		a: Radians,
+		r: Pixels,
+		z: Multiplier
+	) {
+		const { x, y } = cart(a, r);
+		this.x = x;
+		this.y = y;
+		this.back = getBack(z);
 		this.layer = zBeforeUI;
 		this.sprite = new ReticleController(game);
-		this.show = false;
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
-		if (this.show) draw3D(ctx, this);
+		draw2D(ctx, this);
 	}
 }
