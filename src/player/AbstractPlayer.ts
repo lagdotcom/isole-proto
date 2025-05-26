@@ -226,8 +226,8 @@ export default abstract class AbstractPlayer implements Player {
 					reticle.show = true;
 					reticle.a = this.a;
 					reticle.r = this.r + this.h / 2;
-					reticle.z = getZ(aimBack);
 				}
+				reticle.z = getZ(aimBack);
 
 				if (keys.has(InputButton.Left))
 					reticle.a -= scaleWidth(
