@@ -4,20 +4,27 @@ import {
 	jButton2,
 	jButton3,
 	jButton4,
-	jButton5,
+	jButton7,
+	jButton8,
+	jButton13,
+	jButton14,
+	jButton15,
+	jButton16,
+	jButtons,
 	jDown,
 	jLeft,
 	jRight,
 	jUp,
-	kCycle,
+	kAimBack,
+	kAimFront,
 	kDown,
 	kFreeMoney,
 	kJump,
-	kLeap,
 	kLeft,
+	kMelee,
+	kMenu,
 	kRight,
-	kSwing,
-	kThrow,
+	kShift,
 	kUp,
 } from './keys';
 import { gPadAxisThreshold } from './nums';
@@ -25,17 +32,21 @@ import { any } from './tools';
 
 export enum InputButton {
 	None,
+
 	Left,
 	Right,
 	Up,
 	Down,
+
 	Jump,
-	Throw,
-	Swing,
-	Cycle,
-	Pickup,
+	Melee,
+	Menu,
+	Shift,
+
+	AimBack,
+	AimFront,
+
 	FreeMoney,
-	Leap,
 }
 
 interface InputDevice {
@@ -89,10 +100,6 @@ export class GamepadInput implements InputDevice {
 	}
 
 	add(pad: Gamepad) {
-		if (pad.buttons.length < 5) {
-			console.log(`Cannot use pad ${pad.id} - not enough buttons.`);
-			return;
-		}
 		console.log(`Added pad ${pad.id}.`);
 		this.pads.push(pad);
 	}
@@ -110,19 +117,15 @@ export class GamepadInput implements InputDevice {
 			const pad = pads[p.index];
 			if (!pad) return;
 
-			const buttons = pad.buttons;
-			const axes = pad.axes;
+			const { axes, buttons } = pad;
 
 			if (axes[0] < -gPadAxisThreshold) mapper.press(jLeft);
 			if (axes[0] > gPadAxisThreshold) mapper.press(jRight);
 			if (axes[1] < -gPadAxisThreshold) mapper.press(jUp);
 			if (axes[1] > gPadAxisThreshold) mapper.press(jDown);
 
-			if (buttons[0].pressed) mapper.press(jButton1);
-			if (buttons[1].pressed) mapper.press(jButton2);
-			if (buttons[2].pressed) mapper.press(jButton3);
-			if (buttons[3].pressed) mapper.press(jButton4);
-			if (buttons[4].pressed) mapper.press(jButton5);
+			for (let i = 0; i < buttons.length; i++)
+				if (buttons[i].pressed) mapper.press(jButtons[i]);
 		});
 	}
 }
@@ -147,11 +150,11 @@ export default class InputMapper {
 		this.map(kRight, InputButton.Right);
 		this.map(kDown, InputButton.Down);
 		this.map(kJump, InputButton.Jump);
-		this.map(kSwing, InputButton.Swing);
-		this.map(kThrow, InputButton.Throw);
-		this.map(kCycle, InputButton.Cycle);
-		this.map(kLeap, InputButton.Leap);
-		this.map(kDown, InputButton.Pickup);
+		this.map(kMelee, InputButton.Melee);
+		this.map(kMenu, InputButton.Menu);
+		this.map(kShift, InputButton.Shift);
+		this.map(kAimBack, InputButton.AimBack);
+		this.map(kAimFront, InputButton.AimFront);
 		this.map(kFreeMoney, InputButton.FreeMoney);
 
 		this.map(jLeft, InputButton.Left);
@@ -159,11 +162,15 @@ export default class InputMapper {
 		this.map(jRight, InputButton.Right);
 		this.map(jDown, InputButton.Down);
 		this.map(jButton1, InputButton.Jump);
-		this.map(jButton2, InputButton.Throw);
-		this.map(jButton3, InputButton.Swing);
-		this.map(jButton4, InputButton.Cycle);
-		this.map(jButton5, InputButton.Leap);
-		this.map(jDown, InputButton.Pickup);
+		this.map(jButton2, InputButton.Melee);
+		this.map(jButton3, InputButton.Menu);
+		this.map(jButton4, InputButton.Shift);
+		this.map(jButton7, InputButton.AimBack);
+		this.map(jButton8, InputButton.AimFront);
+		this.map(jButton13, InputButton.Up);
+		this.map(jButton14, InputButton.Down);
+		this.map(jButton15, InputButton.Left);
+		this.map(jButton16, InputButton.Right);
 	}
 
 	load(key = 'InputMapping') {

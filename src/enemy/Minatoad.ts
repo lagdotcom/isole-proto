@@ -28,6 +28,7 @@ import {
 } from '../nums';
 import physics from '../physics';
 import { draw3D } from '../rendering';
+import ReticleController from '../spr/ReticleController';
 import {
 	collides,
 	damage,
@@ -196,35 +197,6 @@ const animations: AnimSpecMap = {
 	},
 };
 
-class ReticleController extends AnimController {
-	constructor(img: CanvasImageSource) {
-		super({
-			img,
-			animations: {
-				idle: {
-					loop: true,
-					frames: [
-						{ c: 0, r: 0, t: 75 },
-						{ c: 0, r: 1, t: 75 },
-						{ c: 0, r: 2, t: 75 },
-						{ c: 0, r: 3, t: 75 },
-					],
-				},
-			},
-			w: 128,
-			h: 128,
-			xo: -64,
-			yo: -64,
-		});
-
-		this.play('idle');
-	}
-
-	update(t: number) {
-		this.next(t);
-	}
-}
-
 const gMaxReticleVA = 0.1;
 const gMaxReticleVR = 5;
 
@@ -241,7 +213,7 @@ class Reticle implements DrawnComponent {
 	constructor(game: Game) {
 		this.z = getZ(false);
 		this.a = 0;
-		this.sprite = new ReticleController(game.resources['reticle']);
+		this.sprite = new ReticleController(game);
 		this.game = game;
 		this.layer = zSpark;
 		this.r = 0;

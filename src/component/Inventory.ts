@@ -67,35 +67,36 @@ export default class Inventory implements DrawnComponent {
 
 	update(t: Milliseconds): void {
 		const { game, weapon } = this;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const ok = game.mode === 'level';
 
 		if (weapon && weapon.update) weapon.update(t);
 
-		if (ok && game.keys.has(InputButton.Swing)) {
-			if (weapon && weapon.canUse()) {
-				weapon.use();
-			}
-		}
+		// if (ok && game.keys.has(InputButton.Swing)) {
+		// 	if (weapon && weapon.canUse()) {
+		// 		weapon.use();
+		// 	}
+		// }
 
-		if (ok && game.keys.has(InputButton.Throw)) {
-			if (this.canThrow()) {
-				this.throw();
-			}
+		// if (ok && game.keys.has(InputButton.Throw)) {
+		// 	if (this.canThrow()) {
+		// 		this.throw();
+		// 	}
 
-			// TODO
-			// else {
-			// 	this.game.player.sprite.play('shrug');
-			// }
-		}
+		// 	// TODO
+		// 	// else {
+		// 	// 	this.game.player.sprite.play('shrug');
+		// 	// }
+		// }
 
-		if (ok && game.keys.has(InputButton.Cycle)) {
-			if (!this.cycling) {
-				this.cycle();
-				this.cycling = true;
-			}
-		} else {
-			this.cycling = false;
-		}
+		// if (ok && game.keys.has(InputButton.Cycle)) {
+		// 	if (!this.cycling) {
+		// 		this.cycle();
+		// 		this.cycling = true;
+		// 	}
+		// } else {
+		// 	this.cycling = false;
+		// }
 
 		if (game.keys.has(InputButton.FreeMoney)) {
 			this.money = 10000;

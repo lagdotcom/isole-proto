@@ -48,12 +48,13 @@ export default class MapView implements DrawnComponent {
 		const key = this.debounce(
 			InputButton.Up,
 			InputButton.Down,
-			InputButton.Swing
+			InputButton.Jump,
+			InputButton.Shift
 		);
 
 		if (key === InputButton.Up) this.cycle(-1);
 		else if (key === InputButton.Down) this.cycle(1);
-		else if (key === InputButton.Swing) {
+		else if (key === InputButton.Jump || key === InputButton.Shift) {
 			game.fire('level.enter', { id: selected });
 			this.current = selected;
 			game.nodes[selected].visited = true;

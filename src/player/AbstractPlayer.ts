@@ -2,6 +2,7 @@ import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
 import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
+import DrawnComponent from '../DrawnComponent';
 import {
 	DisplayLayer,
 	Milliseconds,
@@ -14,7 +15,7 @@ import {
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { InputButton } from '../InputMapper';
-import { zPlayer } from '../layers';
+import { zBeforeUI, zPlayer } from '../layers';
 import mel from '../makeElement';
 import {
 	gAirWalk,
@@ -32,8 +33,10 @@ import physics from '../physics';
 import Player, { PlayerInit } from '../Player';
 import { draw3D } from '../rendering';
 import PlayerController from '../spr/PlayerController';
+import ReticleController from '../spr/ReticleController';
 import {
 	cart,
+	clamp,
 	collides,
 	damage,
 	deg2rad,
@@ -42,6 +45,7 @@ import {
 	drawWedge,
 	first,
 	getDirectionVector,
+	isRightOf,
 	jbr,
 	scaleWidth,
 } from '../tools';
@@ -51,7 +55,11 @@ const gJumpAffectStrength = 0.15,
 	gJumpDoubleTimer: ScaledTime = -10,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
-	gLeapSpeed = 0.02;
+	gLeapSpeed = 0.02,
+	gReticleVA = 2,
+	gReticleVR = 1,
+	gReticleMinR: Pixels = 5,
+	gReticleMaxR: Pixels = 800;
 
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
@@ -78,6 +86,7 @@ export default abstract class AbstractPlayer implements Player {
 	pickUpDebounce: boolean;
 	r: Pixels;
 	removeControl: boolean;
+	reticle: ShootingReticle;
 	sprite: PlayerController;
 	stepHeight: Pixels;
 	tscale: ScaledTime;
@@ -111,6 +120,7 @@ export default abstract class AbstractPlayer implements Player {
 				health: 5,
 				pickUpDebounce: false,
 				ignoreGravity: false,
+				reticle: new ShootingReticle(game),
 			},
 			this.getDefaultInit(game, options),
 			options
@@ -130,7 +140,7 @@ export default abstract class AbstractPlayer implements Player {
 
 	update(time: Milliseconds): void {
 		let { z, canDoubleJump, jumplg, jumpTimer } = this;
-		const { game, sprite, va, vr } = this;
+		const { game, sprite, reticle, va, vr } = this;
 		const { keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
@@ -203,77 +213,121 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
-		if (ok && !sprite.flags.noControl && !this.removeControl) {
-			const strength = this.grounded ? gGroundWalk : gAirWalk;
-			if (keys.has(InputButton.Left)) {
-				this.va -= strength;
-				controls.push('left');
 
-				if (!sprite.flags.noTurn) {
-					sprite.face(-1, this.grounded, canDoubleJump, this.leaping);
-					this.facing = dLeft;
-				}
-			} else if (keys.has(InputButton.Right)) {
-				this.va += strength;
-				controls.push('right');
+		if (ok) {
+			const aimBack = keys.has(InputButton.AimBack);
+			const aimFront = keys.has(InputButton.AimFront);
 
-				if (!sprite.flags.noTurn) {
-					sprite.face(1, this.grounded, canDoubleJump, this.leaping);
-					this.facing = dRight;
-				}
-			}
+			if (aimBack || aimFront) {
+				if (aimBack) controls.push('aim:b');
+				else controls.push('aim:f');
 
-			if (keys.has(InputButton.Jump)) {
-				if (floor) {
-					this.vr += gJumpStrength;
-					this.jumpTimer = jumpTimer = gJumpTimer;
-					controls.push('jump');
-					this.body.play('player.jump');
-				} else if (
-					jumpTimer < gJumpDoubleTimer &&
-					canDoubleJump &&
-					jumplg
-				) {
-					this.jumpTimer = jumpTimer = gJumpTimer;
-					this.canDoubleJump = canDoubleJump = false;
-					this.vr = gJumpStrength;
-					controls.push('jumpd');
-					this.body.play('player.jump');
-				} else if (jumpTimer >= gJumpAffectTimer && !jumplg) {
-					this.vr += gJumpAffectStrength;
-					controls.push('jump+');
+				if (!reticle.show) {
+					reticle.show = true;
+					reticle.a = this.a;
+					reticle.r = this.r + this.h / 2;
+					reticle.z = getZ(aimBack);
 				}
 
-				this.jumplg = jumplg = false;
-			} else {
-				this.jumplg = jumplg = true;
-			}
-
-			if (keys.has(InputButton.Swing)) controls.push('swing');
-			if (keys.has(InputButton.Throw)) controls.push('throw');
-
-			if (keys.has(InputButton.Pickup)) {
-				controls.push('pickup');
-
-				if (!this.pickUpDebounce) {
-					const item = game.pickups.find(p =>
-						collides({ bot, top }, p.getHitbox())
+				if (keys.has(InputButton.Left))
+					reticle.a -= scaleWidth(
+						gReticleVA * time,
+						reticle.r,
+						reticle.z
+					);
+				else if (keys.has(InputButton.Right))
+					reticle.a += scaleWidth(
+						gReticleVA * time,
+						reticle.r,
+						reticle.z
 					);
 
-					if (item) {
-						this.pickUpDebounce = true;
-						item.take();
+				const faceLeft = isRightOf(reticle.a, this.a);
+				sprite.face(
+					faceLeft ? -1 : 1,
+					this.grounded,
+					canDoubleJump,
+					this.leaping
+				);
+				this.facing = faceLeft ? dLeft : dRight;
+
+				if (keys.has(InputButton.Up))
+					reticle.r = clamp(
+						reticle.r + gReticleVR * time,
+						gReticleMinR,
+						gReticleMaxR
+					);
+				else if (keys.has(InputButton.Down))
+					reticle.r = clamp(
+						reticle.r - gReticleVR * time,
+						gReticleMinR,
+						gReticleMaxR
+					);
+			} else if (!sprite.flags.noControl && !this.removeControl) {
+				reticle.show = false;
+
+				const strength = this.grounded ? gGroundWalk : gAirWalk;
+				if (keys.has(InputButton.Left)) {
+					this.va -= strength;
+					controls.push('left');
+
+					if (!sprite.flags.noTurn) {
+						sprite.face(
+							-1,
+							this.grounded,
+							canDoubleJump,
+							this.leaping
+						);
+						this.facing = dLeft;
+					}
+				} else if (keys.has(InputButton.Right)) {
+					this.va += strength;
+					controls.push('right');
+
+					if (!sprite.flags.noTurn) {
+						sprite.face(
+							1,
+							this.grounded,
+							canDoubleJump,
+							this.leaping
+						);
+						this.facing = dRight;
 					}
 				}
-			} else {
-				this.pickUpDebounce = false;
-			}
 
-			if (keys.has(InputButton.Leap)) {
-				if (this.grounded) {
-					this.leaping = this.z == gFrontZ ? 'b' : 'f';
-					controls.push('leap');
-					this.body.play('player.jump');
+				if (keys.has(InputButton.Jump)) {
+					if (floor) {
+						this.vr += gJumpStrength;
+						this.jumpTimer = jumpTimer = gJumpTimer;
+						controls.push('jump');
+						this.body.play('player.jump');
+					} else if (
+						jumpTimer < gJumpDoubleTimer &&
+						canDoubleJump &&
+						jumplg
+					) {
+						this.jumpTimer = jumpTimer = gJumpTimer;
+						this.canDoubleJump = canDoubleJump = false;
+						this.vr = gJumpStrength;
+						controls.push('jumpd');
+						this.body.play('player.jump');
+					} else if (jumpTimer >= gJumpAffectTimer && !jumplg) {
+						this.vr += gJumpAffectStrength;
+						controls.push('jump+');
+					}
+
+					this.jumplg = jumplg = false;
+				} else {
+					this.jumplg = jumplg = true;
+				}
+
+				// TODO: dodge
+				if (keys.has(InputButton.Shift)) {
+					if (this.grounded) {
+						this.leaping = this.z == gFrontZ ? 'b' : 'f';
+						controls.push('leap');
+						this.body.play('player.jump');
+					}
 				}
 			}
 		} else controls.push('nocontrol');
@@ -423,5 +477,27 @@ export default abstract class AbstractPlayer implements Player {
 	finishDeath(): void {
 		this.game.fire('player.died', {});
 		this.game.remove(this);
+	}
+}
+
+class ShootingReticle implements DrawnComponent {
+	a: Radians;
+	r: Pixels;
+	z: Multiplier;
+	layer: DisplayLayer;
+	sprite: ReticleController;
+	show: boolean;
+
+	constructor(public game: Game) {
+		this.a = 0;
+		this.r = 0;
+		this.z = gFrontZ;
+		this.layer = zBeforeUI;
+		this.sprite = new ReticleController(game);
+		this.show = false;
+	}
+
+	draw(ctx: CanvasRenderingContext2D) {
+		if (this.show) draw3D(ctx, this);
 	}
 }

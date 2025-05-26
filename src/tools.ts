@@ -104,6 +104,10 @@ export function deg2rad(a: Degrees): Radians {
 export const max = Math.max;
 export const min = Math.min;
 
+export function clamp(n: number, lo: number, hi: number) {
+	return max(min(n, hi), lo);
+}
+
 /**
  * Check if any item matches a predicate
  * @param {T[]} a items

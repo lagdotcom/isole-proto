@@ -18,6 +18,7 @@ export default interface Player extends DrawnComponent, Damageable {
 	vfa: number;
 	vr: number;
 	w: Pixels;
+	reticle: DrawnComponent;
 }
 
 export interface PlayerInit {

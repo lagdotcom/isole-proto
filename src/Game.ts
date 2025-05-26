@@ -284,6 +284,7 @@ export default class Game {
 			...this.decals,
 			...this.pickups,
 			this.player,
+			this.player.reticle,
 			this.inventory,
 			this.zoomer,
 			this.unzoomer,
