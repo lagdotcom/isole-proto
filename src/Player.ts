@@ -4,6 +4,7 @@ import { Facing } from './dirs';
 import DrawnComponent from './DrawnComponent';
 import { Degrees, Pixels, ResourceName } from './flavours';
 import Hitbox from './Hitbox';
+import ShootingReticle from './player/ShootingReticle';
 import PlayerController from './spr/PlayerController';
 
 export default interface Player extends DrawnComponent, Damageable {
@@ -18,7 +19,7 @@ export default interface Player extends DrawnComponent, Damageable {
 	vfa: number;
 	vr: number;
 	w: Pixels;
-	reticle: DrawnComponent;
+	reticle: ShootingReticle;
 }
 
 export interface PlayerInit {

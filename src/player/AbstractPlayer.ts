@@ -1,10 +1,7 @@
-import { aBackgroundAttack, aForegroundAttack, aSideAttack } from '../anims';
 import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
-import CoordARZ from '../CoordARZ';
 import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
-import DrawnComponent from '../DrawnComponent';
 import {
 	DisplayLayer,
 	Milliseconds,
@@ -17,12 +14,11 @@ import {
 import Game from '../Game';
 import { HitSize } from '../Hitbox';
 import { InputButton } from '../InputMapper';
-import { zBeforeUI, zPlayer } from '../layers';
+import { zPlayer } from '../layers';
 import mel from '../makeElement';
 import {
 	gAirWalk,
 	gBackZ,
-	getBack,
 	getZ,
 	gFrontZ,
 	gGroundWalk,
@@ -34,12 +30,10 @@ import {
 } from '../nums';
 import physics from '../physics';
 import Player, { PlayerInit } from '../Player';
-import { draw2D, draw3D } from '../rendering';
+import { draw3D } from '../rendering';
 import PlayerController from '../spr/PlayerController';
-import ReticleController from '../spr/ReticleController';
 import {
 	cart,
-	clamp,
 	collides,
 	damage,
 	deg2rad,
@@ -48,21 +42,17 @@ import {
 	drawWedge,
 	first,
 	getDirectionVector,
-	isRightOf,
 	jbr,
 	scaleWidth,
-	uncart,
 } from '../tools';
+import ShootingReticle from './ShootingReticle';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer: ScaledTime = -10,
 	gJumpDoubleTimer: ScaledTime = -10,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
-	gLeapSpeed = 0.02,
-	gMaxHorizontalReticleDistance: Pixels = 400,
-	gMaxVerticalReticleDistance: Pixels = 300,
-	gReticleSpeed: Pixels = 1;
+	gLeapSpeed = 0.02;
 
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
@@ -309,12 +299,12 @@ export default abstract class AbstractPlayer implements Player {
 		}
 
 		if (this.leaping) sprite.leap(time, this.leaping);
-		else if (aiming)
-			sprite.attack(aimAnimation, reticle.getFacing(this), time);
 		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
-		} else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
+		} else if (aiming)
+			sprite.attack(aimAnimation, reticle.getFacing(this), time);
+		else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
 		else sprite.walk(time);
 
 		if (jumpTimer > 0) flags.push('jump');
@@ -426,85 +416,5 @@ export default abstract class AbstractPlayer implements Player {
 	finishDeath(): void {
 		this.game.fire('player.died', {});
 		this.game.remove(this);
-	}
-}
-
-class ShootingReticle implements DrawnComponent {
-	x: Pixels;
-	y: Pixels;
-	back: boolean;
-	layer: DisplayLayer;
-	sprite: ReticleController;
-
-	constructor(
-		public game: Game,
-		a: Radians,
-		r: Pixels,
-		z: Multiplier
-	) {
-		const { x, y } = cart(a, r);
-		this.x = x;
-		this.y = y;
-		this.back = getBack(z);
-		this.layer = zBeforeUI;
-		this.sprite = new ReticleController(game);
-	}
-
-	draw(ctx: CanvasRenderingContext2D) {
-		draw2D(ctx, this);
-	}
-
-	adjust(owner: CoordARZ, time: Milliseconds) {
-		const { game } = this;
-		const { keys } = game;
-
-		const aimBack = keys.has(InputButton.AimBack);
-		const aimFront = keys.has(InputButton.AimFront);
-
-		if (aimBack) this.back = true;
-		else if (aimFront) this.back = false;
-
-		if (keys.has(InputButton.AimAtMouse)) {
-			const { x, y } = game.zoomer.convert(game.mousePosition);
-			this.x = x;
-			this.y = y;
-		}
-
-		let mx = 0;
-		if (keys.has(InputButton.AimLeft)) mx = -gReticleSpeed * time;
-		if (keys.has(InputButton.AimRight)) mx = gReticleSpeed * time;
-
-		let my = 0;
-		if (keys.has(InputButton.AimUp)) my = -gReticleSpeed * time;
-		if (keys.has(InputButton.AimDown)) my = gReticleSpeed * time;
-
-		const pos = cart(owner.a, owner.r);
-		this.x = clamp(
-			this.x + mx,
-			pos.x - gMaxHorizontalReticleDistance,
-			pos.x + gMaxHorizontalReticleDistance
-		);
-		this.y = clamp(
-			this.y + my,
-			pos.y - gMaxVerticalReticleDistance,
-			pos.y + gMaxVerticalReticleDistance
-		);
-
-		const ownerBack = getBack(owner.z);
-
-		return {
-			aiming: aimBack || aimFront,
-			aimAnimation:
-				this.back === ownerBack
-					? aSideAttack
-					: this.back
-						? aBackgroundAttack
-						: aForegroundAttack,
-		};
-	}
-
-	getFacing(owner: CoordARZ): 1 | -1 {
-		const me = uncart(this.x, this.y, this.back);
-		return isRightOf(owner.a, me.a) ? 1 : -1;
 	}
 }

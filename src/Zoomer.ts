@@ -42,6 +42,12 @@ export default class Zoomer implements DrawnComponent {
 			const xy = cart(player.a, player.r);
 			this.px = xy.x;
 			this.py = xy.y;
+
+			const { x, y } = player.reticle;
+			if (!isNaN(x)) {
+				this.px += x / 10;
+				this.py += y / 10;
+			}
 		}
 	}
 
@@ -67,5 +73,15 @@ export default class Zoomer implements DrawnComponent {
 			x: pos.x / currentScale - game.cx,
 			y: pos.y / currentScale - game.cy,
 		};
+	}
+
+	bounds() {
+		const min = this.convert({ x: 0, y: 0 });
+		const max = this.convert({
+			x: this.game.options.width,
+			y: this.game.options.height,
+		});
+
+		return [min, max] as const;
 	}
 }

@@ -77,7 +77,7 @@ export function uncart<T extends number>(
 	back: boolean
 ): CoordARZ<Radians, T> {
 	const a = Math.atan2(dy, dx);
-	const r = 30 as T;
+	const r = 30 as T; // TODO when it matters lol
 
 	return { a, r, z: getZ(back) };
 }
