@@ -1,5 +1,6 @@
 import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
+import CoordARZ from '../CoordARZ';
 import Damageable from '../Damageable';
 import { dLeft, dRight, Facing } from '../dirs';
 import DrawnComponent from '../DrawnComponent';
@@ -37,6 +38,7 @@ import PlayerController from '../spr/PlayerController';
 import ReticleController from '../spr/ReticleController';
 import {
 	cart,
+	clamp,
 	collides,
 	damage,
 	deg2rad,
@@ -55,6 +57,7 @@ const gJumpAffectStrength = 0.15,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
 	gLeapSpeed = 0.02,
+	gMaxReticleDistance: Pixels = 400,
 	gReticleSpeed: Pixels = 1;
 
 export default abstract class AbstractPlayer implements Player {
@@ -212,26 +215,11 @@ export default abstract class AbstractPlayer implements Player {
 			this.grounded = false;
 		}
 
-		const aimBack = keys.has(InputButton.AimBack);
-		const aimFront = keys.has(InputButton.AimFront);
-
-		if (aimBack) reticle.back = true;
-		else if (aimFront) reticle.back = false;
-
-		if (keys.has(InputButton.AimAtMouse)) {
-			const { x, y } = game.zoomer.convert(game.mousePosition);
-			reticle.x = x;
-			reticle.y = y;
-		}
-		if (keys.has(InputButton.AimLeft)) reticle.x -= gReticleSpeed * time;
-		if (keys.has(InputButton.AimRight)) reticle.x += gReticleSpeed * time;
-		if (keys.has(InputButton.AimUp)) reticle.y -= gReticleSpeed * time;
-		if (keys.has(InputButton.AimDown)) reticle.y += gReticleSpeed * time;
-
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
+		const aiming = this.reticle.adjust(this, time);
 
-		if (ok && !sprite.flags.noControl && !this.removeControl) {
+		if (ok && !sprite.flags.noControl && !this.removeControl && !aiming) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				this.va -= strength;
@@ -458,5 +446,44 @@ class ShootingReticle implements DrawnComponent {
 
 	draw(ctx: CanvasRenderingContext2D) {
 		draw2D(ctx, this);
+	}
+
+	adjust(owner: CoordARZ, time: Milliseconds) {
+		const { game } = this;
+		const { keys } = game;
+
+		const aimBack = keys.has(InputButton.AimBack);
+		const aimFront = keys.has(InputButton.AimFront);
+
+		if (aimBack) this.back = true;
+		else if (aimFront) this.back = false;
+
+		if (keys.has(InputButton.AimAtMouse)) {
+			const { x, y } = game.zoomer.convert(game.mousePosition);
+			this.x = x;
+			this.y = y;
+		}
+
+		let mx = 0;
+		if (keys.has(InputButton.AimLeft)) mx = -gReticleSpeed * time;
+		if (keys.has(InputButton.AimRight)) mx = gReticleSpeed * time;
+
+		let my = 0;
+		if (keys.has(InputButton.AimUp)) my = -gReticleSpeed * time;
+		if (keys.has(InputButton.AimDown)) my = gReticleSpeed * time;
+
+		const pos = cart(owner.a, owner.r);
+		this.x = clamp(
+			this.x + mx,
+			pos.x - gMaxReticleDistance,
+			pos.x + gMaxReticleDistance
+		);
+		this.y = clamp(
+			this.y + my,
+			pos.y - gMaxReticleDistance,
+			pos.y + gMaxReticleDistance
+		);
+
+		return aimBack || aimFront;
 	}
 }
