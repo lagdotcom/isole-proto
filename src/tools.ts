@@ -4,7 +4,7 @@ import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import { Degrees, Multiplier, Pixels, Radians } from './flavours';
 import Hitbox, { HitSize } from './Hitbox';
-import { gCollideZ, gFrontZ, gHitboxScale } from './nums';
+import { gCollideZ, getZ, gFrontZ, gHitboxScale } from './nums';
 
 export const π: Radians = Math.PI,
 	π2: Radians = π * 2,
@@ -69,6 +69,17 @@ export function cart<T extends number>(a: Radians, r: T): CoordXY<T> {
 		x: (Math.cos(a) * r) as T,
 		y: (Math.sin(a) * r) as T,
 	};
+}
+
+export function uncart<T extends number>(
+	dx: T,
+	dy: T,
+	back: boolean
+): CoordARZ<Radians, T> {
+	const a = Math.atan2(dy, dx);
+	const r = 30 as T;
+
+	return { a, r, z: getZ(back) };
 }
 
 /**

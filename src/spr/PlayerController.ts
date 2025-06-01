@@ -16,6 +16,7 @@ import {
 	aThrow,
 	aWalk,
 } from '../anims';
+import { AnimName, Milliseconds } from '../flavours';
 import Player from '../Player';
 
 const midAirAnimations = [aJump, aDoubleJump];
@@ -96,6 +97,14 @@ export default class PlayerController extends AnimController {
 
 	die(): void {
 		this.play(aDying);
+	}
+
+	attack(animation: AnimName, vr: 1 | -1, time: Milliseconds) {
+		this.facing = vr;
+		this.flip = vr < 0;
+
+		this.play(animation);
+		this.next(time);
 	}
 
 	onstep(): void {

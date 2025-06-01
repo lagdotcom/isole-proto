@@ -1,17 +1,20 @@
 import {
 	aAxe,
+	aBackgroundAttack,
 	aBackgroundLeap,
 	aBackgroundLeapFlip,
 	aDoubleJump,
 	aDoubleJumpFlip,
 	aDying,
 	aFlip,
+	aForegroundAttack,
 	aForegroundLeap,
 	aForegroundLeapFlip,
 	aHurt,
 	aJump,
 	aJumpFlip,
 	aLand,
+	aSideAttack,
 	aStand,
 	aStatus,
 	aThrow,
@@ -201,6 +204,36 @@ export default function woodyController(
 					{ c: 8, r: 7, t: 75, hotspot: { x: 50, y: 32 } },
 					{ c: 8, r: 8, t: 75, hotspot: { x: 50, y: 32 } },
 					{ c: 8, r: 9, t: 75, hotspot: { x: 50, y: 32 } },
+				],
+			},
+
+			[aForegroundAttack]: {
+				loop: true,
+				frames: [
+					{ c: 9, r: 0, t: 75 },
+					{ c: 9, r: 1, t: 75 },
+					{ c: 9, r: 2, t: 75 },
+					{ c: 9, r: 3, t: 75 },
+				],
+			},
+
+			[aSideAttack]: {
+				loop: true,
+				frames: [
+					{ c: 10, r: 0, t: 75 },
+					{ c: 10, r: 1, t: 75 },
+					{ c: 10, r: 2, t: 75 },
+					{ c: 10, r: 3, t: 75 },
+				],
+			},
+
+			[aBackgroundAttack]: {
+				loop: true,
+				frames: [
+					{ c: 11, r: 0, t: 75 },
+					{ c: 11, r: 1, t: 75 },
+					{ c: 11, r: 2, t: 75 },
+					{ c: 11, r: 3, t: 75 },
 				],
 			},
 

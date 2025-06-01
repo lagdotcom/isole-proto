@@ -1,3 +1,4 @@
+import { aBackgroundAttack, aForegroundAttack, aSideAttack } from '../anims';
 import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
 import CoordARZ from '../CoordARZ';
@@ -47,8 +48,10 @@ import {
 	drawWedge,
 	first,
 	getDirectionVector,
+	isRightOf,
 	jbr,
 	scaleWidth,
+	uncart,
 } from '../tools';
 
 const gJumpAffectStrength = 0.15,
@@ -57,7 +60,8 @@ const gJumpAffectStrength = 0.15,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
 	gLeapSpeed = 0.02,
-	gMaxReticleDistance: Pixels = 400,
+	gMaxHorizontalReticleDistance: Pixels = 400,
+	gMaxVerticalReticleDistance: Pixels = 300,
 	gReticleSpeed: Pixels = 1;
 
 export default abstract class AbstractPlayer implements Player {
@@ -217,7 +221,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
-		const aiming = this.reticle.adjust(this, time);
+		const { aiming, aimAnimation } = this.reticle.adjust(this, time);
 
 		if (ok && !sprite.flags.noControl && !this.removeControl && !aiming) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
@@ -305,6 +309,8 @@ export default abstract class AbstractPlayer implements Player {
 		}
 
 		if (this.leaping) sprite.leap(time, this.leaping);
+		else if (aiming)
+			sprite.attack(aimAnimation, reticle.getFacing(this), time);
 		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
@@ -475,15 +481,30 @@ class ShootingReticle implements DrawnComponent {
 		const pos = cart(owner.a, owner.r);
 		this.x = clamp(
 			this.x + mx,
-			pos.x - gMaxReticleDistance,
-			pos.x + gMaxReticleDistance
+			pos.x - gMaxHorizontalReticleDistance,
+			pos.x + gMaxHorizontalReticleDistance
 		);
 		this.y = clamp(
 			this.y + my,
-			pos.y - gMaxReticleDistance,
-			pos.y + gMaxReticleDistance
+			pos.y - gMaxVerticalReticleDistance,
+			pos.y + gMaxVerticalReticleDistance
 		);
 
-		return aimBack || aimFront;
+		const ownerBack = getBack(owner.z);
+
+		return {
+			aiming: aimBack || aimFront,
+			aimAnimation:
+				this.back === ownerBack
+					? aSideAttack
+					: this.back
+						? aBackgroundAttack
+						: aForegroundAttack,
+		};
+	}
+
+	getFacing(owner: CoordARZ): 1 | -1 {
+		const me = uncart(this.x, this.y, this.back);
+		return isRightOf(owner.a, me.a) ? 1 : -1;
 	}
 }
