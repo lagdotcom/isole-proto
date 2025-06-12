@@ -46,6 +46,7 @@ import {
 	scaleWidth,
 } from '../tools';
 import ShootingReticle from './ShootingReticle';
+import SpellCircle from './SpellCircle';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer: ScaledTime = -10,
@@ -80,6 +81,7 @@ export default abstract class AbstractPlayer implements Player {
 	r: Pixels;
 	removeControl: boolean;
 	reticle: ShootingReticle;
+	spellCircle: SpellCircle;
 	sprite: PlayerController;
 	stepHeight: Pixels;
 	tscale: ScaledTime;
@@ -126,6 +128,7 @@ export default abstract class AbstractPlayer implements Player {
 			this.r + this.h / 2,
 			this.z
 		);
+		this.spellCircle = new SpellCircle(game);
 
 		if (game.options.showDebug) {
 			this.del = mel(game.options.debugContainer, 'div', {
@@ -138,7 +141,7 @@ export default abstract class AbstractPlayer implements Player {
 
 	update(time: Milliseconds): void {
 		let { z, canDoubleJump, jumplg, jumpTimer } = this;
-		const { game, sprite, reticle, va, vr } = this;
+		const { game, sprite, va, vr } = this;
 		const { keys, enemies } = game,
 			tscale = time / gTimeScale;
 		this.tscale = tscale;
@@ -211,9 +214,15 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
-		const { aiming, aimAnimation } = this.reticle.adjust(this, time);
+		const aim = this.reticle.adjust(this, time);
+		this.spellCircle.useAim(aim.active, aim.facing);
 
-		if (ok && !sprite.flags.noControl && !this.removeControl && !aiming) {
+		if (
+			ok &&
+			!sprite.flags.noControl &&
+			!this.removeControl &&
+			!aim.active
+		) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				this.va -= strength;
@@ -302,8 +311,7 @@ export default abstract class AbstractPlayer implements Player {
 		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
-		} else if (aiming)
-			sprite.attack(aimAnimation, reticle.getFacing(this), time);
+		} else if (aim.active) sprite.attack(aim.animation, aim.facing, time);
 		else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
 		else sprite.walk(time);
 

@@ -20,6 +20,7 @@ import {
 	aThrow,
 	aWalk,
 } from '../anims';
+import CoordXY from '../CoordXY';
 import { eSwing, eThrow } from '../events';
 import Player from '../Player';
 import PlayerController from './PlayerController';
@@ -42,6 +43,8 @@ Cell order, left to right:
 - Hurt (loop last 4 frames only, briefly)
 - Death (on death, play hurt animation once fully, then death animation after)
 */
+
+const attackHotspot: CoordXY = { x: 70, y: 40 };
 
 export default function woodyController(
 	parent: Player,
@@ -200,40 +203,40 @@ export default function woodyController(
 						hotspot: { x: 50, y: 32 },
 						event: eSwing,
 					},
-					{ c: 8, r: 6, t: 75, hotspot: { x: 50, y: 32 } },
-					{ c: 8, r: 7, t: 75, hotspot: { x: 50, y: 32 } },
-					{ c: 8, r: 8, t: 75, hotspot: { x: 50, y: 32 } },
-					{ c: 8, r: 9, t: 75, hotspot: { x: 50, y: 32 } },
+					{ c: 8, r: 6, t: 75, hotspot: attackHotspot },
+					{ c: 8, r: 7, t: 75, hotspot: attackHotspot },
+					{ c: 8, r: 8, t: 75, hotspot: attackHotspot },
+					{ c: 8, r: 9, t: 75, hotspot: attackHotspot },
 				],
 			},
 
 			[aForegroundAttack]: {
 				loop: true,
 				frames: [
-					{ c: 9, r: 0, t: 75 },
-					{ c: 9, r: 1, t: 75 },
-					{ c: 9, r: 2, t: 75 },
-					{ c: 9, r: 3, t: 75 },
+					{ c: 9, r: 0, t: 75, hotspot: attackHotspot },
+					{ c: 9, r: 1, t: 75, hotspot: attackHotspot },
+					{ c: 9, r: 2, t: 75, hotspot: attackHotspot },
+					{ c: 9, r: 3, t: 75, hotspot: attackHotspot },
 				],
 			},
 
 			[aSideAttack]: {
 				loop: true,
 				frames: [
-					{ c: 10, r: 0, t: 75 },
-					{ c: 10, r: 1, t: 75 },
-					{ c: 10, r: 2, t: 75 },
-					{ c: 10, r: 3, t: 75 },
+					{ c: 10, r: 0, t: 75, hotspot: attackHotspot },
+					{ c: 10, r: 1, t: 75, hotspot: attackHotspot },
+					{ c: 10, r: 2, t: 75, hotspot: attackHotspot },
+					{ c: 10, r: 3, t: 75, hotspot: attackHotspot },
 				],
 			},
 
 			[aBackgroundAttack]: {
 				loop: true,
 				frames: [
-					{ c: 11, r: 0, t: 75 },
-					{ c: 11, r: 1, t: 75 },
-					{ c: 11, r: 2, t: 75 },
-					{ c: 11, r: 3, t: 75 },
+					{ c: 11, r: 0, t: 75, hotspot: attackHotspot },
+					{ c: 11, r: 1, t: 75, hotspot: attackHotspot },
+					{ c: 11, r: 2, t: 75, hotspot: attackHotspot },
+					{ c: 11, r: 3, t: 75, hotspot: attackHotspot },
 				],
 			},
 

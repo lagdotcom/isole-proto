@@ -1,4 +1,4 @@
-import AnimController from '../AnimController';
+import AnimController, { AnimInit } from '../AnimController';
 import {
 	aBackgroundLeap,
 	aBackgroundLeapFlip,
@@ -21,12 +21,18 @@ import Player from '../Player';
 
 const midAirAnimations = [aJump, aDoubleJump];
 
+type PlayerControllerInit = Omit<AnimInit, 'img' | 'parent'>;
+
 export default class PlayerController extends AnimController {
 	facing: 1 | -1;
 	parent: Player;
 	step?: boolean;
 
-	constructor(parent: Player, img: CanvasImageSource, options: any) {
+	constructor(
+		parent: Player,
+		img: CanvasImageSource,
+		options: PlayerControllerInit
+	) {
 		super(Object.assign({ facing: 1, img, parent }, options));
 
 		this.parent = parent;

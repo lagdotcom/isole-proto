@@ -76,13 +76,14 @@ export default class ShootingReticle implements DrawnComponent {
 		this.y = clamp(this.y + my, min.y, max.y);
 
 		return {
-			aiming: aimBack || aimFront,
-			aimAnimation:
+			active: aimBack || aimFront,
+			animation:
 				this.back === getBack(owner.z)
 					? aSideAttack
 					: this.back
 						? aBackgroundAttack
 						: aForegroundAttack,
+			facing: this.getFacing(owner),
 		};
 	}
 

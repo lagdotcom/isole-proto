@@ -294,6 +294,7 @@ export default class Game {
 			...this.pickups,
 			this.player,
 			this.player.reticle,
+			this.player.spellCircle,
 			this.inventory,
 			this.zoomer,
 			this.unzoomer,

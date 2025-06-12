@@ -1,5 +1,5 @@
 import AnimController from '../AnimController';
-import { ResourceName } from '../flavours';
+import { Milliseconds, ResourceName } from '../flavours';
 import Game from '../Game';
 
 export default class ReticleController extends AnimController {
@@ -26,7 +26,7 @@ export default class ReticleController extends AnimController {
 		this.play('idle');
 	}
 
-	update(t: number) {
+	update(t: Milliseconds) {
 		this.next(t);
 	}
 }

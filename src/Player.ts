@@ -5,6 +5,7 @@ import DrawnComponent from './DrawnComponent';
 import { Degrees, Pixels, ResourceName } from './flavours';
 import Hitbox from './Hitbox';
 import ShootingReticle from './player/ShootingReticle';
+import SpellCircle from './player/SpellCircle';
 import PlayerController from './spr/PlayerController';
 
 export default interface Player extends DrawnComponent, Damageable {
@@ -20,6 +21,7 @@ export default interface Player extends DrawnComponent, Damageable {
 	vr: number;
 	w: Pixels;
 	reticle: ShootingReticle;
+	spellCircle: SpellCircle;
 }
 
 export interface PlayerInit {

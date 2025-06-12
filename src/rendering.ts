@@ -9,14 +9,18 @@ interface HasDrawFunction {
 	draw(c: CanvasRenderingContext2D): void;
 }
 
-type Object3D = CoordARZ & { game: Game; sprite: HasDrawFunction };
+type Draw3D = CoordARZ & {
+	game: Game;
+	sprite: HasDrawFunction;
+	rotation?: Radians;
+};
 
 export function draw3D(
 	c: CanvasRenderingContext2D,
-	{ a, r, z, game, sprite }: Object3D
+	{ a, r, z, game, sprite, rotation = 0 }: Draw3D
 ) {
 	const { cx, cy } = game;
-	const normal = a + πHalf;
+	const normal = a + πHalf + rotation;
 	const { x, y } = cart(a, r);
 
 	drawSprite(c, sprite, { cx, cy, x, y, z, normal });

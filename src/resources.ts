@@ -15,6 +15,10 @@ import shockwaveImg from '../media/gfx/mon/minatoad.shockwave.png';
 import projectileImg from '../media/gfx/projectiles.png';
 import reticleImg from '../media/gfx/reticle.png';
 import shopBgImg from '../media/gfx/shop.png';
+import spellCircleCentre from '../media/gfx/spell/center.png';
+import spellCircleInnerOne from '../media/gfx/spell/inner_one.png';
+import spellCircleInnerTwo from '../media/gfx/spell/inner_two.png';
+import spellCircleOuter from '../media/gfx/spell/outer.png';
 import bluegrassImg from '../media/gfx/tile/bluegrass.png';
 import grassImg from '../media/gfx/tile/grass.png';
 import greyboxImg from '../media/gfx/tile/greybox.png';
@@ -99,7 +103,7 @@ function image(fn: UrlString, onload: (e: Event) => void): HTMLImageElement {
 }
 
 const MediaErrors = [
-	'',
+	'UNKNOWN',
 	'MEDIA_ERR_ABORTED',
 	'MEDIA_ERR_NETWORK',
 	'MEDIA_ERR_DECODE',
@@ -116,7 +120,9 @@ function sound(fn: UrlString, onload: (e: Event) => void): HTMLAudioElement {
 	const el = new Audio(fn);
 	el.addEventListener('canplaythrough', onload);
 	el.addEventListener('error', e => {
-		console.log(`could not load ${fn} - ${MediaErrors[el.error!.code]}`);
+		console.log(
+			`could not load ${fn} - ${MediaErrors[el.error?.code ?? 0]}`
+		);
 		onload(e as Event);
 	});
 
@@ -145,6 +151,10 @@ export default function PreloadResources(game: Game) {
 	game.require('projectile', image, projectileImg);
 	game.require('player.jacques', image, jacquesImg);
 	game.require('player.woody', image, woodyImg);
+	game.require('player.spell.1', image, spellCircleOuter);
+	game.require('player.spell.2', image, spellCircleInnerOne);
+	game.require('player.spell.3', image, spellCircleInnerTwo);
+	game.require('player.spell.4', image, spellCircleCentre);
 	game.require('tile.grass', image, grassImg);
 	game.require('tile.bluegrass', image, bluegrassImg);
 	game.require('tile.greybox', image, greyboxImg);
