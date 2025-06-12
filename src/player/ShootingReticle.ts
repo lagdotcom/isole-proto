@@ -39,6 +39,10 @@ export default class ShootingReticle implements DrawnComponent {
 		this.sprite = new ReticleController(game);
 	}
 
+	update(time: Milliseconds) {
+		this.sprite.update(time);
+	}
+
 	draw(ctx: CanvasRenderingContext2D) {
 		draw2D(ctx, this);
 	}
