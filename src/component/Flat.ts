@@ -13,9 +13,9 @@ import {
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { getZ, gHitboxScale } from '../nums';
-import { drawSprite } from '../rendering';
+import { draw3D } from '../rendering';
 import Texture from '../Texture';
-import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
+import { deg2rad, scaleWidth, wrapAngle } from '../tools';
 import Wall from './Wall';
 
 /** Floor or Ceiling */
@@ -112,9 +112,8 @@ export default class Flat implements DrawnComponent {
 	 */
 	draw(c: CanvasRenderingContext2D): void {
 		const { left, right, r, game, scale, sprite, width, z } = this;
-		const { cx, cy } = game;
 		const step = scaleWidth(scale, r, z),
-			offset = scaleWidth(scale / 2, r, z);
+			rotation = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -128,10 +127,7 @@ export default class Flat implements DrawnComponent {
 				a = right - step;
 			}
 
-			const normal = a + offset + πHalf;
-			const { x, y } = cart(a, r);
-
-			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+			draw3D(c, { a, r, z, game, sprite, rotation });
 
 			remaining -= step;
 			a += step;

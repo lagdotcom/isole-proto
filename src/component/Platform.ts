@@ -11,9 +11,9 @@ import {
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { getZ, gHitboxScale } from '../nums';
-import { drawSprite } from '../rendering';
+import { draw3D } from '../rendering';
 import Texture from '../Texture';
-import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
+import { deg2rad, scaleWidth, wrapAngle } from '../tools';
 import Flat from './Flat';
 import Wall from './Wall';
 
@@ -179,9 +179,8 @@ export default class Platform implements DrawnComponent {
 
 	drawSlice(c: CanvasRenderingContext2D, row: string, r: number) {
 		const { left, right, game, scale, sprite, width, z } = this;
-		const { cx, cy } = game;
 		const step = scaleWidth(scale, r, z),
-			offset = scaleWidth(scale / 2, r, z);
+			rotation = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -192,10 +191,7 @@ export default class Platform implements DrawnComponent {
 				a = right - step;
 			}
 
-			const normal = a + offset + πHalf;
-			const { x, y } = cart(a, r);
-
-			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+			draw3D(c, { a, r, z, game, sprite, rotation });
 
 			remaining -= step;
 			a += step;

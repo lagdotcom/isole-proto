@@ -4,10 +4,10 @@ import { DisplayLayer, Multiplier, Pixels } from '../flavours';
 import Game from '../Game';
 import { zDecal } from '../layers';
 import { getZ } from '../nums';
-import { drawSprite } from '../rendering';
+import { draw3D } from '../rendering';
 import textures from '../texture/bluegrass';
 import TileController from '../texture/TileController';
-import { cart, scaleWidth, πHalf } from '../tools';
+import { scaleWidth } from '../tools';
 
 const bluegrassTips = game =>
 	new TileController(game.resources['tile.bluegrass'], {
@@ -41,9 +41,8 @@ class GrassTips implements DrawnComponent {
 	draw(c: CanvasRenderingContext2D): void {
 		const { flat, game, r, z, sprite } = this;
 		const { left, right, scale, width } = flat;
-		const { cx, cy } = game;
 		const step = scaleWidth(scale, r, z),
-			offset = scaleWidth(scale / 2, r, z);
+			rotation = scaleWidth(scale / 2, r, z);
 		let remaining = width * 2,
 			a = left;
 
@@ -54,10 +53,7 @@ class GrassTips implements DrawnComponent {
 				a = right - step;
 			}
 
-			const normal = a + offset + πHalf;
-			const { x, y } = cart(a, r);
-
-			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+			draw3D(c, { a, r, z, game, sprite, rotation });
 
 			remaining -= step;
 			a += step;

@@ -12,9 +12,9 @@ import {
 import Game from '../Game';
 import { zStructure } from '../layers';
 import { getZ, gHitboxScale, gWallGap } from '../nums';
-import { drawSprite } from '../rendering';
+import { draw3D } from '../rendering';
 import Texture from '../Texture';
-import { cart, deg2rad, scaleWidth, wrapAngle, πHalf } from '../tools';
+import { cart, deg2rad, scaleWidth, wrapAngle } from '../tools';
 import Flat from './Flat';
 
 export default class Wall implements DrawnComponent {
@@ -106,7 +106,6 @@ export default class Wall implements DrawnComponent {
 
 	drawLeft(c: CanvasRenderingContext2D): void {
 		const { a, t, b, z, game, scale, sprite } = this;
-		const { cx, cy } = game;
 		const step = sprite.h;
 
 		let remaining = t - b,
@@ -119,12 +118,8 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scaleWidth(scale / 2, r, z),
-				amod: Radians = a - scaleWidth(scale, r, z),
-				normal: Radians = amod + offset + πHalf,
-				{ x, y } = cart(amod, r);
-
-			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+			const rotation = scaleWidth(scale / 2, r, z);
+			draw3D(c, { a, r, z, game, sprite, rotation });
 
 			remaining -= step;
 			r -= step;
@@ -134,7 +129,6 @@ export default class Wall implements DrawnComponent {
 
 	drawRight(c: CanvasRenderingContext2D): void {
 		const { a, t, b, z, game, scale, sprite } = this;
-		const { cx, cy } = game;
 		const step = sprite.h;
 
 		let remaining = t - b,
@@ -147,11 +141,8 @@ export default class Wall implements DrawnComponent {
 				r = b + step;
 			}
 
-			const offset = scaleWidth(scale / 2, r, z),
-				normal: Radians = a + offset + πHalf,
-				{ x, y } = cart(a, r);
-
-			drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+			const rotation = scaleWidth(scale / 2, r, z);
+			draw3D(c, { a, r, z, game, sprite, rotation });
 
 			remaining -= step;
 			r -= step;

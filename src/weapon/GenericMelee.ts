@@ -11,15 +11,8 @@ import Hitbox from '../Hitbox';
 import HitboxXYWH from '../HitboxXYWH';
 import { zSpark } from '../layers';
 import Player from '../Player';
-import { drawSprite } from '../rendering';
-import {
-	cart,
-	collides,
-	displace,
-	drawWedge,
-	scaleWidth,
-	πHalf,
-} from '../tools';
+import { draw3D } from '../rendering';
+import { collides, displace, drawWedge, scaleWidth } from '../tools';
 import Weapon from '../Weapon';
 
 export const aIdle = 'idle',
@@ -106,14 +99,8 @@ class Swing implements DrawnComponent {
 		if (!this.owner.alive) return;
 
 		const { game, sprite } = this;
-		const { cx, cy } = game;
 		const { a, r, z } = this.getPosition();
-
-		const normal = a + πHalf;
-
-		const { x, y } = cart(a, r);
-
-		drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+		draw3D(c, { a, r, z, game, sprite });
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {

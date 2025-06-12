@@ -26,7 +26,7 @@ export function draw3D(
 	drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 }
 
-export function drawSprite(
+function drawSprite(
 	c: CanvasRenderingContext2D,
 	sprite: HasDrawFunction,
 	{

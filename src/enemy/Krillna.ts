@@ -8,11 +8,10 @@ import Hitbox from '../Hitbox';
 import { zEnemy } from '../layers';
 import { gGravityStrength, gTimeScale, gWalkScale } from '../nums';
 import physics from '../physics';
-import { drawSprite } from '../rendering';
+import { draw3D } from '../rendering';
 import controller from '../spr/krillna';
 import {
 	angleDistance,
-	cart,
 	drawWedge,
 	scaleWidth,
 	wrapAngle,
@@ -236,10 +235,7 @@ export default class Krillna extends AbstractEnemy {
 
 	draw(c: CanvasRenderingContext2D) {
 		const { a, r, z, game, sprite } = this;
-		const { cx, cy } = game;
-		const normal = a + πHalf + sprite.normal;
-		const { x, y } = cart(a, r);
-		drawSprite(c, sprite, { cx, cy, x, y, z, normal });
+		draw3D(c, { a, r, z, game, sprite, rotation: sprite.normal });
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D) {
