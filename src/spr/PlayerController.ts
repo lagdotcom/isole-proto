@@ -2,6 +2,7 @@ import AnimController, { AnimInit } from '../AnimController';
 import {
 	aBackgroundLeap,
 	aBackgroundLeapFlip,
+	aDodge,
 	aDoubleJump,
 	aDoubleJumpFlip,
 	aDying,
@@ -12,10 +13,12 @@ import {
 	aJump,
 	aJumpFlip,
 	aLand,
+	aRoll,
 	aStand,
 	aThrow,
 	aWalk,
 } from '../anims';
+import { eAnimationEnded } from '../events';
 import { AnimName, Milliseconds } from '../flavours';
 import Player from '../Player';
 
@@ -90,6 +93,16 @@ export default class PlayerController extends AnimController {
 		}
 
 		this.play(aWalk);
+		this.next(t);
+	}
+
+	dodge(t: Milliseconds) {
+		this.play(aDodge);
+		this.next(t);
+	}
+
+	roll(t: Milliseconds, onEnd: () => void) {
+		this.play(aRoll, undefined, { [eAnimationEnded]: onEnd });
 		this.next(t);
 	}
 

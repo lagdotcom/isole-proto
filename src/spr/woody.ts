@@ -3,6 +3,7 @@ import {
 	aBackgroundAttack,
 	aBackgroundLeap,
 	aBackgroundLeapFlip,
+	aDodge,
 	aDoubleJump,
 	aDoubleJumpFlip,
 	aDying,
@@ -14,6 +15,7 @@ import {
 	aJump,
 	aJumpFlip,
 	aLand,
+	aRoll,
 	aSideAttack,
 	aStand,
 	aStatus,
@@ -237,6 +239,29 @@ export default function woodyController(
 					{ c: 11, r: 1, t: 75, hotspot: attackHotspot },
 					{ c: 11, r: 2, t: 75, hotspot: attackHotspot },
 					{ c: 11, r: 3, t: 75, hotspot: attackHotspot },
+				],
+			},
+
+			[aDodge]: {
+				loop: true,
+				flags: { noControl: true },
+				frames: [
+					{ c: 12, r: 0, t: 75 },
+					{ c: 12, r: 1, t: 75 },
+					{ c: 12, r: 2, t: 75 },
+					{ c: 12, r: 3, t: 75 },
+					{ c: 12, r: 4, t: 75 },
+				],
+			},
+
+			[aRoll]: {
+				flags: { noControl: true },
+				frames: [
+					{ c: 12, r: 5, t: 75 },
+					{ c: 12, r: 6, t: 75 },
+					{ c: 12, r: 7, t: 75 },
+					{ c: 12, r: 8, t: 75 },
+					{ c: 12, r: 9, t: 75 },
 				],
 			},
 

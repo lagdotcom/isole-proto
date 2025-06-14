@@ -46,6 +46,8 @@ import {
 	getDirectionVector,
 	isRightOf,
 	jbr,
+	max,
+	min,
 	scaleWidth,
 	uncart,
 } from '../tools';
@@ -56,7 +58,14 @@ const gJumpAffectStrength = 0.15,
 	gJumpDoubleTimer: ScaledTime = -10,
 	gJumpStrength = 4,
 	gJumpTimer: ScaledTime = 8,
-	gLeapSpeed = 0.02;
+	gLeapSpeed = 0.02,
+	gDodgeSpeed = 1,
+	gDodgeDuration: Milliseconds = 350;
+
+interface Dodge {
+	direction: 'l' | 'r';
+	duration: Milliseconds;
+}
 
 export default abstract class AbstractPlayer implements Player {
 	a: Radians;
@@ -64,6 +73,7 @@ export default abstract class AbstractPlayer implements Player {
 	body: Channel;
 	deadSound: ResourceName;
 	del?: HTMLElement;
+	dodge?: Dodge;
 	facing: Facing;
 	game: Game;
 	grounded: boolean;
@@ -84,6 +94,7 @@ export default abstract class AbstractPlayer implements Player {
 	r: Pixels;
 	removeControl: boolean;
 	reticle: ShootingReticle;
+	roll: boolean;
 	sprite: PlayerController;
 	stepHeight: Pixels;
 	tscale: ScaledTime;
@@ -117,6 +128,9 @@ export default abstract class AbstractPlayer implements Player {
 				health: 5,
 				pickUpDebounce: false,
 				ignoreGravity: false,
+				invincible: false,
+				invincibleTimer: 0,
+				roll: false,
 			},
 			this.getDefaultInit(game, options),
 			options
@@ -213,10 +227,13 @@ export default abstract class AbstractPlayer implements Player {
 			this.grounded = false;
 		}
 
-		const ok = game.mode === 'level';
+		const onLevel = game.mode === 'level';
 		const controls: string[] = [];
 		const haveControl =
-			ok && this.alive && !sprite.flags.noControl && !this.removeControl;
+			onLevel &&
+			this.alive &&
+			!sprite.flags.noControl &&
+			!this.removeControl;
 
 		const aim = this.getAim(keys);
 
@@ -240,7 +257,42 @@ export default abstract class AbstractPlayer implements Player {
 				}
 			}
 
-			if (keys.has(InputButton.Jump)) {
+			if (keys.has(InputButton.Shift)) {
+				controls.push('shift');
+				if (this.grounded) {
+					if (keys.has(InputButton.Up) && this.z === gFrontZ) {
+						this.leaping = 'b';
+						this.body.play('player.jump');
+					} else if (
+						keys.has(InputButton.Down) &&
+						this.z === gBackZ
+					) {
+						this.leaping = 'f';
+						this.body.play('player.jump');
+					} else if (keys.has(InputButton.Left)) {
+						this.dodge = {
+							direction: 'l',
+							duration: gDodgeDuration,
+						};
+						this.invincible = true;
+						this.body.play('player.jump');
+					} else if (keys.has(InputButton.Right)) {
+						this.dodge = {
+							direction: 'r',
+							duration: gDodgeDuration,
+						};
+						this.invincible = true;
+						this.body.play('player.jump');
+					}
+				}
+			}
+
+			if (
+				keys.has(InputButton.Jump) &&
+				!this.leaping &&
+				!this.dodge &&
+				!this.roll
+			) {
 				if (floor) {
 					this.vr += gJumpStrength;
 					this.jumpTimer = jumpTimer = gJumpTimer;
@@ -265,16 +317,21 @@ export default abstract class AbstractPlayer implements Player {
 			} else {
 				this.jumplg = jumplg = true;
 			}
-
-			// TODO: dodge
-			if (keys.has(InputButton.Shift)) {
-				if (this.grounded) {
-					this.leaping = this.z == gFrontZ ? 'b' : 'f';
-					controls.push('leap');
-					this.body.play('player.jump');
-				}
-			}
 		} else controls.push('nocontrol');
+
+		if (this.dodge) {
+			if (this.dodge.direction === 'l')
+				this.va = min(-gDodgeSpeed, this.va);
+			else if (this.dodge.direction === 'r')
+				this.va = max(gDodgeSpeed, this.va);
+
+			this.dodge.duration -= time;
+			if (this.dodge.duration <= 0) {
+				this.dodge = undefined;
+				this.invincible = false;
+				this.roll = true;
+			}
+		}
 
 		if (wall && !ceiling) {
 			flags.push('wall');
@@ -306,6 +363,8 @@ export default abstract class AbstractPlayer implements Player {
 		}
 
 		if (this.leaping) sprite.leap(time, this.leaping);
+		else if (this.roll) sprite.roll(time, () => (this.roll = false));
+		else if (this.dodge) sprite.dodge(time);
 		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
@@ -357,9 +416,9 @@ export default abstract class AbstractPlayer implements Player {
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
-		if (this.invincible) c.globalAlpha = 0.5;
+		if (this.invincibleTimer > 0) c.globalAlpha = 0.5;
 		draw3D(c, this);
-		if (this.invincible) c.globalAlpha = 1;
+		if (this.invincibleTimer > 0) c.globalAlpha = 1;
 	}
 
 	drawHitbox(c: CanvasRenderingContext2D): void {
@@ -421,6 +480,7 @@ export default abstract class AbstractPlayer implements Player {
 	hurt(by: Damageable, damage: number): void {
 		this.invincible = true;
 		this.invincibleTimer = 1000;
+		this.roll = false;
 
 		// TODO: is this working?
 		const dv = getDirectionVector(this, by);
@@ -433,8 +493,10 @@ export default abstract class AbstractPlayer implements Player {
 	}
 
 	hurtTimer(t: Milliseconds): void {
-		this.invincibleTimer -= t;
-		if (this.invincibleTimer <= 0) this.invincible = false;
+		if (this.invincibleTimer > 0) {
+			this.invincibleTimer -= t;
+			if (this.invincibleTimer <= 0) this.invincible = false;
+		}
 	}
 
 	die(by: Damageable): void {
