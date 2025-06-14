@@ -44,7 +44,7 @@ Cell order, left to right:
 - Death (on death, play hurt animation once fully, then death animation after)
 */
 
-const attackHotspot: CoordXY = { x: 70, y: 40 };
+const attackHotspot: CoordXY = { x: 98, y: 86 };
 
 export default function woodyController(
 	parent: Player,

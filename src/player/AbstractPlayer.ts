@@ -1,3 +1,4 @@
+import { aBackgroundAttack, aForegroundAttack, aSideAttack } from '../anims';
 import Channel from '../Channel';
 import { cHotspot, cHurt, cStep } from '../colours';
 import Damageable from '../Damageable';
@@ -19,6 +20,7 @@ import mel from '../makeElement';
 import {
 	gAirWalk,
 	gBackZ,
+	getBack,
 	getZ,
 	gFrontZ,
 	gGroundWalk,
@@ -42,11 +44,12 @@ import {
 	drawWedge,
 	first,
 	getDirectionVector,
+	isRightOf,
 	jbr,
 	scaleWidth,
+	uncart,
 } from '../tools';
 import ShootingReticle from './ShootingReticle';
-import SpellCircle from './SpellCircle';
 
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer: ScaledTime = -10,
@@ -81,7 +84,6 @@ export default abstract class AbstractPlayer implements Player {
 	r: Pixels;
 	removeControl: boolean;
 	reticle: ShootingReticle;
-	spellCircle: SpellCircle;
 	sprite: PlayerController;
 	stepHeight: Pixels;
 	tscale: ScaledTime;
@@ -128,7 +130,6 @@ export default abstract class AbstractPlayer implements Player {
 			this.r + this.h / 2,
 			this.z
 		);
-		this.spellCircle = new SpellCircle(game);
 
 		if (game.options.showDebug) {
 			this.del = mel(game.options.debugContainer, 'div', {
@@ -214,8 +215,7 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
-		const aim = this.reticle.adjust(this, time);
-		this.spellCircle.useAim(aim.active, aim.facing);
+		const aim = this.getAim(keys);
 
 		if (
 			ok &&
@@ -332,6 +332,27 @@ export default abstract class AbstractPlayer implements Player {
 				}`,
 				debug
 			);
+	}
+
+	getAim(keys: Set<InputButton>) {
+		const { reticle, a, z } = this;
+
+		const aimBack = keys.has(InputButton.AimBack);
+		const aimFront = keys.has(InputButton.AimFront);
+
+		const myBack = getBack(z);
+		const aimPosition = uncart(reticle.x, reticle.y, reticle.back);
+
+		return {
+			active: aimBack || aimFront,
+			animation:
+				reticle.back === myBack
+					? aSideAttack
+					: reticle.back
+						? aBackgroundAttack
+						: aForegroundAttack,
+			facing: isRightOf(a, aimPosition.a) ? 1 : -1,
+		} as const;
 	}
 
 	draw(c: CanvasRenderingContext2D): void {
