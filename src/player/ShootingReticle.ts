@@ -61,19 +61,18 @@ export default class ShootingReticle implements DrawnComponent {
 		this.sp4.update(time);
 		this.rotation = wrapAngle(this.rotation + time * gRotationSpeed);
 
-		const { keys, mousePosition, zoomer } = this.game;
-
-		const aimBack = keys.has(InputButton.AimBack);
-		const aimFront = keys.has(InputButton.AimFront);
-
-		if (aimBack) this.back = true;
-		else if (aimFront) this.back = false;
+		const { keys, mousePosition, player, zoomer } = this.game;
 
 		if (keys.has(InputButton.AimAtMouse)) {
 			const { x, y } = zoomer.convert(mousePosition);
 			this.x = x;
 			this.y = y;
-		} else {
+		}
+
+		const aim = player.getAim();
+		if (aim.active) {
+			this.back = aim.back;
+
 			let mx = 0;
 			if (keys.has(InputButton.AimLeft)) mx = -gMoveSpeed * time;
 			if (keys.has(InputButton.AimRight)) mx = gMoveSpeed * time;
@@ -87,7 +86,7 @@ export default class ShootingReticle implements DrawnComponent {
 			this.y = clamp(this.y + my, min.y, max.y);
 		}
 
-		const dSize = aimBack || aimFront ? gSizeChange : -gSizeChange;
+		const dSize = aim.active ? gSizeChange : -gSizeChange;
 		this.scale = clamp(this.scale + dSize, 0, 1);
 	}
 

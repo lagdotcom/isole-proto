@@ -235,7 +235,7 @@ export default abstract class AbstractPlayer implements Player {
 			!sprite.flags.noControl &&
 			!this.removeControl;
 
-		const aim = this.getAim(keys);
+		const aim = this.getAim();
 
 		if (haveControl && !aim.active) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
@@ -360,8 +360,10 @@ export default abstract class AbstractPlayer implements Player {
 		else if (!this.grounded) {
 			if (canDoubleJump) sprite.jump(time);
 			else sprite.doubleJump(time);
-		} else if (aim.active) sprite.attack(aim.animation, aim.facing, time);
-		else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
+		} else if (aim.active) {
+			sprite.attack(aim.animation, aim.facing, time);
+			this.facing = aim.facing === -1 ? 'L' : 'R';
+		} else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
 		else sprite.walk(time);
 
 		// do this here so the hotspot has been updated
@@ -386,17 +388,20 @@ export default abstract class AbstractPlayer implements Player {
 			);
 	}
 
-	getAim(keys: Set<InputButton>) {
-		const { reticle, a, z } = this;
+	getAim() {
+		const { game, reticle, a, z } = this;
 
-		const aimBack = keys.has(InputButton.AimBack);
-		const aimFront = keys.has(InputButton.AimFront);
+		const shifting =
+			game.keys.has(InputButton.Shift) || !!this.dodge || this.roll;
+		const aimBack = !shifting && game.keys.has(InputButton.AimBack);
+		const aimFront = !shifting && game.keys.has(InputButton.AimFront);
 
 		const myBack = getBack(z);
 		const aimPosition = uncart(reticle.x, reticle.y, reticle.back);
 
 		return {
 			active: aimBack || aimFront,
+			back: aimBack,
 			animation:
 				reticle.back === myBack
 					? aSideAttack
