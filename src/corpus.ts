@@ -7,9 +7,9 @@ import Krillna from './enemy/Krillna';
 import Minatoad from './enemy/Minatoad';
 import BombItem from './item/Bomb';
 import RockItem from './item/Rock';
+import GreenBalls from './player/attack/GreenBalls';
 import Jacques from './player/Jacques';
 import Woody from './player/Woody';
-import AxeWeapon from './weapon/Axe';
 
 export const enemyTypes = {
 	bat: Bat,
@@ -28,5 +28,5 @@ export const itemNames = ['', ...Object.keys(itemTypes)];
 export const playerTypes = { jacques: Jacques, woody: Woody };
 export const playerNames = Object.keys(playerTypes);
 
-export const weaponTypes = { axe: AxeWeapon };
+export const weaponTypes = { greenBalls: GreenBalls };
 export const weaponNames = ['', ...Object.keys(weaponTypes)];

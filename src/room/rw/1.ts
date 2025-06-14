@@ -41,7 +41,7 @@ const rw1: EditorData = {
 		a: 270,
 		r: 288,
 		item: 'rock',
-		weapon: 'axe',
+		weapon: 'greenBalls',
 	},
 	enemies: [
 		{ type: 'buster', a: 0, r: 288, dir: 'L' },

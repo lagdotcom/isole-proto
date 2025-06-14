@@ -39,7 +39,7 @@ const rw5: EditorData = {
 		a: 270,
 		r: 120,
 		item: 'rock',
-		weapon: 'axe',
+		weapon: 'greenBalls',
 	},
 	enemies: [
 		{ type: 'bat', a: 180, r: 240, dir: 'L' },

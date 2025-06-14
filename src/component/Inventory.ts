@@ -4,10 +4,12 @@ import Game from '../Game';
 import { InputButton } from '../InputMapper';
 import Item from '../Item';
 import { zUI } from '../layers';
+import PlayerAttack from '../player/attack/PlayerAttack';
 import { drawCross } from '../tools';
 import Weapon from '../Weapon';
 
 export default class Inventory implements DrawnComponent {
+	attack?: PlayerAttack;
 	cycling: boolean;
 	game: Game;
 	health: number;
@@ -109,7 +111,7 @@ export default class Inventory implements DrawnComponent {
 		const y = game.options.height - 48;
 		let x = 60;
 
-		if (weapon) weapon.draw(c, game.options.width - 48, y);
+		if (weapon) weapon.draw?.(c, game.options.width - 48, y);
 
 		items.forEach(i => {
 			if (i && i.draw) i.draw(c, x, y);

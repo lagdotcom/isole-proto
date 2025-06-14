@@ -69,7 +69,13 @@ const defaultData: EditorData = {
 		{ h: 700, a: 140, w: 30, motion: 0, material: 'grass' },
 	],
 	objects: [],
-	player: { type: 'woody', a: 50, r: 200, item: 'rock', weapon: 'axe' },
+	player: {
+		type: 'woody',
+		a: 50,
+		r: 200,
+		item: 'rock',
+		weapon: 'greenBalls',
+	},
 	enemies: [{ type: 'minatoad', a: 0, r: 150, dir: 'L' }],
 };
 
@@ -210,7 +216,7 @@ export default class Editor
 		game.inventory.clear();
 		if (player.item) game.inventory.add(itemTypes[player.item]);
 		if (player.weapon)
-			game.inventory.weapon = new weaponTypes[player.weapon](game);
+			game.inventory.attack = new weaponTypes[player.weapon](game);
 		game.inventory.health = game.player.health;
 
 		this.dump.value = JSON.stringify(data);

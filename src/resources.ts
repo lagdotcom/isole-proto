@@ -27,6 +27,7 @@ import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
 import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
 import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
 import woodyImg from '../media/gfx/woody.png';
+import woodyProjectile from '../media/gfx/woody_projectile.png';
 import axeImg from '../media/gfx/wp/axe.png';
 import batPunchSnd from '../media/sfx/bat-punch.wav';
 import bopSnd from '../media/sfx/Enemy_Bop.wav';
@@ -149,6 +150,7 @@ export default function PreloadResources(game: Game) {
 	game.require('weapon.axe', image, axeImg);
 	game.require('reticle', image, reticleImg);
 	game.require('projectile', image, projectileImg);
+	game.require('projectile.woody', image, woodyProjectile);
 	game.require('player.jacques', image, jacquesImg);
 	game.require('player.woody', image, woodyImg);
 	game.require('player.spell.1', image, spellCircleOuter);

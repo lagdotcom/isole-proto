@@ -904,6 +904,7 @@ export default class Minatoad extends AbstractEnemy {
 			vfa: 0,
 			vr: 0,
 			ignoreCeilings: false,
+			alive: true,
 			health: 10,
 			waittimer: 0,
 			shots: 0,

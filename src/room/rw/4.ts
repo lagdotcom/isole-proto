@@ -65,7 +65,7 @@ const rw4: EditorData = {
 		a: 180,
 		r: 640,
 		item: 'rock',
-		weapon: 'axe',
+		weapon: 'greenBalls',
 	},
 	enemies: [
 		{ type: 'krillna', a: 270, r: 240, dir: 'R' },

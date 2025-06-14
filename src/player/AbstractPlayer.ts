@@ -215,14 +215,12 @@ export default abstract class AbstractPlayer implements Player {
 
 		const ok = game.mode === 'level';
 		const controls: string[] = [];
+		const haveControl =
+			ok && this.alive && !sprite.flags.noControl && !this.removeControl;
+
 		const aim = this.getAim(keys);
 
-		if (
-			ok &&
-			!sprite.flags.noControl &&
-			!this.removeControl &&
-			!aim.active
-		) {
+		if (haveControl && !aim.active) {
 			const strength = this.grounded ? gGroundWalk : gAirWalk;
 			if (keys.has(InputButton.Left)) {
 				this.va -= strength;
@@ -314,6 +312,9 @@ export default abstract class AbstractPlayer implements Player {
 		} else if (aim.active) sprite.attack(aim.animation, aim.facing, time);
 		else if (Math.abs(this.va) < gStandThreshold) sprite.stand(time);
 		else sprite.walk(time);
+
+		// do this here so the hotspot has been updated
+		game.inventory.attack?.update(time, aim.active && haveControl);
 
 		if (jumpTimer > 0) flags.push('jump');
 		if (this.grounded) flags.push('grounded');

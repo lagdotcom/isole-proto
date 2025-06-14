@@ -1,5 +1,6 @@
 import CoordARZ from './CoordARZ';
 import CoordXY from './CoordXY';
+import CoordXYZ from './CoordXYZ';
 import Damageable from './Damageable';
 import DrawnComponent from './DrawnComponent';
 import { Degrees, Multiplier, Pixels, Radians } from './flavours';
@@ -72,12 +73,12 @@ export function cart<T extends number>(a: Radians, r: T): CoordXY<T> {
 }
 
 export function uncart<T extends number>(
-	dx: T,
-	dy: T,
+	x: T,
+	y: T,
 	back: boolean
 ): CoordARZ<Radians, T> {
-	const a = Math.atan2(dy, dx);
-	const r = 30 as T; // TODO when it matters lol
+	const a = Math.atan2(y, x);
+	const r = Math.sqrt(x * x + y * y) as T;
 
 	return { a, r, z: getZ(back) };
 }
@@ -468,4 +469,35 @@ export function compareDrawnComponent(a: DrawnComponent, b: DrawnComponent) {
 	const az = 'z' in a ? (a.z as Multiplier) : gFrontZ;
 	const bz = 'z' in b ? (b.z as Multiplier) : gFrontZ;
 	return bz - az;
+}
+
+const scaleZ = 1;
+
+export function toXYZ({ a, r, z }: CoordARZ) {
+	return {
+		x: Math.cos(a) * r,
+		y: Math.sin(a) * r,
+		z: z * scaleZ,
+	} as CoordXYZ;
+}
+
+export function toARZ({ x, y, z }: CoordXYZ) {
+	return {
+		a: Math.atan2(y, x),
+		r: Math.sqrt(x * x + y * y),
+		z: z / scaleZ,
+	} as CoordARZ;
+}
+
+export function aimXYZatXYZ(src: CoordXYZ, target: CoordXYZ, speed: Pixels) {
+	const dx = target.x - src.x;
+	const dy = target.y - src.y;
+	const dz = target.z - src.z;
+	const magnitude = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+	return {
+		x: (dx / magnitude) * speed,
+		y: (dy / magnitude) * speed,
+		z: (dz / magnitude) * speed,
+	};
 }

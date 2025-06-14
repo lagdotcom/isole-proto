@@ -87,7 +87,7 @@ const rw3: EditorData = {
 		a: 180,
 		r: 440,
 		item: 'rock',
-		weapon: 'axe',
+		weapon: 'greenBalls',
 	},
 	enemies: [
 		{ type: 'buster', a: 215, r: 320, dir: 'L' },
