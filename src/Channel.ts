@@ -1,19 +1,26 @@
 import { ResourceName } from './flavours';
 import Game from './Game';
 
+type ChannelState = 'idle' | 'queued' | 'playing';
+
 /** Audio channel */
 export default class Channel {
 	a: HTMLAudioElement;
-	g: Game;
-	name: string;
+	state: ChannelState;
 
 	/**
 	 * Create a new audio channel
 	 * @param {Game} g game instance
 	 * @param {string} name channel name
 	 */
-	constructor(g: Game, name: string) {
-		Object.assign(this, { g, name, a: new Audio() });
+	constructor(
+		public g: Game,
+		public name: string
+	) {
+		this.a = new Audio();
+		this.state = 'idle';
+
+		this.a.addEventListener('ended', () => (this.state = 'idle'));
 	}
 
 	/**
@@ -27,9 +34,16 @@ export default class Channel {
 			return;
 		}
 
+		// promise hasn't returned yet...
+		if (this.state === 'queued') return;
+
 		this.a.pause();
 
 		this.a.src = snd.src;
-		this.a.play();
+		this.state = 'queued';
+		this.a
+			.play()
+			.then(() => (this.state = 'playing'))
+			.catch(() => (this.state = 'idle'));
 	}
 }
