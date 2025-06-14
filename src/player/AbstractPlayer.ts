@@ -63,7 +63,7 @@ const gJumpAffectStrength = 0.15,
 	gDodgeDuration: Milliseconds = 350;
 
 interface Dodge {
-	direction: 'l' | 'r';
+	direction: Facing;
 	duration: Milliseconds;
 }
 
@@ -269,16 +269,9 @@ export default abstract class AbstractPlayer implements Player {
 					) {
 						this.leaping = 'f';
 						this.body.play('player.jump');
-					} else if (keys.has(InputButton.Left)) {
+					} else {
 						this.dodge = {
-							direction: 'l',
-							duration: gDodgeDuration,
-						};
-						this.invincible = true;
-						this.body.play('player.jump');
-					} else if (keys.has(InputButton.Right)) {
-						this.dodge = {
-							direction: 'r',
+							direction: this.facing,
 							duration: gDodgeDuration,
 						};
 						this.invincible = true;
@@ -320,10 +313,9 @@ export default abstract class AbstractPlayer implements Player {
 		} else controls.push('nocontrol');
 
 		if (this.dodge) {
-			if (this.dodge.direction === 'l')
+			if (this.dodge.direction === 'L')
 				this.va = min(-gDodgeSpeed, this.va);
-			else if (this.dodge.direction === 'r')
-				this.va = max(gDodgeSpeed, this.va);
+			else this.va = max(gDodgeSpeed, this.va);
 
 			this.dodge.duration -= time;
 			if (this.dodge.duration <= 0) {
