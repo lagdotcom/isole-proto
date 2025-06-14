@@ -63,7 +63,6 @@ export default class Flazza extends AbstractEnemy {
 		{ r = 250, img = 'enemy.flazza' }: FlazzaInit = {}
 	) {
 		super({
-			isEnemy: true,
 			layer: zFlying,
 			game,
 			name: 'Flazza',

@@ -51,7 +51,6 @@ export default class Krillna extends AbstractEnemy {
 		}: KrillnaInit = {}
 	) {
 		super({
-			isEnemy: true,
 			layer: zEnemy,
 			game,
 			name: 'Krillna',

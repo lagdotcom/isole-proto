@@ -95,7 +95,6 @@ export default class Buster extends AbstractEnemy {
 		}: BusterInit = {}
 	) {
 		super({
-			isEnemy: true,
 			layer: zEnemy,
 			game,
 			name: 'Buster',

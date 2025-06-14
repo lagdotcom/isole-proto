@@ -22,7 +22,7 @@ export default abstract class AbstractEnemy implements Enemy {
 	game: Game;
 	health: number;
 	height: Pixels;
-	isEnemy: true;
+	isEnemy: boolean;
 	layer: DisplayLayer;
 	name: string;
 	r: Pixels;
@@ -40,6 +40,7 @@ export default abstract class AbstractEnemy implements Enemy {
 		this.stunmultiplier = gStunMultiplier;
 		this.stuntimer = 0;
 
+		this.isEnemy = true;
 		Object.assign(this, options);
 		this.z = getZ(options.back ?? false);
 		this.a = deg2rad(options.a ?? 0);
@@ -77,10 +78,7 @@ export default abstract class AbstractEnemy implements Enemy {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	die(by: Damageable) {
-		if (this.del && this.game.options.debugContainer) {
-			this.game.options.debugContainer.removeChild(this.del);
-		}
-
+		this.del?.remove();
 		this.game.remove(this);
 	}
 }

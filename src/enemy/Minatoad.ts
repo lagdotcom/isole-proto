@@ -286,6 +286,7 @@ class Shockwave extends AbstractEnemy {
 
 	constructor(game: Game, back: boolean, a: number, r: number, va: number) {
 		super({
+			isEnemy: false,
 			name: 'Minatoad Shockwave',
 			game,
 			active: true,
@@ -436,6 +437,7 @@ class SmallBullet extends AbstractEnemy {
 		vr: number
 	) {
 		super({
+			isEnemy: false,
 			name: 'Minatoad Small Bullet',
 			owner,
 			game,
@@ -553,6 +555,7 @@ class BigBullet extends AbstractEnemy {
 		vr: number
 	) {
 		super({
+			isEnemy: false,
 			name: 'Minatoad Big Bullet',
 			owner,
 			game,
@@ -687,6 +690,7 @@ class PoisonSprayField extends AbstractEnemy {
 		r: number
 	) {
 		super({
+			isEnemy: false,
 			name: 'Poison Spray',
 			owner,
 			game,

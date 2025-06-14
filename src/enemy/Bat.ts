@@ -119,7 +119,6 @@ export default class Bat extends AbstractEnemy {
 	) {
 		super({
 			channel: new Channel(game, 'Bat'),
-			isEnemy: true,
 			layer: zFlying,
 			game,
 			name: 'Bat',
