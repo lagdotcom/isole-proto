@@ -62,32 +62,34 @@ export default class ShootingReticle implements DrawnComponent {
 		this.rotation = wrapAngle(this.rotation + time * gRotationSpeed);
 
 		const { keys, mousePosition, player, zoomer } = this.game;
+		let { x, y } = this;
 
 		if (keys.has(InputButton.AimAtMouse)) {
-			const { x, y } = zoomer.convert(mousePosition);
-			this.x = x;
-			this.y = y;
+			const mouse = zoomer.convert(mousePosition);
+			x = mouse.x;
+			y = mouse.y;
 		}
 
+		let dScale = -gSizeChange;
 		const aim = player.getAim();
 		if (aim.active) {
 			this.back = aim.back;
-
-			let mx = 0;
-			if (keys.has(InputButton.AimLeft)) mx = -gMoveSpeed * time;
-			if (keys.has(InputButton.AimRight)) mx = gMoveSpeed * time;
-
-			let my = 0;
-			if (keys.has(InputButton.AimUp)) my = -gMoveSpeed * time;
-			if (keys.has(InputButton.AimDown)) my = gMoveSpeed * time;
-
-			const [min, max] = zoomer.bounds();
-			this.x = clamp(this.x + mx, min.x, max.x);
-			this.y = clamp(this.y + my, min.y, max.y);
+			dScale = gSizeChange;
 		}
 
-		const dSize = aim.active ? gSizeChange : -gSizeChange;
-		this.scale = clamp(this.scale + dSize, 0, 1);
+		let dx = 0;
+		if (keys.has(InputButton.AimLeft)) dx = -gMoveSpeed * time;
+		if (keys.has(InputButton.AimRight)) dx = gMoveSpeed * time;
+
+		let dy = 0;
+		if (keys.has(InputButton.AimUp)) dy = -gMoveSpeed * time;
+		if (keys.has(InputButton.AimDown)) dy = gMoveSpeed * time;
+
+		const [min, max] = zoomer.bounds();
+		this.x = clamp(x + dx, min.x, max.x);
+		this.y = clamp(y + dy, min.y, max.y);
+
+		this.scale = clamp(this.scale + dScale, 0, 1);
 	}
 
 	draw(ctx: CanvasRenderingContext2D) {
