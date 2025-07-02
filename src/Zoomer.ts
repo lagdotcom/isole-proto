@@ -1,3 +1,4 @@
+import CoordARZ from './CoordARZ';
 import CoordXY from './CoordXY';
 import DrawnComponent from './DrawnComponent';
 import { DisplayLayer, Multiplier, Pixels } from './flavours';
@@ -83,5 +84,12 @@ export default class Zoomer implements DrawnComponent {
 		});
 
 		return [min, max] as const;
+	}
+
+	isOnScreen({ a, r }: CoordARZ) {
+		const { x, y } = cart(a, r);
+		const [min, max] = this.bounds();
+
+		return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
 	}
 }

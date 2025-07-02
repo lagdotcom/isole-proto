@@ -9,6 +9,7 @@ import DrawnComponent from '../DrawnComponent';
 import { eAnimationEnded } from '../events';
 import {
 	AnimName,
+	DisplayLayer,
 	Milliseconds,
 	Multiplier,
 	Pixels,
@@ -19,13 +20,7 @@ import {
 import Game from '../Game';
 import Hitbox from '../Hitbox';
 import { zSpark } from '../layers';
-import {
-	getBack,
-	getZ,
-	gStandThreshold,
-	gTimeScale,
-	gWalkScale,
-} from '../nums';
+import { getBack, getZ, gTimeScale, gWalkScale } from '../nums';
 import physics from '../physics';
 import { draw3D } from '../rendering';
 import ReticleController from '../spr/ReticleController';
@@ -201,11 +196,11 @@ const gMaxReticleVA = 0.1;
 const gMaxReticleVR = 5;
 
 class Reticle implements DrawnComponent {
-	a: number;
+	a: Radians;
 	sprite: ReticleController;
 	game: Game;
-	layer: number;
-	r: number;
+	layer: DisplayLayer;
+	r: Pixels;
 	va: number;
 	vr: number;
 	z: Multiplier;
@@ -282,6 +277,7 @@ class ShockwaveController extends AnimController {
 }
 class Shockwave extends AbstractEnemy {
 	active: boolean;
+	duration: Milliseconds;
 	sprite: ShockwaveController;
 
 	constructor(game: Game, back: boolean, a: number, r: number, va: number) {
@@ -296,6 +292,7 @@ class Shockwave extends AbstractEnemy {
 			va,
 			vr: 0,
 			layer: zSpark,
+			duration: gShockwaveLifetime,
 			width: 48,
 			height: 48,
 			sprite: new ShockwaveController(
@@ -313,10 +310,11 @@ class Shockwave extends AbstractEnemy {
 		const { active, game, sprite } = this;
 
 		sprite.update(t);
-		this.a += this.va;
+		this.a += this.va * t;
 		this.va *= 0.9;
+		this.duration -= t;
 
-		if (Math.abs(this.va) < gStandThreshold) {
+		if (this.duration <= 0) {
 			this.die(this);
 			return;
 		}
@@ -543,6 +541,7 @@ class SmallBullet extends AbstractEnemy {
 
 class BigBullet extends AbstractEnemy {
 	active: boolean;
+	duration: Milliseconds;
 	owner: Minatoad;
 	sprite: BulletController;
 
@@ -566,6 +565,7 @@ class BigBullet extends AbstractEnemy {
 			va: 0,
 			vr,
 			layer: zSpark,
+			duration: gBigBulletLifetime,
 			width: 40,
 			height: 40,
 			sprite: new BulletController(game.resources['projectile']),
@@ -583,8 +583,9 @@ class BigBullet extends AbstractEnemy {
 
 		sprite.update(t);
 		this.r += this.vr * t;
+		this.duration -= t;
 
-		if (this.r >= gRadiusCap) {
+		if (this.duration <= 0) {
 			for (let i = 0; i < gSplitCount; i++) {
 				const bullet = new SmallBullet(
 					this.owner,
@@ -669,25 +670,25 @@ class BigBullet extends AbstractEnemy {
 }
 
 class PoisonSprayField extends AbstractEnemy {
-	a: number;
-	duration: number;
+	a: Radians;
+	duration: Milliseconds;
 	game: Game;
 	height: number;
 	name: string;
 	owner: Minatoad;
-	r: number;
-	spread: number;
-	width: number;
+	r: Pixels;
+	spread: Milliseconds;
+	width: Pixels;
 	va: number;
 	vr: number;
 
 	constructor(
 		owner: Minatoad,
 		game: Game,
-		duration: number,
-		spread: number,
-		a: number,
-		r: number
+		duration: Milliseconds,
+		spread: Milliseconds,
+		a: Radians,
+		r: Pixels
 	) {
 		super({
 			isEnemy: false,
@@ -861,10 +862,11 @@ type MinatoadState =
 const gBetweenAttacks: Milliseconds = 1000;
 const gJumpStrength = 5;
 const gJumpSpeed = 0.4;
-const gShockwaveSpeed = 0.08;
-const gRadiusCap = 1000;
+const gShockwaveSpeed = 0.0008;
+const gShockwaveLifetime: Milliseconds = 600;
 const gLeapSpeed = 20;
-const gBigBulletSpeed = 1;
+const gBigBulletSpeed = 1.4;
+const gBigBulletLifetime: Milliseconds = 800;
 const gSplitCount = 5;
 const gSmallBulletSpeed = () => randomRange(-8, -5);
 
@@ -882,7 +884,7 @@ export default class Minatoad extends AbstractEnemy {
 	state: MinatoadState;
 	tscale: ScaledTime;
 	vfa: number;
-	waittimer: Milliseconds;
+	waitTimer: Milliseconds;
 
 	constructor(
 		game: Game,
@@ -910,7 +912,7 @@ export default class Minatoad extends AbstractEnemy {
 			ignoreCeilings: false,
 			alive: true,
 			health: 10,
-			waittimer: 0,
+			waitTimer: 0,
 			shots: 0,
 			jumps: 0,
 			hidden: false,
@@ -939,7 +941,7 @@ export default class Minatoad extends AbstractEnemy {
 		}
 
 		this.state = 'idle';
-		this.waittimer = 0;
+		this.waitTimer = 0;
 	}
 
 	onFire() {
@@ -1021,8 +1023,8 @@ export default class Minatoad extends AbstractEnemy {
 		this.sprite.idle(t);
 		physics(this, t);
 
-		this.waittimer += t;
-		if (this.waittimer > gBetweenAttacks && !this.bullets) {
+		this.waitTimer += t;
+		if (this.waitTimer > gBetweenAttacks && !this.bullets) {
 			const next = this.getNextAttack();
 			this.last = this.state = next;
 		}
@@ -1034,9 +1036,8 @@ export default class Minatoad extends AbstractEnemy {
 
 		physics(this, t);
 
-		if (this.r >= gRadiusCap) {
+		if (!this.game.zoomer.isOnScreen(this)) {
 			this.hidden = true;
-			this.r = gRadiusCap;
 
 			this.reticle.reset();
 			this.game.components.push(this.reticle);
@@ -1044,18 +1045,19 @@ export default class Minatoad extends AbstractEnemy {
 
 			this.state = 'track';
 			this.vr = 0;
-			this.waittimer = randomRange(2000, 3000);
+			this.waitTimer = randomRange(2000, 3000);
 		}
 	}
 
 	trackUpdate(t: Milliseconds) {
-		this.waittimer -= t;
-		if (this.waittimer <= 0) {
+		this.waitTimer -= t;
+		if (this.waitTimer <= 0) {
 			this.state = 'fall';
 
 			this.game.remove(this.reticle);
 			this.z = getZ(getBack(this.game.player.z));
 			this.a = this.reticle.a;
+			this.r = this.reticle.r + 1000;
 			this.vr = -20;
 			this.hidden = false;
 		}

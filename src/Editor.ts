@@ -56,27 +56,29 @@ interface EditorInit {
 }
 
 const defaultData: EditorData = {
-	platforms: [
-		{ h: 340, a: 235, w: 30, th: 32, motion: 0, material: 'grass2' },
-	],
+	platforms: [],
 	walls: [],
 	floors: [
-		{ h: 150, a: 0, w: 360, material: 'bluegrass' },
-		{ h: 150, a: 0, w: 360, material: 'bluegrass', back: true },
-		{ h: 300, a: 180, w: 30, motion: 2, material: 'cloud' },
-		{ h: 300, a: 0, w: 30, motion: 2, material: 'cloud' },
-		{ h: 500, a: 190, w: 40, motion: 0, material: 'grass' },
-		{ h: 700, a: 140, w: 30, motion: 0, material: 'grass' },
+		{ h: 1200, a: 0, w: 360, material: 'bluegrass' },
+		{ h: 1200, a: 0, w: 360, material: 'bluegrass', back: true },
+		{ h: 1500, a: 180, w: 15, motion: 2, material: 'cloud' },
+		{ h: 1500, a: 0, w: 10, motion: 2, material: 'cloud' },
+		{ h: 1500, a: 180, w: 10, motion: 2, material: 'cloud', back: true },
+		{ h: 1500, a: 0, w: 10, motion: 2, material: 'cloud', back: true },
+		{ h: 1500, a: 90, w: 10, motion: 2, material: 'cloud' },
+		{ h: 1500, a: 90, w: 10, motion: 2, material: 'cloud', back: true },
+		{ h: 1500, a: 270, w: 10, motion: 2, material: 'cloud' },
+		{ h: 1500, a: 270, w: 10, motion: 2, material: 'cloud', back: true },
 	],
 	objects: [],
 	player: {
 		type: 'woody',
 		a: 50,
-		r: 200,
+		r: 1250,
 		item: 'rock',
 		weapon: 'greenBalls',
 	},
-	enemies: [{ type: 'minatoad', a: 0, r: 150, dir: 'L' }],
+	enemies: [{ type: 'minatoad', a: 0, r: 1250, dir: 'L' }],
 };
 
 export default class Editor
