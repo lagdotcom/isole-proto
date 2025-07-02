@@ -1,85 +1,129 @@
-import Controller from '../Controller';
-
-// idle: 0,0 forever
-// near player: 0,1-6 loop at 75ms
-// launch: 1,0-1 at 75ms
-// jump up: 1,2-3? at 75ms
-// fall: 1,4?-7 at 75ms
-// land: 1,8-9 at 75ms
+import AnimController, { AnimSpecMap } from '../AnimController';
+import { eAnimationEnded } from '../events';
+import { Milliseconds } from '../flavours';
 
 const aLand = 'land',
 	aFall = 'fall';
 
-export default class BusterController extends Controller {
+const animations: AnimSpecMap = {
+	idle: {
+		loop: true,
+		frames: [{ c: 0, r: 0, t: Infinity }],
+	},
+
+	near: {
+		loop: true,
+		frames: [
+			{ c: 0, r: 1, t: 75 },
+			{ c: 0, r: 2, t: 75 },
+			{ c: 0, r: 3, t: 75 },
+			{ c: 0, r: 4, t: 75 },
+			{ c: 0, r: 5, t: 75 },
+			{ c: 0, r: 6, t: 75 },
+		],
+	},
+
+	jump: {
+		extend: true,
+		frames: [
+			{ c: 1, r: 0, t: 75 },
+			{ c: 1, r: 1, t: 75 },
+		],
+	},
+
+	rise: {
+		extend: true,
+		frames: [
+			{ c: 1, r: 2, t: 75 },
+			{ c: 1, r: 3, t: 75 },
+		],
+	},
+
+	[aFall]: {
+		extend: true,
+		frames: [
+			{ c: 1, r: 4, t: 75 },
+			{ c: 1, r: 5, t: 75 },
+			{ c: 1, r: 6, t: 75 },
+			{ c: 1, r: 7, t: 75 },
+		],
+	},
+
+	[aLand]: {
+		priority: 1,
+		frames: [
+			{ c: 1, r: 8, t: 75 },
+			{ c: 1, r: 9, t: 75 },
+		],
+	},
+};
+
+export default class BusterController extends AnimController {
+	oldVr: number;
+
 	constructor(img: CanvasImageSource) {
 		super({
+			animations,
 			img,
 			w: 84,
 			h: 56,
 			xo: -42,
 			yo: -52,
 		});
+		this.oldVr = 0;
 	}
 
-	land(t: number): boolean {
-		if (this.show(aLand, 1, 8)) {
-			this.timer += t;
-			if (this.timer >= 75) {
-				this.r++;
-				if (this.r >= 10) return true;
-				else this.timer = 0;
-			}
+	animate(
+		t: Milliseconds,
+		vr: number,
+		grounded: boolean,
+		preJump: boolean,
+		near: boolean
+	) {
+		if (!grounded) {
+			if (vr > 0) this.play('rise');
+			else this.play('fall');
+		} else if (this.oldVr) {
+			this.play('land');
+		} else if (preJump) {
+			this.play('jump');
+		} else if (near) {
+			this.play('near');
+		} else {
+			this.play('idle');
 		}
 
-		return false;
+		this.oldVr = vr;
+		this.next(t);
 	}
 
-	idle(t: number) {
-		if (this.state === aFall || this.state === aLand) {
-			if (!this.land(t)) return;
-		}
+	idle(t: Milliseconds) {
+		if (this.state === aFall || this.state === aLand)
+			this.play(aLand, true, {
+				[eAnimationEnded]: () => this.play('idle'),
+			});
+		else this.play('idle');
 
-		this.show('idle', 0, 0);
+		this.next(t);
 	}
 
-	near(t: number) {
-		if (this.show('near', 0, 1)) {
-			this.timer += t;
-			if (this.timer >= 75) {
-				this.r++;
-				this.timer = 0;
-				if (this.r === 7) this.r = 1;
-			}
-		}
+	near(t: Milliseconds) {
+		this.play('near');
+		this.next(t);
 	}
 
-	jump(t: number) {
-		if (this.show('jump', 1, 0)) {
-			this.timer += t;
-			if (this.timer >= 75 && this.r < 1) {
-				this.r++;
-				this.timer = 0;
-			}
-		}
+	jump(t: Milliseconds) {
+		this.play('jump');
+		this.next(t);
 	}
 
-	rise(t: number) {
-		if (this.show('rise', 1, 2)) {
-			this.timer += t;
-			if (this.timer >= 75 && this.r < 3) {
-				this.r++;
-				this.timer = 0;
-			}
-		}
+	rise(t: Milliseconds) {
+		this.play('rise');
+		this.next(t);
 	}
 
-	fall(t: number) {
-		if (this.show(aFall, 1, 4)) {
-			this.timer += t;
-			if (this.timer >= 75 && this.r < 7) {
-				this.r++;
-				this.timer = 0;
-			}
-		}
+	fall(t: Milliseconds) {
+		this.play(aFall);
+		this.next(t);
 	}
 }

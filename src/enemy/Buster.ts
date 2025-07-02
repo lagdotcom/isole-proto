@@ -21,7 +21,7 @@ import {
 import physics from '../physics';
 import Player from '../Player';
 import { draw3D } from '../rendering';
-import controller from '../spr/buster';
+import BusterController from '../spr/buster';
 import {
 	angleDistance,
 	drawArc,
@@ -47,15 +47,6 @@ const sIdle = 'idle',
 	sWaiting = 'waiting';
 type BusterState = 'idle' | 'prejump' | 'jumping' | 'waiting';
 
-interface BusterController {
-	draw(c: CanvasRenderingContext2D): void;
-	fall(t: Milliseconds): void;
-	idle(t: Milliseconds): void;
-	jump(t: Milliseconds): void;
-	near(t: Milliseconds): void;
-	rise(t: Milliseconds): void;
-}
-
 interface BusterInit {
 	back?: boolean;
 	a?: Degrees;
@@ -63,17 +54,17 @@ interface BusterInit {
 	health?: number;
 	height?: Pixels;
 	img?: ResourceName;
-	jumpfatigue?: ScaledTime;
+	jumpFatigue?: ScaledTime;
 	r?: Pixels;
 	sprite?: BusterController;
 	width?: Pixels;
 }
 
 export default class Buster extends AbstractEnemy {
-	fatigue: number;
+	fatigue: ScaledTime;
 	grounded: boolean;
-	jumpdelay: ScaledTime;
-	jumpfatigue: ScaledTime;
+	jumpDelay: ScaledTime;
+	jumpFatigue: ScaledTime;
 	sprite: BusterController;
 	state: BusterState;
 	tscale: ScaledTime;
@@ -87,7 +78,7 @@ export default class Buster extends AbstractEnemy {
 			height = 30,
 			a = 0,
 			r = 250,
-			jumpfatigue = gJumpFatigue,
+			jumpFatigue = gJumpFatigue,
 			sprite,
 			img = 'enemy.buster',
 			health = 3,
@@ -108,10 +99,10 @@ export default class Buster extends AbstractEnemy {
 			vfa: 0,
 			vfr: 0,
 			fatigue: 0,
-			jumpdelay: 0,
-			jumpfatigue,
+			jumpDelay: 0,
+			jumpFatigue,
 			state: sIdle,
-			sprite: sprite ?? new controller(game.resources[img]),
+			sprite: sprite ?? new BusterController(game.resources[img]),
 			alive: true,
 			health,
 			damage,
@@ -144,10 +135,10 @@ export default class Buster extends AbstractEnemy {
 			if (this.canAttack(player, playerDist)) {
 				switch (state) {
 					case sPreJump:
-						this.jumpdelay -= tscale;
-						if (this.jumpdelay <= 0) {
+						this.jumpDelay -= tscale;
+						if (this.jumpDelay <= 0) {
 							va = this.getJumpSide() * gJumpSide;
-							this.fatigue = this.jumpfatigue;
+							this.fatigue = this.jumpFatigue;
 							vr = gJumpStrength;
 							state = sJumping;
 						}
@@ -158,14 +149,14 @@ export default class Buster extends AbstractEnemy {
 						break;
 
 					case sWaiting:
-						this.jumpdelay -= tscale;
-						if (this.jumpdelay <= 0) state = sIdle;
+						this.jumpDelay -= tscale;
+						if (this.jumpDelay <= 0) state = sIdle;
 						break;
 
 					default:
 						if (this.fatigue <= 0) {
 							state = sPreJump;
-							this.jumpdelay = gJumpStartup;
+							this.jumpDelay = gJumpStartup;
 						} else {
 							state = sIdle;
 						}
@@ -206,25 +197,15 @@ export default class Buster extends AbstractEnemy {
 		this.a = wrapAngle(a);
 		this.r = r;
 		this.state = state;
-
-		if (!this.grounded) {
-			if (vr > 0) sprite.rise(time);
-			else sprite.fall(time);
-		} else if (state === sPreJump) {
-			sprite.jump(time);
-		} else if (near) {
-			sprite.near(time);
-		} else {
-			sprite.idle(time);
-		}
+		sprite.animate(time, vr, this.grounded, state === sPreJump, near);
 
 		if (this.del) {
-			const { jumpdelay, fatigue } = this;
+			const { jumpDelay, fatigue } = this;
 			this.debug({
 				state,
 				vel: `${vr.toFixed(2)},${va.toFixed(2)}r`,
 				pos: `${r.toFixed(2)},${a.toFixed(2)}r,${this.z.toFixed(2)}`,
-				jump: `${jumpdelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`,
+				jump: `${jumpDelay.toFixed(2)}jd, ${fatigue.toFixed(2)}f`,
 			});
 		}
 	}

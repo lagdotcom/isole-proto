@@ -223,7 +223,7 @@ export default class Krillna extends AbstractEnemy {
 		if (!floor && !ceiling && !wall) {
 			sprite.air();
 		} else {
-			sprite.walk(tscale, dir);
+			sprite.walk(time, dir);
 		}
 
 		this.debug({

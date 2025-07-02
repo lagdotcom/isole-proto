@@ -1,17 +1,20 @@
-import Controller from '../Controller';
+import AnimController, { AnimSpecMap } from '../AnimController';
 import { dDown, dLeft, dRight, dUp } from '../dirs';
 import { Radians } from '../flavours';
 import { π, πHalf } from '../tools';
 
-// MOVEMENT: Frame 1 = 120 ms, Frame 2 & 3 = 75 ms, Frame 4 = 120 ms, Frame 5 & 6 = 75 ms
-
-const moveTimes = {
-	0: 12,
-	1: 7.5,
-	2: 7.5,
-	3: 12,
-	4: 7.5,
-	5: 7.5,
+const animations: AnimSpecMap = {
+	move: {
+		loop: true,
+		frames: [
+			{ c: 0, r: 0, t: 120 },
+			{ c: 0, r: 1, t: 75 },
+			{ c: 0, r: 2, t: 75 },
+			{ c: 0, r: 3, t: 120 },
+			{ c: 0, r: 4, t: 75 },
+			{ c: 0, r: 5, t: 75 },
+		],
+	},
 };
 
 const offsetX = {
@@ -23,7 +26,7 @@ const offsetX = {
 
 type KrillnaStuck = 'ground' | 'ceiling' | 'walkLeft' | 'walkRight';
 
-export default class KrillnaController extends Controller {
+export default class KrillnaController extends AnimController {
 	walkTimer: number;
 	walkMax: number;
 	normal: Radians;
@@ -32,6 +35,7 @@ export default class KrillnaController extends Controller {
 
 	constructor(img: CanvasImageSource) {
 		super({
+			animations,
 			img,
 			w: 72,
 			h: 72,
@@ -42,6 +46,7 @@ export default class KrillnaController extends Controller {
 		this.walkMax = 8;
 		this.normal = 0;
 		this.flipTwice = false;
+		this.play('move');
 	}
 
 	air(): void {
@@ -87,13 +92,6 @@ export default class KrillnaController extends Controller {
 			if (flipTwice) this.flip = !this.flip;
 		}
 
-		if (this.show('walk', 0, 0)) {
-			this.timer += t;
-			if (this.timer >= moveTimes[this.r]) {
-				this.timer = 0;
-				this.r++;
-				if (this.r >= 6) this.r = 0;
-			}
-		}
+		this.next(t);
 	}
 }
