@@ -27,6 +27,7 @@ import ReticleController from '../spr/ReticleController';
 import {
 	collides,
 	damage,
+	displace,
 	drawWedge,
 	fillWedge,
 	isRightOf,
@@ -37,43 +38,12 @@ import {
 } from '../tools';
 import AbstractEnemy from './AbstractEnemy';
 
-/*
-Column 1: IDLE
-	- 75ms, stays active between the boss's various attacks
-
-Column 2: BIG LEAP
-	- Frames 1-3 65ms, Frames 4-6 75ms, Frame 7 150ms, Frame 8-9 75ms, Frame 10 300ms, Frame 11-12 75ms.
-	- Frame 13 hold this behavior til the Minatoad vanishes off screen, have the target reticle effect appear and follow the player for a few seconds
-	- Frame 14-15 75ms, hold on frame 16 til the Minatoad lands, upon hitting the ground send shockwaves out left and right and maybe stun player if they don't jump
-	- Frame 17 75ms, Frame 18 300 ms, Frame 19-24 75ms, return to idle motion after behavior completes
-	- Use this move somewhat sparingly in boss's AI, maybe so it can only be used every two or more moves?
-
-Column 3: SMALL HOP
-	- Frames 1-4 75ms, Frame 5 hold until apex of jump is reached
-	- Frames 6-7 75ms, Frame 8 hold until touching the ground
-	- Loop back to frame 1, while this behavior is active have the boss leap continually clockwise or counterclockwise towards the player, like the Boosters
-	- Random number of hops, no less than 3 and no more than 6 potentially? Can be adjusted later
-
-Column 4: POISON SPRAY
-	- Frames 1-4 75ms, Frame 5 300ms
-	- Frames 6-14 75ms, During this animation spread a slightly transluscent purple wavey mist in an AOE around the Minatoad that stays for a duration.
-	- Unsure if purple mist would need a sprite? Seems like it'd fit mostly as a programatic effect
-
-Column 5: RAPID FIRE CIRCULAR BULLET PATTERN
-	- Frames 1-4 75ms, Frame 5 150 ms, shoot burst of either large or medium sized bullets from the sheet into the air
-	- Frame 6 75ms, loop back to frame 2-4 and repeat this animation cycle 3-4 times, whatever feels good
-	- As these actions are occuring, begin bullets falling from the edges of the screen like in the rapid trunk spray attack concept
-	- Play frame 7-8 at 75ms, let Minatoad idle for a bit til bullets are mostly dissipated, then begin other attacks
-
-Likely an obvious note, but Minatoad shouldn't be able to use any of it's skills twice in a row except for maybe the small hop.
-*/
-
 const eLeap = 'leap';
 const eFire = 'fire';
 const eRefire = 'refire';
 const eSpray = 'spray';
 
-interface MinatoadListenerMap extends ListenerMap {
+interface FrogaboarListenerMap extends ListenerMap {
 	[eLeap]: Listener;
 	[eFire]: Listener;
 	[eRefire]: Listener;
@@ -84,81 +54,84 @@ const animations: AnimSpecMap = {
 	idle: {
 		loop: true,
 		frames: [
-			{ c: 0, r: 0, t: 75 },
-			{ c: 0, r: 1, t: 75 },
-			{ c: 0, r: 2, t: 75 },
-			{ c: 0, r: 3, t: 75 },
-			{ c: 0, r: 4, t: 75 },
-			{ c: 0, r: 5, t: 75 },
+			{ c: 2, r: 0, t: 75 },
+			{ c: 2, r: 1, t: 75 },
+			{ c: 2, r: 2, t: 75 },
+			{ c: 2, r: 3, t: 75 },
+			{ c: 2, r: 4, t: 75 },
+			{ c: 2, r: 5, t: 75 },
 		],
 	},
 
 	leapRise: {
 		extend: true,
 		frames: [
-			{ c: 1, r: 0, t: 65 },
-			{ c: 1, r: 1, t: 65 },
-			{ c: 1, r: 2, t: 65 },
-			{ c: 1, r: 3, t: 75 },
-			{ c: 1, r: 4, t: 75 },
-			{ c: 1, r: 5, t: 75, event: eLeap },
-			{ c: 1, r: 6, t: 150 },
-			{ c: 1, r: 7, t: 75 },
-			{ c: 1, r: 8, t: 75 },
-			{ c: 1, r: 9, t: 300 },
-			{ c: 1, r: 10, t: 75 },
-			{ c: 1, r: 11, t: 75 },
-			{ c: 1, r: 12, t: 75 },
+			{ c: 4, r: 0, t: 75 },
+			{ c: 4, r: 1, t: 75 },
+			{ c: 4, r: 2, t: 75 },
+			{ c: 4, r: 3, t: 75 },
+			{ c: 4, r: 4, t: 75 },
+			{ c: 4, r: 5, t: 75 },
+			{ c: 4, r: 6, t: 75 },
+			{ c: 4, r: 7, t: 75 },
+			{ c: 4, r: 8, t: 75 },
+			{ c: 5, r: 0, t: 75, event: eLeap },
+			{ c: 5, r: 1, t: 75 },
+			{ c: 5, r: 2, t: 75 },
 		],
 	},
 
 	leapFall: {
-		extend: true,
+		loop: true,
 		frames: [
-			{ c: 1, r: 13, t: 75 },
-			{ c: 1, r: 14, t: 75 },
-			{ c: 1, r: 15, t: 75 },
+			{ c: 5, r: 3, t: 75 },
+			{ c: 5, r: 4, t: 75 },
+			{ c: 5, r: 5, t: 75 },
 		],
 	},
 
 	leapLand: {
 		frames: [
-			{ c: 1, r: 16, t: 75 },
-			{ c: 1, r: 17, t: 300 },
-			{ c: 1, r: 18, t: 75 },
-			{ c: 1, r: 19, t: 75 },
-			{ c: 1, r: 20, t: 75 },
-			{ c: 1, r: 21, t: 75 },
-			{ c: 1, r: 22, t: 75 },
-			{ c: 1, r: 23, t: 75 },
+			{ c: 6, r: 0, t: 75 },
+			{ c: 6, r: 1, t: 75 },
+			{ c: 6, r: 2, t: 75 },
+			{ c: 6, r: 3, t: 75 },
+			{ c: 6, r: 4, t: 75 },
+			{ c: 6, r: 5, t: 75 },
+			{ c: 6, r: 6, t: 75 },
+			{ c: 6, r: 7, t: 75 },
+			{ c: 6, r: 8, t: 75 },
+			{ c: 6, r: 9, t: 75 },
+			{ c: 6, r: 10, t: 75 },
 		],
 	},
 
 	jump: {
 		frames: [
-			{ c: 2, r: 0, t: 75 },
-			{ c: 2, r: 1, t: 75 },
+			{ c: 3, r: 0, t: 75 },
+			{ c: 3, r: 1, t: 75 },
 		],
 	},
 
 	rise: {
 		extend: true,
 		frames: [
-			{ c: 2, r: 2, t: 75 },
-			{ c: 2, r: 3, t: 75 },
-			{ c: 2, r: 4, t: 75 },
+			{ c: 3, r: 2, t: 75 },
+			{ c: 3, r: 3, t: 75 },
+			{ c: 3, r: 4, t: 75 },
 		],
 	},
 
 	fall: {
 		extend: true,
 		frames: [
-			{ c: 2, r: 5, t: 75 },
-			{ c: 2, r: 6, t: 75 },
-			{ c: 2, r: 7, t: 75 },
+			{ c: 3, r: 5, t: 75 },
+			{ c: 3, r: 6, t: 75 },
+			{ c: 3, r: 7, t: 75 },
 		],
 	},
 
+	// TODO
 	spray: {
 		frames: [
 			{ c: 3, r: 0, t: 75 },
@@ -180,14 +153,18 @@ const animations: AnimSpecMap = {
 
 	rapid: {
 		frames: [
-			{ c: 4, r: 0, t: 75 },
-			{ c: 4, r: 1, t: 75 },
-			{ c: 4, r: 2, t: 75 },
-			{ c: 4, r: 3, t: 75 },
-			{ c: 4, r: 4, t: 150, event: eFire },
-			{ c: 4, r: 5, t: 75, event: eRefire },
-			{ c: 4, r: 6, t: 75 },
-			{ c: 4, r: 7, t: 75 },
+			{ c: 7, r: 0, t: 75 },
+			{ c: 7, r: 1, t: 75 },
+			{ c: 7, r: 2, t: 75 },
+			{ c: 7, r: 3, t: 75 },
+			{ c: 7, r: 4, t: 75 },
+			{ c: 7, r: 5, t: 75 },
+			{ c: 7, r: 6, t: 75, event: eFire, hotspot: { x: 30, y: 400 } }, // TODO
+			{ c: 7, r: 7, t: 75 },
+			{ c: 7, r: 8, t: 75 },
+			{ c: 7, r: 9, t: 75 },
+			{ c: 7, r: 10, t: 75 },
+			{ c: 7, r: 11, t: 75, event: eRefire },
 		],
 	},
 };
@@ -283,7 +260,7 @@ class Shockwave extends AbstractEnemy {
 	constructor(game: Game, back: boolean, a: number, r: number, va: number) {
 		super({
 			isEnemy: false,
-			name: 'Minatoad Shockwave',
+			name: 'Frogaboar Shockwave',
 			game,
 			active: true,
 			back,
@@ -296,7 +273,7 @@ class Shockwave extends AbstractEnemy {
 			width: 48,
 			height: 48,
 			sprite: new ShockwaveController(
-				game.resources['enemy.minatoad.shockwave']
+				game.resources['enemy.frogaboar.shockwave']
 			),
 		});
 
@@ -422,12 +399,12 @@ class BulletController extends AnimController {
 class SmallBullet extends AbstractEnemy {
 	active: boolean;
 	ignoreGravity: boolean;
-	owner: Minatoad;
+	owner: Frogaboar;
 	sprite: BulletController;
 	vfa: number;
 
 	constructor(
-		owner: Minatoad,
+		owner: Frogaboar,
 		game: Game,
 		back: boolean,
 		a: number,
@@ -436,7 +413,7 @@ class SmallBullet extends AbstractEnemy {
 	) {
 		super({
 			isEnemy: false,
-			name: 'Minatoad Small Bullet',
+			name: 'Frogaboar Small Bullet',
 			owner,
 			game,
 			active: true,
@@ -542,20 +519,20 @@ class SmallBullet extends AbstractEnemy {
 class BigBullet extends AbstractEnemy {
 	active: boolean;
 	duration: Milliseconds;
-	owner: Minatoad;
+	owner: Frogaboar;
 	sprite: BulletController;
 
 	constructor(
-		owner: Minatoad,
+		owner: Frogaboar,
 		game: Game,
 		back: boolean,
-		a: number,
-		r: number,
+		a: Radians,
+		r: Pixels,
 		vr: number
 	) {
 		super({
 			isEnemy: false,
-			name: 'Minatoad Big Bullet',
+			name: 'Frogaboar Big Bullet',
 			owner,
 			game,
 			active: true,
@@ -673,9 +650,9 @@ class PoisonSprayField extends AbstractEnemy {
 	a: Radians;
 	duration: Milliseconds;
 	game: Game;
-	height: number;
+	height: Pixels;
 	name: string;
-	owner: Minatoad;
+	owner: Frogaboar;
 	r: Pixels;
 	spread: Milliseconds;
 	width: Pixels;
@@ -683,7 +660,7 @@ class PoisonSprayField extends AbstractEnemy {
 	vr: number;
 
 	constructor(
-		owner: Minatoad,
+		owner: Frogaboar,
 		game: Game,
 		duration: Milliseconds,
 		spread: Milliseconds,
@@ -776,17 +753,18 @@ class PoisonSprayField extends AbstractEnemy {
 	}
 }
 
-class MinatoadController extends AnimController {
-	parent: MinatoadListenerMap;
+class FrogaboarController extends AnimController {
+	parent: FrogaboarListenerMap;
 
-	constructor(parent: MinatoadListenerMap, img: CanvasImageSource) {
+	constructor(parent: FrogaboarListenerMap, img: CanvasImageSource) {
 		super({
 			img,
 			animations,
-			w: 240,
-			h: 240,
-			xo: -120,
-			yo: -170,
+			w: 960,
+			h: 960,
+			xo: -480,
+			yo: -650,
+			leftFlip: false,
 		});
 
 		this.parent = parent;
@@ -842,14 +820,14 @@ class MinatoadController extends AnimController {
 	}
 }
 
-interface MinatoadOptions {
+interface FrogaboarOptions {
 	a?: Radians;
 	dir?: Facing;
 	img?: ResourceName;
 	r?: Pixels;
 }
 
-type MinatoadState =
+type FrogaboarState =
 	| 'idle'
 	| 'leap'
 	| 'track'
@@ -870,18 +848,18 @@ const gBigBulletLifetime: Milliseconds = 800;
 const gSplitCount = 5;
 const gSmallBulletSpeed = () => randomRange(-8, -5);
 
-export default class Minatoad extends AbstractEnemy {
+export default class Frogaboar extends AbstractEnemy {
 	bullets: number;
 	dir: Facing;
 	hidden: boolean;
 	ignoreCeilings: boolean;
 	jumps: number;
-	last: MinatoadState;
+	last: FrogaboarState;
 	poisonField?: PoisonSprayField;
 	reticle: Reticle;
 	shots: number;
-	sprite: MinatoadController;
-	state: MinatoadState;
+	sprite: FrogaboarController;
+	state: FrogaboarState;
 	tscale: ScaledTime;
 	vfa: number;
 	waitTimer: Milliseconds;
@@ -892,15 +870,15 @@ export default class Minatoad extends AbstractEnemy {
 			dir = 'L',
 			a = 0,
 			r = 250,
-			img = 'enemy.minatoad',
-		}: MinatoadOptions = {}
+			img = 'enemy.frogaboar',
+		}: FrogaboarOptions = {}
 	) {
 		super({
 			game,
 			bullets: 0,
-			width: 80,
-			height: 80,
-			name: 'Minatoad',
+			width: 260,
+			height: 340,
+			name: 'Frogaboar',
 			dir,
 			last: 'idle',
 			state: 'idle',
@@ -918,7 +896,7 @@ export default class Minatoad extends AbstractEnemy {
 			hidden: false,
 		});
 
-		this.sprite = new MinatoadController(
+		this.sprite = new FrogaboarController(
 			{
 				[eAnimationEnded]: this.onAnimEnd.bind(this),
 				[eFire]: this.onFire.bind(this),
@@ -935,6 +913,9 @@ export default class Minatoad extends AbstractEnemy {
 	onAnimEnd() {
 		if (this.state === 'hop' && this.jumps > 0) {
 			this.va = this.getJumpDir();
+			this.dir = this.va < 0 ? 'L' : 'R';
+			if (this.dir === 'L') this.sprite.left();
+			else this.sprite.right();
 			this.vr = gJumpStrength;
 			this.jumps--;
 			return;
@@ -945,12 +926,14 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	onFire() {
+		const pos = displace(this, [this.sprite.hotspot], this.sprite.leftFlip);
+
 		const bullet = new BigBullet(
 			this,
 			this.game,
-			getBack(this.z),
-			this.a,
-			this.r + this.height * this.z,
+			getBack(pos.z),
+			pos.a,
+			pos.r,
 			gBigBulletSpeed
 		);
 		this.game.components.push(bullet);
@@ -976,7 +959,7 @@ export default class Minatoad extends AbstractEnemy {
 	}
 
 	getNextAttack() {
-		let next: MinatoadState = this.last;
+		let next: FrogaboarState = this.last;
 
 		while (next === this.last) {
 			next = randomItem([

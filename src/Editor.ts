@@ -78,7 +78,7 @@ const defaultData: EditorData = {
 		item: 'rock',
 		weapon: 'greenBalls',
 	},
-	enemies: [{ type: 'minatoad', a: 0, r: 1250, dir: 'L' }],
+	enemies: [{ type: 'frogaboar', a: 0, r: 1250, dir: 'L' }],
 };
 
 export default class Editor

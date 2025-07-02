@@ -3,8 +3,8 @@ import Booster from './enemy/Booster';
 import Buster from './enemy/Buster';
 import ChompChamp from './enemy/ChompChamp';
 import Flazza from './enemy/Flazza';
+import Frogaboar from './enemy/Frogaboar';
 import Krillna from './enemy/Krillna';
-import Minatoad from './enemy/Minatoad';
 import BombItem from './item/Bomb';
 import RockItem from './item/Rock';
 import GreenBalls from './player/attack/GreenBalls';
@@ -18,7 +18,7 @@ export const enemyTypes = {
 	chompChamp: ChompChamp,
 	krillna: Krillna,
 	flazza: Flazza,
-	minatoad: Minatoad,
+	frogaboar: Frogaboar,
 };
 export const enemyNames = Object.keys(enemyTypes);
 
