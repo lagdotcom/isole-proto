@@ -107,7 +107,7 @@ interface BatListenerMap extends ListenerMap {
 export default class BatController extends AnimController {
 	map: BatListenerMap;
 
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			animations,
 			img,

@@ -27,7 +27,7 @@ const animations: AnimSpecMap = {
 	},
 };
 
-const controller = (img: CanvasImageSource, flip?: boolean) =>
+const controller = (img: HTMLImageElement, flip?: boolean) =>
 	new AnimController({
 		img,
 		flip,

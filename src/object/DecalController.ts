@@ -4,7 +4,7 @@ export default class DecalController extends Controller {
 	x: number;
 	y: number;
 
-	constructor(img: CanvasImageSource, options: any) {
+	constructor(img: HTMLImageElement, options: any) {
 		super(Object.assign({}, { img, ...options }));
 	}
 

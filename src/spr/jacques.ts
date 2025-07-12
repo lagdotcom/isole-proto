@@ -1,12 +1,12 @@
 import {
 	aAxe,
-	aDoubleJumpFlip,
 	aDoubleJump,
+	aDoubleJumpFlip,
 	aDying,
 	aFlip,
 	aHurt,
-	aJumpFlip,
 	aJump,
+	aJumpFlip,
 	aLand,
 	aStand,
 	aStatus,
@@ -15,13 +15,14 @@ import {
 } from '../anims';
 import { eSwing, eThrow } from '../events';
 import Player from '../Player';
+import { PackedImageData } from '../resources';
 import PlayerController from './PlayerController';
 
-export default function woodyController(
+export default function jacquesController(
 	parent: Player,
-	img: CanvasImageSource
+	data: PackedImageData
 ) {
-	return new PlayerController(parent, img, {
+	return new PlayerController(parent, data, {
 		w: 140,
 		h: 140,
 		xo: -70,

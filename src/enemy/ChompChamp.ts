@@ -108,7 +108,7 @@ const animations = {
 class ChompChampController extends AnimController implements ChompChampSprite {
 	parent: ListenerMap;
 
-	constructor(parent: ChompChampListenerMap, img: CanvasImageSource) {
+	constructor(parent: ChompChampListenerMap, img: HTMLImageElement) {
 		super({
 			animations,
 			img,

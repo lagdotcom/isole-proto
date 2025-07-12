@@ -22,7 +22,6 @@ import {
 	Pixels,
 	ResourceName,
 	TextureName,
-	UrlString,
 } from './flavours';
 import InputMapper, { InputButton } from './InputMapper';
 import { zBeforeUI } from './layers';
@@ -84,7 +83,7 @@ interface GameInit {
 	width: Pixels;
 }
 
-type ResourceLoader<T> = (url: string, callback: () => void) => T;
+type ResourceLoader<T, U> = (path: U, callback: () => void) => T;
 
 class Unzoomer implements DrawnComponent {
 	game: Game;
@@ -210,13 +209,9 @@ export default class Game {
 	 * Require a resource
 	 * @param {ResourceName} name resource name
 	 * @param {ResourceLoader} typ resource loader
-	 * @param {string} src source URL
+	 * @param {U} src source URL
 	 */
-	require<T>(
-		name: ResourceName,
-		typ: ResourceLoader<T>,
-		src: UrlString
-	): void {
+	require<T, U>(name: ResourceName, typ: ResourceLoader<T, U>, src: U): void {
 		this.loading++;
 		this.resources[name] = typ(src, () => this.resourceLoaded());
 	}

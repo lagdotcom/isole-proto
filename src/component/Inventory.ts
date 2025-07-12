@@ -13,7 +13,7 @@ export default class Inventory implements DrawnComponent {
 	cycling: boolean;
 	game: Game;
 	health: number;
-	img: CanvasImageSource;
+	img: HTMLImageElement;
 	items: (Item | undefined)[];
 	keys: number;
 	layer: DisplayLayer;

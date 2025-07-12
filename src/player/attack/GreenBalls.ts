@@ -65,7 +65,7 @@ class GreenBallController extends AnimController {
 		img: ResourceName = 'projectile.woody'
 	) {
 		super({
-			img: game.resources[img],
+			...game.resources[img],
 			animations,
 			w: 80,
 			h: 80,

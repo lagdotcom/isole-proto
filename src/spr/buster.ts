@@ -61,7 +61,7 @@ const animations: AnimSpecMap = {
 export default class BusterController extends AnimController {
 	oldVr: number;
 
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			animations,
 			img,

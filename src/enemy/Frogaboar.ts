@@ -23,6 +23,7 @@ import { zSpark } from '../layers';
 import { getBack, getZ, gTimeScale, gWalkScale } from '../nums';
 import physics from '../physics';
 import { draw3D } from '../rendering';
+import { PackedImageData } from '../resources';
 import ReticleController from '../spr/ReticleController';
 import {
 	collides,
@@ -102,7 +103,6 @@ const animations: AnimSpecMap = {
 			{ c: 6, r: 7, t: 75 },
 			{ c: 6, r: 8, t: 75 },
 			{ c: 6, r: 9, t: 75 },
-			{ c: 6, r: 10, t: 75 },
 		],
 	},
 
@@ -225,7 +225,7 @@ class Reticle implements DrawnComponent {
 }
 
 class ShockwaveController extends AnimController {
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			img,
 			leftFlip: false,
@@ -362,7 +362,7 @@ class Shockwave extends AbstractEnemy {
 }
 
 class BulletController extends AnimController {
-	constructor(img: CanvasImageSource, xo = -40, yo = -80) {
+	constructor(img: HTMLImageElement, xo = -40, yo = -80) {
 		super({
 			img,
 			leftFlip: false,
@@ -756,9 +756,13 @@ class PoisonSprayField extends AbstractEnemy {
 class FrogaboarController extends AnimController {
 	parent: FrogaboarListenerMap;
 
-	constructor(parent: FrogaboarListenerMap, img: CanvasImageSource) {
+	constructor(
+		parent: FrogaboarListenerMap,
+		{ img, frames }: PackedImageData
+	) {
 		super({
 			img,
+			frames,
 			animations,
 			w: 960,
 			h: 960,

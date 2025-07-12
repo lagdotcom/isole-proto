@@ -9,7 +9,8 @@ import boosterImg from '../media/gfx/mon/booster.png';
 import busterImg from '../media/gfx/mon/buster.png';
 import chompChampImg from '../media/gfx/mon/chompchamp.png';
 import flazzaImg from '../media/gfx/mon/flazza.png';
-import frogaboarImg from '../media/gfx/mon/frogaboar.png';
+import frogaboarJson from '../media/gfx/mon/frogaboar.png.packed.json';
+import frogaboarImg from '../media/gfx/mon/frogaboar.png.packed.png';
 import krillnaImg from '../media/gfx/mon/krillna.png';
 import shockwaveImg from '../media/gfx/mon/minatoad.shockwave.png';
 import projectileImg from '../media/gfx/projectiles.png';
@@ -26,8 +27,10 @@ import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
 import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
 import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
 import rwfartreesImg from '../media/gfx/tile/rwfartrees.png';
-import woodyImg from '../media/gfx/woody.png';
-import woodyProjectile from '../media/gfx/woody_projectile.png';
+import woodyJson from '../media/gfx/woody.png.packed.json';
+import woodyImg from '../media/gfx/woody.png.packed.png';
+import woodyProjectileJson from '../media/gfx/woody_projectile.png.packed.json';
+import woodyProjectileImg from '../media/gfx/woody_projectile.png.packed.png';
 import axeImg from '../media/gfx/wp/axe.png';
 import batPunchSnd from '../media/sfx/bat-punch.wav';
 import bopSnd from '../media/sfx/Enemy_Bop.wav';
@@ -38,7 +41,7 @@ import jumpSnd from '../media/sfx/Jump.wav';
 import deathSnd from '../media/sfx/Player_Death.wav';
 import jacquesHurtSnd from '../media/sfx/Player_Hurt_Jacques.wav';
 import woodyHurtSnd from '../media/sfx/Player_Hurt_Woody.wav';
-import Controller from './Controller';
+import Controller, { ControllerFrame } from './Controller';
 import { MaterialName, ObjectName, UrlString } from './flavours';
 import Game from './Game';
 import bluegrassMaterials from './material/bluegrass';
@@ -103,6 +106,19 @@ function image(fn: UrlString, onload: (e: Event) => void): HTMLImageElement {
 	return el;
 }
 
+export interface PackedImageData {
+	img: HTMLImageElement;
+	frames: ControllerFrame[][];
+}
+
+function packedImage(
+	[url, frames]: [UrlString, ControllerFrame[][]],
+	onload: () => void
+): PackedImageData {
+	const img = image(url, onload);
+	return { img, frames };
+}
+
 const MediaErrors = [
 	'UNKNOWN',
 	'MEDIA_ERR_ABORTED',
@@ -143,16 +159,19 @@ export default function PreloadResources(game: Game) {
 	game.require('enemy.chompchamp', image, chompChampImg);
 	game.require('enemy.flazza', image, flazzaImg);
 	game.require('enemy.krillna', image, krillnaImg);
-	game.require('enemy.frogaboar', image, frogaboarImg);
+	game.require('enemy.frogaboar', packedImage, [frogaboarImg, frogaboarJson]);
 	game.require('enemy.frogaboar.shockwave', image, shockwaveImg);
 	game.require('item.bomb', image, bombImg);
 	game.require('item.rock', image, rockImg);
 	game.require('weapon.axe', image, axeImg);
 	game.require('reticle', image, reticleImg);
 	game.require('projectile', image, projectileImg);
-	game.require('projectile.woody', image, woodyProjectile);
+	game.require('projectile.woody', packedImage, [
+		woodyProjectileImg,
+		woodyProjectileJson,
+	]);
 	game.require('player.jacques', image, jacquesImg);
-	game.require('player.woody', image, woodyImg);
+	game.require('player.woody', packedImage, [woodyImg, woodyJson]);
 	game.require('player.spell.1', image, spellCircleOuter);
 	game.require('player.spell.2', image, spellCircleInnerOne);
 	game.require('player.spell.3', image, spellCircleInnerTwo);

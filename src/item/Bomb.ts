@@ -68,7 +68,7 @@ const animations = {
 };
 
 class BombController extends AnimController {
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			animations,
 			img,

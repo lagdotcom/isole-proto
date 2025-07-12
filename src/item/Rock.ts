@@ -33,7 +33,7 @@ import {
 const gFloatTime: ScaledTime = 80,
 	gWindLoss: Multiplier = 0.995;
 
-const controller = (img: CanvasImageSource) =>
+const controller = (img: HTMLImageElement) =>
 	new Controller({ img, w: 48, h: 48, xo: -24, yo: -36 });
 
 class Rock implements DrawnComponent {

@@ -21,6 +21,7 @@ import {
 import { eAnimationEnded } from '../events';
 import { AnimName, Milliseconds } from '../flavours';
 import Player from '../Player';
+import { PackedImageData } from '../resources';
 
 const midAirAnimations = [aJump, aDoubleJump];
 
@@ -33,10 +34,10 @@ export default class PlayerController extends AnimController {
 
 	constructor(
 		parent: Player,
-		img: CanvasImageSource,
+		{ img, frames }: PackedImageData,
 		options: PlayerControllerInit
 	) {
-		super(Object.assign({ facing: 1, img, parent }, options));
+		super(Object.assign({ facing: 1, img, frames, parent }, options));
 
 		this.parent = parent;
 		this.facing = 1;

@@ -25,6 +25,7 @@ import {
 import CoordXY from '../CoordXY';
 import { eSwing, eThrow } from '../events';
 import Player from '../Player';
+import { PackedImageData } from '../resources';
 import PlayerController from './PlayerController';
 
 /*
@@ -48,11 +49,8 @@ Cell order, left to right:
 
 const attackHotspot: CoordXY = { x: 98, y: 70 };
 
-export default function woodyController(
-	parent: Player,
-	img: CanvasImageSource
-) {
-	return new PlayerController(parent, img, {
+export default function woodyController(parent: Player, data: PackedImageData) {
+	return new PlayerController(parent, data, {
 		w: 224,
 		h: 224,
 		xo: -110,

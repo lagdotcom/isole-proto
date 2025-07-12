@@ -1,38 +1,40 @@
 {
-  "name": "isole-proto",
-  "version": "0.1.0",
-  "description": "",
-  "main": "index.html",
-  "scripts": {
-    "build": "webpack --mode production",
-    "dev": "webpack --mode development",
-    "start": "webpack serve",
-    "lint": "eslint src",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Lag.Com <lagdotcom@gmail.com>",
-  "license": "ISC",
-  "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.25.0",
-    "@typescript-eslint/eslint-plugin": "^8.30.1",
-    "@typescript-eslint/parser": "^8.30.1",
-    "css-loader": "^7.1.2",
-    "eslint": "^9.25.0",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "file-loader": "^6.2.0",
-    "prettier": "^3.5.3",
-    "style-loader": "^4.0.0",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "webpack": "^5.99.6",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.1"
-  },
-  "dependencies": {
-    "delaunay-fast": "^1.0.1"
-  }
+	"name": "isole-proto",
+	"version": "0.1.0",
+	"description": "",
+	"main": "index.html",
+	"scripts": {
+		"build": "webpack --mode production",
+		"dev": "webpack --mode development",
+		"start": "webpack serve",
+		"lint": "eslint src",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Lag.Com <lagdotcom@gmail.com>",
+	"license": "ISC",
+	"devDependencies": {
+		"@eslint/eslintrc": "^3.3.1",
+		"@eslint/js": "^9.25.0",
+		"@typescript-eslint/eslint-plugin": "^8.30.1",
+		"@typescript-eslint/parser": "^8.30.1",
+		"css-loader": "^7.1.2",
+		"eslint": "^9.25.0",
+		"eslint-config-prettier": "^10.1.2",
+		"eslint-plugin-prettier": "^5.2.6",
+		"eslint-plugin-simple-import-sort": "^12.1.1",
+		"file-loader": "^6.2.0",
+		"prettier": "^3.5.3",
+		"rectangle-packer": "^1.0.4",
+		"sharp": "^0.34.3",
+		"style-loader": "^4.0.0",
+		"ts-loader": "^9.5.2",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.30.1",
+		"webpack": "^5.99.6",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.1"
+	},
+	"dependencies": {
+		"delaunay-fast": "^1.0.1"
+	}
 }

@@ -18,7 +18,7 @@ import Weapon from '../Weapon';
 export const aIdle = 'idle',
 	aSwing = 'swing';
 
-type ControllerGen = (img: CanvasImageSource, flip?: boolean) => AnimController;
+type ControllerGen = (img: HTMLImageElement, flip?: boolean) => AnimController;
 type OnEnemyHit = (enemy: Enemy) => void;
 
 class Swing implements DrawnComponent {

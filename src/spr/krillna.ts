@@ -33,7 +33,7 @@ export default class KrillnaController extends AnimController {
 	stuck?: KrillnaStuck;
 	flipTwice: boolean;
 
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			animations,
 			img,

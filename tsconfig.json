@@ -3,11 +3,13 @@
 	"compilerOptions": {
 		"module": "es6",
 		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
 		"inlineSources": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": true,
 		"outDir": "dist",
 		"pretty": true,
+		"resolveJsonModule": true,
 		"sourceMap": true,
 		"strictNullChecks": true,
 		"target": "es5"

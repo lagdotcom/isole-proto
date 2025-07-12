@@ -4,7 +4,7 @@ export default class GCBDController extends Controller {
 	walkTimer: number;
 	walkMax: number;
 
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			img,
 			w: 56,

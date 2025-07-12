@@ -67,7 +67,7 @@ interface FlazzaListenerMap extends ListenerMap {
 export default class FlazzaController extends AnimController {
 	map: FlazzaListenerMap;
 
-	constructor(img: CanvasImageSource) {
+	constructor(img: HTMLImageElement) {
 		super({
 			animations,
 			img,

@@ -7,7 +7,7 @@ export default class TileController extends Controller implements Texture {
 	tiles: TileDataMap;
 	tileName: TileName;
 
-	constructor(img: CanvasImageSource, tiles: TileDataMap, options = {}) {
+	constructor(img: HTMLImageElement, tiles: TileDataMap, options = {}) {
 		super(
 			Object.assign(
 				{},
