@@ -1,17 +1,17 @@
 import { KeyCode, PadCode } from './flavours';
 
 // TODO: config
-export const kLeft: KeyCode = 'ArrowLeft';
-export const kRight: KeyCode = 'ArrowRight';
-export const kUp: KeyCode = 'ArrowUp';
-export const kDown: KeyCode = 'ArrowDown';
-export const kJump: KeyCode = 'ArrowUp';
+export const kLeft: KeyCode = 'KeyA';
+export const kRight: KeyCode = 'KeyD';
+export const kUp: KeyCode = 'KeyW';
+export const kDown: KeyCode = 'KeyS';
+export const kJump: KeyCode = 'Space';
 export const kMelee: KeyCode = 'KeyZ';
 export const kMenu: KeyCode = 'KeyX';
 export const kShift: KeyCode = 'KeyC';
 export const kFreeMoney: KeyCode = 'KeyM';
-export const kAimBack: KeyCode = 'KeyA';
-export const kAimFront: KeyCode = 'KeyS';
+export const kAimBack: KeyCode = 'KeyQ';
+export const kAimFront: KeyCode = 'KeyE';
 
 export const jLeft: PadCode = 'JoypadLeft';
 export const jRight: PadCode = 'JoypadRight';

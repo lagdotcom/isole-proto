@@ -56,10 +56,10 @@ import ShootingReticle from './ShootingReticle';
 const gJumpAffectStrength = 0.15,
 	gJumpAffectTimer: ScaledTime = -10,
 	gJumpDoubleTimer: ScaledTime = -10,
-	gJumpStrength = 4,
+	gJumpStrength = 2,
 	gJumpTimer: ScaledTime = 8,
-	gLeapSpeed = 0.02,
-	gDodgeSpeed = 1,
+	gLeapSpeed = 0.03,
+	gDodgeSpeed = 1.35,
 	gDodgeDuration: Milliseconds = 350;
 
 interface Dodge {
@@ -193,7 +193,7 @@ export default abstract class AbstractPlayer implements Player {
 		this.jumpTimer = jumpTimer -= tscale;
 
 		if (hurtEnemy) {
-			this.vr = gJumpStrength * 0.75;
+			this.vr = gJumpStrength * 1.5;
 			damage(hurtEnemy, this, 1);
 			this.body.play('player.bop');
 		}

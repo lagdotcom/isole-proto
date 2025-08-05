@@ -25,7 +25,7 @@ import PlayerAttack from './PlayerAttack';
 
 const gLifetime: Milliseconds = 3000;
 const gChargeSpeed = 1;
-const gChargeRequired = 600;
+const gChargeRequired = 180;
 const gSpeed: Pixels = 0.5;
 
 const animations: AnimSpecMap = {
