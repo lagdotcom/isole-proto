@@ -53,10 +53,10 @@ import {
 } from '../tools';
 import ShootingReticle from './ShootingReticle';
 
-const gJumpAffectStrength = 0.15,
-	gJumpAffectTimer: ScaledTime = -10,
-	gJumpDoubleTimer: ScaledTime = -10,
-	gJumpStrength = 2,
+const gJumpAffectStrength = 0,
+	gJumpAffectTimer: ScaledTime = 0,
+	gJumpDoubleTimer: ScaledTime = 0,
+	gJumpStrength = 7,
 	gJumpTimer: ScaledTime = 8,
 	gLeapSpeed = 0.03,
 	gDodgeSpeed = 1.35,
