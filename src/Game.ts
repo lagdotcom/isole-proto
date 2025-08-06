@@ -124,6 +124,7 @@ export default class Game {
 	mapView: MapView;
 	materials: Record<MaterialName, Material>;
 	mode: GameMode;
+	mouseFire?: InputButton;
 	mousePosition: CoordXY;
 	mouseUpdate: boolean;
 	nodes: MapNode[];
@@ -184,6 +185,14 @@ export default class Game {
 		this.element.addEventListener('mousemove', e => {
 			this.mousePosition = { x: e.offsetX, y: e.offsetY };
 			this.mouseUpdate = true;
+		});
+		this.element.addEventListener('mousedown', e => {
+			if (e.buttons & 1) this.mouseFire = InputButton.AimFront;
+			else if (e.buttons & 2) this.mouseFire = InputButton.AimBack;
+			else this.mouseFire = undefined;
+		});
+		this.element.addEventListener('mouseup', () => {
+			this.mouseFire = undefined;
 		});
 
 		const context = this.element.getContext('2d');
@@ -437,6 +446,7 @@ export default class Game {
 			this.mouseUpdate = false;
 			this.keys.add(InputButton.AimAtMouse);
 		}
+		if (this.mouseFire) this.keys.add(this.mouseFire);
 		this.components.forEach(co => co.update?.(step));
 
 		if (this.redraw) {
