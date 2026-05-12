@@ -23,6 +23,7 @@ import spellCircleOuter from '../media/gfx/spell/outer.png';
 import bluegrassImg from '../media/gfx/tile/bluegrass.png';
 import grassImg from '../media/gfx/tile/grass.png';
 import greyboxImg from '../media/gfx/tile/greybox.png';
+import orangePlatImg from '../media/gfx/tile/orangeplat.png';
 import rwbgcanopyImg from '../media/gfx/tile/rwbgcanopy.png';
 import rwbgrocksImg from '../media/gfx/tile/rwbgrocks.png';
 import rwbgtreeImg from '../media/gfx/tile/rwbgtree.png';
@@ -47,6 +48,7 @@ import Game from './Game';
 import bluegrassMaterials from './material/bluegrass';
 import grassMaterials from './material/grass';
 import greyboxMaterials from './material/greybox';
+import orangeMaterials from './material/orange';
 import bluegrassObjects from './object/bluegrass';
 import Texture from './Texture';
 
@@ -198,6 +200,13 @@ export default function PreloadResources(game: Game) {
 
 	game.require('enemy.bat.punch', sound, batPunchSnd);
 
-	addMaterials(game, [grassMaterials, bluegrassMaterials, greyboxMaterials]);
+	game.require('tile.orangeplat', image, orangePlatImg);
+
+	addMaterials(game, [
+		grassMaterials,
+		bluegrassMaterials,
+		greyboxMaterials,
+		orangeMaterials,
+	]);
 	addObjects(game, [bluegrassObjects]);
 }
