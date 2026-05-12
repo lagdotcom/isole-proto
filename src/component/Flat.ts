@@ -12,7 +12,7 @@ import {
 } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
-import { getZ, gHitboxScale } from '../nums';
+import { getBack, getZ, gHitboxScale } from '../nums';
 import { draw3D } from '../rendering';
 import Texture from '../Texture';
 import { deg2rad, scaleWidth, wrapAngle } from '../tools';
@@ -111,6 +111,8 @@ export default class Flat implements DrawnComponent {
 	 * @param {CanvasRenderingContext2D} c image context
 	 */
 	draw(c: CanvasRenderingContext2D): void {
+		if (getBack(this.z)) return;
+
 		const { left, right, r, game, scale, sprite, width, z } = this;
 		const step = scaleWidth(scale, r, z),
 			rotation = scaleWidth(scale / 2, r, z);
@@ -127,7 +129,7 @@ export default class Flat implements DrawnComponent {
 				a = right - step;
 			}
 
-			draw3D(c, { a, r, z, game, sprite, rotation });
+			draw3D(c, { a, r, z, game, sprite, rotation, noadjust: true });
 
 			remaining -= step;
 			a += step;

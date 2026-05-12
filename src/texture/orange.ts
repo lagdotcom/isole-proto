@@ -7,7 +7,7 @@ const tcm =
 	(resource: ResourceName, tiles: TileDataMap, options?) => (game: Game) =>
 		new TileController(game.resources[resource], tiles, {
 			w: 32,
-			h: 112,
+			h: 160,
 			...options,
 		});
 

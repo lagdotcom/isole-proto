@@ -42,7 +42,7 @@ window.addEventListener('load', () => {
 		showDebug: true,
 		debugContainer: debug,
 		showFps: true,
-		showHitboxes: true,
+		// showHitboxes: true,
 	});
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	(window as any).G = G;

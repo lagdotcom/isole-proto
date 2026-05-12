@@ -11,7 +11,7 @@ import {
 } from '../flavours';
 import Game from '../Game';
 import { zStructure } from '../layers';
-import { getZ, gHitboxScale, gWallGap } from '../nums';
+import { getBack, getZ, gHitboxScale, gWallGap } from '../nums';
 import { draw3D } from '../rendering';
 import Texture from '../Texture';
 import { cart, deg2rad, scaleWidth, wrapAngle } from '../tools';
@@ -105,6 +105,8 @@ export default class Wall implements DrawnComponent {
 	}
 
 	drawLeft(c: CanvasRenderingContext2D): void {
+		if (getBack(this.z)) return;
+
 		const { a, t, b, z, game, scale, sprite } = this;
 		const step = sprite.h;
 
@@ -119,7 +121,7 @@ export default class Wall implements DrawnComponent {
 			}
 
 			const rotation = scaleWidth(scale / 2, r, z);
-			draw3D(c, { a, r, z, game, sprite, rotation });
+			draw3D(c, { a, r, z, game, sprite, rotation, noadjust: true });
 
 			remaining -= step;
 			r -= step;
@@ -128,6 +130,8 @@ export default class Wall implements DrawnComponent {
 	}
 
 	drawRight(c: CanvasRenderingContext2D): void {
+		if (getBack(this.z)) return;
+
 		const { a, t, b, z, game, scale, sprite } = this;
 		const step = sprite.h;
 
@@ -142,7 +146,7 @@ export default class Wall implements DrawnComponent {
 			}
 
 			const rotation = scaleWidth(scale / 2, r, z);
-			draw3D(c, { a, r, z, game, sprite, rotation });
+			draw3D(c, { a, r, z, game, sprite, rotation, noadjust: true });
 
 			remaining -= step;
 			r -= step;

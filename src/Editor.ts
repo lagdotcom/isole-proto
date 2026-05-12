@@ -60,21 +60,22 @@ const defaultData: EditorData = {
 	walls: [],
 	floors: [
 		{ h: 200, a: 0, w: 360, material: 'orangeplat' },
-		{ h: 200, a: 0, w: 360, material: 'orangeplat', back: true },
 		{ h: 500, a: 180, w: 15, motion: 2, material: 'orangeplat' },
 		{ h: 500, a: 0, w: 10, motion: 2, material: 'orangeplat' },
+		{ h: 500, a: 90, w: 10, motion: 2, material: 'orangeplat' },
+		{ h: 500, a: 270, w: 10, motion: 2, material: 'orangeplat' },
+
+		{ h: 200, a: 0, w: 360, material: 'orangeplat', back: true },
 		{
 			h: 500,
 			a: 180,
-			w: 10,
+			w: 15,
 			motion: 2,
 			material: 'orangeplat',
 			back: true,
 		},
 		{ h: 500, a: 0, w: 10, motion: 2, material: 'orangeplat', back: true },
-		{ h: 500, a: 90, w: 10, motion: 2, material: 'orangeplat' },
 		{ h: 500, a: 90, w: 10, motion: 2, material: 'orangeplat', back: true },
-		{ h: 500, a: 270, w: 10, motion: 2, material: 'orangeplat' },
 		{
 			h: 500,
 			a: 270,

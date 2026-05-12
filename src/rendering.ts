@@ -3,7 +3,15 @@ import CoordXY from './CoordXY';
 import { Multiplier, Pixels, Radians } from './flavours';
 import Game from './Game';
 import { gBackZ, gFrontZ } from './nums';
-import { cart, πHalf } from './tools';
+import { cart, lerp, πHalf } from './tools';
+
+const gFrontY = -120;
+const gBackY = -24;
+
+export function getROffsetByZ(z: Multiplier) {
+	const fraction = (z - gBackZ) * (1 / (gFrontZ - gBackZ));
+	return lerp(gBackY, gFrontY, fraction);
+}
 
 interface HasDrawFunction {
 	draw(c: CanvasRenderingContext2D): void;
@@ -13,15 +21,17 @@ type Draw3D = CoordARZ & {
 	game: Game;
 	sprite: HasDrawFunction;
 	rotation?: Radians;
+	noadjust?: boolean;
 };
 
 export function draw3D(
 	c: CanvasRenderingContext2D,
-	{ a, r, z, game, sprite, rotation = 0 }: Draw3D
+	{ a, r, z, game, sprite, rotation = 0, noadjust = false }: Draw3D
 ) {
 	const { cx, cy } = game;
 	const normal = a + πHalf + rotation;
-	const { x, y } = cart(a, r);
+	const rOffset = noadjust ? 0 : getROffsetByZ(z);
+	const { x, y } = cart(a, r + rOffset);
 
 	drawSprite(c, sprite, { cx, cy, x, y, z, normal });
 }

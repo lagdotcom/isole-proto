@@ -6,6 +6,7 @@ import DrawnComponent from './DrawnComponent';
 import { Degrees, Multiplier, Pixels, Radians } from './flavours';
 import Hitbox, { HitSize } from './Hitbox';
 import { gCollideZ, getZ, gFrontZ, gHitboxScale } from './nums';
+import { getROffsetByZ } from './rendering';
 
 export const π: Radians = Math.PI,
 	π2: Radians = π * 2,
@@ -255,7 +256,9 @@ export function displace(
 
 	if (flip) x = 0 - x;
 
-	return { a: a + scaleWidth(x, r + y, z), r: r + y, z };
+	const moveR = r + getROffsetByZ(z) + y;
+
+	return { a: a + scaleWidth(x, moveR, z), r: moveR, z };
 }
 
 /**
