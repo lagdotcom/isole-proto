@@ -369,7 +369,13 @@ export default class Game {
 	 */
 	makeCanvas(parent?: HTMLElement): HTMLCanvasElement {
 		const { width, height } = this.options;
-		return mel(parent, 'canvas', { width, height }) as HTMLCanvasElement;
+		const canvas = mel(parent, 'canvas', {
+			width,
+			height,
+		}) as HTMLCanvasElement;
+
+		canvas.addEventListener('contextmenu', e => e.preventDefault());
+		return canvas;
 	}
 
 	/**
